@@ -11,12 +11,12 @@
   --bg-elevated-primary: #2f2f2f;
   --bg-elevated-secondary: #1a1a1a;
   --bg-accent-static: #d0d0d0;
-  --bg-status-warning: #4a2206;
+  --bg-status-warning: #1f3327;
   --bg-status-error: #4d100e;
   --border-default: #ffffff26;
   --border-heavy: #ffffff33;
   --border-light: #ffffff14;
-  --border-status-warning: #4a2206;
+  --border-status-warning: #1f3327;
   --border-status-error: #4d100e;
   --text-primary: #ffffff;
   --text-secondary: #f0f0f0;
@@ -24,16 +24,16 @@
   --text-inverted: #0d0d0d;
   --text-inverted-static: #ffffff;
   --text-accent: #f5f5f5;
-  --text-status-warning: #ff9e6c;
-  --text-status-error: #ff8583;
+  --text-status-warning: #7fe3a3;
+  --text-status-error: #ff5f5f;
   --icon-primary: #e8e8e8;
   --icon-secondary: #cdcdcd;
   --icon-tertiary: #a3a3a3;
   --icon-inverted: #0d0d0d;
   --icon-inverted-static: #ffffff;
   --icon-accent: #f0f0f0;
-  --icon-status-warning: #ff9e6c;
-  --icon-status-error: #ff8583;
+  --icon-status-warning: #7fe3a3;
+  --icon-status-error: #ff5f5f;
   --interactive-bg-primary-default: #f4f4f4;
   --interactive-bg-primary-hover: #e8e8e8;
   --interactive-bg-primary-press: #dcdcdc;
@@ -49,13 +49,13 @@
   --interactive-bg-tertiary-press: #151515;
   --interactive-bg-tertiary-inactive: #2b2b2b;
   --interactive-bg-tertiary-selected: #2b2b2b;
-  --interactive-bg-accent-default: #f4f4f4;
-  --interactive-bg-accent-hover: #dedede;
-  --interactive-bg-accent-muted-hover: #3c3c3c;
-  --interactive-bg-accent-muted-context: #3c3c3c80;
-  --interactive-bg-accent-press: #cecece;
-  --interactive-bg-accent-muted-press: #424242;
-  --interactive-bg-accent-inactive: #f4f4f4;
+  --interactive-bg-accent-default: #1f3327;
+  --interactive-bg-accent-hover: #28463a;
+  --interactive-bg-accent-muted-hover: #28463a;
+  --interactive-bg-accent-muted-context: #28463a80;
+  --interactive-bg-accent-press: #1a2a21;
+  --interactive-bg-accent-muted-press: #1a2a21;
+  --interactive-bg-accent-inactive: #1f3327;
   --interactive-bg-danger-primary-default: #e02e2a;
   --interactive-bg-danger-primary-hover: #fa423e;
   --interactive-bg-danger-primary-press: #ba2623;
@@ -92,11 +92,11 @@
   --interactive-label-tertiary-press: #c3c3c3;
   --interactive-label-tertiary-inactive: #c3c3c3;
   --interactive-label-tertiary-selected: #c3c3c3;
-  --interactive-label-accent-default: #2b2b2b;
-  --interactive-label-accent-hover: #2b2b2b;
-  --interactive-label-accent-press: #2b2b2b;
-  --interactive-label-accent-inactive: #2b2b2b;
-  --interactive-label-accent-selected: #2b2b2b;
+  --interactive-label-accent-default: #7fe3a3;
+  --interactive-label-accent-hover: #7fe3a3;
+  --interactive-label-accent-press: #7fe3a3;
+  --interactive-label-accent-inactive: #7fe3a3;
+  --interactive-label-accent-selected: #7fe3a3;
   --interactive-label-danger-primary-default: #ffffff;
   --interactive-label-danger-primary-hover: #ffffff;
   --interactive-label-danger-primary-press: #ffffff;
@@ -120,11 +120,11 @@
   --interactive-icon-tertiary-press: #c3c3c3;
   --interactive-icon-tertiary-selected: #c3c3c3;
   --interactive-icon-tertiary-inactive: #c3c3c3;
-  --interactive-icon-accent-default: #2b2b2b;
-  --interactive-icon-accent-hover: #2b2b2b;
-  --interactive-icon-accent-press: #2b2b2b;
-  --interactive-icon-accent-selected: #2b2b2b;
-  --interactive-icon-accent-inactive: #2b2b2b;
+  --interactive-icon-accent-default: #7fe3a3;
+  --interactive-icon-accent-hover: #7fe3a3;
+  --interactive-icon-accent-press: #7fe3a3;
+  --interactive-icon-accent-selected: #7fe3a3;
+  --interactive-icon-accent-inactive: #7fe3a3;
   --interactive-icon-danger-primary-default: #ffffff;
   --interactive-icon-danger-primary-hover: #ffffff;
   --interactive-icon-danger-primary-press: #ffffff;
@@ -142,7 +142,7 @@
 
 body {
   margin: 0;
-  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-roboto), "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -177,28 +177,22 @@ main {
 }
 
 .font-display {
-  font-family: var(--font-orbitron), "Inter", system-ui, sans-serif;
-  letter-spacing: 0.08em;
+  font-family: var(--font-roboto), "Roboto", system-ui, sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
+
 
 .section-shell {
   position: relative;
-  border-radius: 40px;
+  border-radius: 36px;
   border: 1px solid var(--border-default);
   background-color: var(--bg-elevated-primary);
-  box-shadow: 0 32px 120px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-}
-
-.section-shell > * {
-  position: relative;
-  z-index: 1;
 }
 
 .glass-panel {
-  backdrop-filter: blur(12px);
-  background: rgba(47, 47, 47, 0.8);
-  border-radius: 32px;
+  background-color: var(--bg-secondary);
+  border-radius: 28px;
   border: 1px solid var(--border-light);
 }
 
@@ -212,8 +206,8 @@ main {
   text-transform: uppercase;
   border-radius: 9999px;
   border: 1px solid var(--border-default);
-  color: var(--text-inverted);
-  background: rgba(245, 245, 245, 0.85);
+  color: var(--text-status-warning);
+  background: var(--bg-status-warning);
 }
 
 .grid-card {
@@ -221,19 +215,18 @@ main {
   border-radius: 28px;
   padding: 2rem;
   border: 1px solid var(--border-light);
-  background: rgba(43, 43, 43, 0.85);
-  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  background: var(--bg-elevated-primary);
+  transition: transform 0.4s ease, border-color 0.4s ease;
 }
 
 .grid-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   border-color: var(--border-default);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
 .gradient-divider {
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: var(--border-light);
   border: none;
 }
 

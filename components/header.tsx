@@ -1,8 +1,9 @@
 "use client";
 
-import { Menu, UserRound } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, ChevronRight, Menu, UserRound } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MegaMenu } from "./mega-menu";
 
 type NavigationItem = {
@@ -23,6 +24,23 @@ type NavigationSection = {
   items: NavigationItem[];
 };
 
+type SecondaryPanelItem = {
+  title: string;
+  description: string;
+  href: string;
+  tone?: "positive" | "critical";
+  meta?: string;
+};
+
+type SecondaryPanelGroup = {
+  title: string;
+  items: SecondaryPanelItem[];
+};
+
+type TopNavItem =
+  | { id: string; label: string; type: "mega" | "secondary" }
+  | { id: string; label: string; type: "anchor"; href: string };
+
 const NAVIGATION: NavigationSection[] = [
   {
     id: "ai",
@@ -36,7 +54,8 @@ const NAVIGATION: NavigationSection[] = [
         href: "/ai/atlas",
         badge: "beta",
         focus: "Autonomous research fleets",
-        preview: "Atlas coordinates thousands of model collectives to design, debate, and execute missions without human latency.",
+        preview:
+          "Atlas coordinates thousands of model collectives to design, debate, and execute missions without human latency.",
         metrics: ["Agent mesh", "Alignment core", "Mission studio"]
       },
       {
@@ -44,7 +63,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Multimodal models for neuromorphic biology and synthetic matter.",
         href: "/ai/helios",
         focus: "Bio-systems cognition",
-        preview: "Helios blends biological data, materials research, and orbital telemetry to build living intelligence blueprints.",
+        preview:
+          "Helios blends biological data, materials research, and orbital telemetry to build living intelligence blueprints.",
         metrics: ["Bio-compute", "Adaptive memory", "Compliance"]
       },
       {
@@ -52,7 +72,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Collaborative workspace for training and validating AI teams in real time.",
         href: "/ai/aidev-mesh",
         focus: "Coordinated development",
-        preview: "AIDev Mesh provides a secure arena for multi-tenant agents, with review boards, deployment locks, and provenance logs.",
+        preview:
+          "AIDev Mesh provides a secure arena for multi-tenant agents, with review boards, deployment locks, and provenance logs.",
         metrics: ["Version spine", "Secure sandbox", "Telemetry"]
       }
     ]
@@ -69,7 +90,8 @@ const NAVIGATION: NavigationSection[] = [
         href: "/network/nova-proxy",
         badge: "new",
         focus: "Open relay fabric",
-        preview: "NOVA wraps every request in rotating identities, while maintaining observability for enterprise audits.",
+        preview:
+          "NOVA wraps every request in rotating identities, while maintaining observability for enterprise audits.",
         metrics: ["<3ms latency", "Global PoPs", "Open SDK"]
       },
       {
@@ -77,7 +99,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Deterministic edge compute for cities, labs, and low-earth orbit.",
         href: "/network/edge-grid",
         focus: "Sovereign edge cloud",
-        preview: "EdgeGrid pairs quantum key distribution with deterministic scheduling to secure mission-critical workloads.",
+        preview:
+          "EdgeGrid pairs quantum key distribution with deterministic scheduling to secure mission-critical workloads.",
         metrics: ["Deterministic", "PQ secure", "Operator console"]
       },
       {
@@ -85,7 +108,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Self-organizing network for robots, implants, and autonomous habitats.",
         href: "/network/synapse-mesh",
         focus: "Cyber-biological link",
-        preview: "Synapse Mesh streams neural telemetry to implants and prosthetics with adaptive bandwidth shaping.",
+        preview:
+          "Synapse Mesh streams neural telemetry to implants and prosthetics with adaptive bandwidth shaping.",
         metrics: ["Neural QoS", "Mesh governance", "Edge AI"]
       }
     ]
@@ -101,7 +125,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Programmable economy for physical networks and autonomy fleets.",
         href: "/crypto/depin",
         focus: "Economy control plane",
-        preview: "Govern thousands of edge devices with composite DAOs, revenue splits, and automated compliance.",
+        preview:
+          "Govern thousands of edge devices with composite DAOs, revenue splits, and automated compliance.",
         metrics: ["DAO mesh", "Revenue share", "Telemetry"]
       },
       {
@@ -109,7 +134,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Custodial vault with PQC key orchestration for AI and biomedical assets.",
         href: "/crypto/vault",
         focus: "Secure key fabric",
-        preview: "Vault orchestrates lattice-based cryptography for models, neural data, and diplomatic archives.",
+        preview:
+          "Vault orchestrates lattice-based cryptography for models, neural data, and diplomatic archives.",
         metrics: ["PQC", "Key rotation", "Hardware enclaves"]
       },
       {
@@ -117,7 +143,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Digital identity and governance rails for critical infrastructure.",
         href: "/crypto/consensus",
         focus: "Institutional trust",
-        preview: "Consensus Fabric issues verifiable credentials and notarizes every machine decision across jurisdictions.",
+        preview:
+          "Consensus Fabric issues verifiable credentials and notarizes every machine decision across jurisdictions.",
         metrics: ["Identity", "Audit", "Policy"]
       }
     ]
@@ -133,7 +160,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Brain-computer interfaces with adaptive neurovascular architecture.",
         href: "/bio/neuro-weave",
         focus: "Consciousness continuity",
-        preview: "NeuroWeave maps neural rhythms into digital twins while delivering haptic feedback across the nervous system.",
+        preview:
+          "NeuroWeave maps neural rhythms into digital twins while delivering haptic feedback across the nervous system.",
         metrics: ["Neural mesh", "Bio feedback", "Clinical ops"]
       },
       {
@@ -141,7 +169,8 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Longevity, regeneration, and cellular reprogramming initiatives.",
         href: "/bio/vitality-labs",
         focus: "Regenerative biology",
-        preview: "Vitality Labs fuses gene editing, synthetic organs, and AI diagnostics to extend human capability.",
+        preview:
+          "Vitality Labs fuses gene editing, synthetic organs, and AI diagnostics to extend human capability.",
         metrics: ["Regeneration", "Biofoundry", "Clinical trials"]
       },
       {
@@ -149,86 +178,302 @@ const NAVIGATION: NavigationSection[] = [
         summary: "Bionic prosthetics with neural control and sensory feedback.",
         href: "/bio/adaptive-prosthetics",
         focus: "Responsive mobility",
-        preview: "Adaptive Prosthetics translate neural intentions into motion with sub-sensory latency and learning loops.",
+        preview:
+          "Adaptive Prosthetics translate neural intentions into motion with sub-sensory latency and learning loops.",
         metrics: ["Motor control", "Sensory", "Custom fit"]
       }
     ]
   }
 ];
 
-export function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+const SECONDARY_MENUS: Record<string, SecondaryPanelGroup[]> = {
+  research: [
+    {
+      title: "Research streams",
+      items: [
+        {
+          title: "Immortality Initiative",
+          description: "Long-horizon trials for consciousness continuity and regenerative medicine.",
+          href: "/research/immortality",
+          tone: "positive"
+        },
+        {
+          title: "Cybernetic BioLabs",
+          description: "Implants, neural recording, and adaptive prosthetics with live telemetry.",
+          href: "/research/cybernetic-biolabs"
+        },
+        {
+          title: "Containment Protocols",
+          description: "Risk management for autonomous agents, pathogens, and synthetic organisms.",
+          href: "/research/containment",
+          tone: "critical"
+        }
+      ]
+    },
+    {
+      title: "Briefings",
+      items: [
+        {
+          title: "Mission Atlas",
+          description: "Weekly directives for autonomous exploration squads across orbit and deep sea.",
+          href: "/briefs/mission-atlas"
+        },
+        {
+          title: "NeuroWeave Clinical",
+          description: "Regulatory dashboards, compliance notes, and neural feedback scoring.",
+          href: "/briefs/neuro-clinical",
+          tone: "critical"
+        },
+        {
+          title: "Synthesis Insights",
+          description: "Highlights from material science labs, robotics foundries, and quantum comms.",
+          href: "/briefs/synthesis",
+          tone: "positive"
+        }
+      ]
+    }
+  ],
+  access: [
+    {
+      title: "Access tiers",
+      items: [
+        {
+          title: "Open Research",
+          description: "Atlas playgrounds, NOVA proxy, and transparency reports.",
+          href: "/access/open",
+          tone: "positive"
+        },
+        {
+          title: "Strategic Alliance",
+          description: "DePIN orchestration, robotics missions, and sovereign regions onboarding.",
+          href: "/access/strategic"
+        },
+        {
+          title: "Sovereign Command",
+          description: "Joint labs, quantum cryptography, and mission governance audits.",
+          href: "/access/sovereign",
+          tone: "critical"
+        }
+      ]
+    },
+    {
+      title: "Credential fabric",
+      items: [
+        {
+          title: "Aeterna Pass",
+          description: "Unified biometric credential to traverse AI, biotech, and orbital facilities.",
+          href: "/platform/pass"
+        },
+        {
+          title: "Audit console",
+          description: "Live compliance scoring, behavioral analytics, and anomaly response.",
+          href: "/platform/audit",
+          tone: "critical"
+        },
+        {
+          title: "Partner onboarding",
+          description: "Secure exchange for governments, enterprises, and universities.",
+          href: "/partners/onboarding",
+          tone: "positive"
+        }
+      ]
+    }
+  ],
+  company: [
+    {
+      title: "About Aeterna",
+      items: [
+        {
+          title: "Corporate Manifesto",
+          description: "Our doctrine for synchronizing intelligence, biology, and infrastructure.",
+          href: "/company/manifesto",
+          tone: "positive"
+        },
+        {
+          title: "Ethics & Governance",
+          description: "Alignment frameworks, containment councils, and escalation paths.",
+          href: "/company/governance",
+          tone: "critical"
+        },
+        {
+          title: "Leadership",
+          description: "Global executives guiding AI, biotech, cryptography, and orbital missions.",
+          href: "/company/leadership"
+        }
+      ]
+    },
+    {
+      title: "Careers & missions",
+      items: [
+        {
+          title: "Mission briefs",
+          description: "Live openings for intelligence architects, bioengineers, and roboticists.",
+          href: "/careers/missions"
+        },
+        {
+          title: "Fellowships",
+          description: "Invite-only residencies across quantum security and regenerative science.",
+          href: "/careers/fellowships",
+          tone: "positive"
+        },
+        {
+          title: "Security clearance",
+          description: "Red and black clearance procedures for sensitive facilities.",
+          href: "/careers/security",
+          tone: "critical"
+        }
+      ]
+    }
+  ]
+};
 
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    handler();
-    window.addEventListener("scroll", handler);
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
+const TOP_NAV: TopNavItem[] = [
+  { id: "ecosystem", label: "Ecosystem", type: "mega" },
+  { id: "research", label: "Research & Labs", type: "secondary" },
+  { id: "access", label: "Access", type: "secondary" },
+  { id: "company", label: "Company", type: "secondary" },
+  { id: "programs", label: "Programs", type: "anchor", href: "#programs" },
+  { id: "insights", label: "Insights", type: "anchor", href: "#insights" }
+];
+
+export function Header() {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+  const closeMenus = () => setOpenMenu(null);
+
+  const toggleMenu = (id: string) => {
+    setOpenMenu((current) => (current === id ? null : id));
+  };
 
   return (
-    <header
-      className="sticky top-0 z-50 flex w-full items-center justify-between border-b border-transparent px-8 py-4 transition-all duration-500"
-      style={{
-        background: scrolled ? "rgba(26,26,26,0.95)" : "rgba(26,26,26,0.7)",
-        backdropFilter: "blur(14px)",
-        borderColor: scrolled ? "var(--border-default)" : "transparent"
-      }}
-    >
-      <div className="flex items-center gap-10">
+    <header className="sticky top-0 z-50 border-b border-[var(--border-default)] bg-[var(--bg-primary)]">
+      <div className="mx-auto flex w-full max-w-[1200px] items-center gap-8 px-8 py-4">
         <Link href="/" className="flex items-center gap-3 text-lg font-semibold tracking-wider">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] font-display text-base uppercase text-[var(--text-inverted)]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] font-display text-sm text-[var(--text-status-warning)]">
             AT
           </span>
-          <span className="font-display text-xl uppercase tracking-[0.24em] text-[var(--text-secondary)]">
+          <span className="font-display text-sm tracking-[0.32em] text-[var(--text-secondary)]">
             Aeterna Technology
           </span>
         </Link>
-        <nav className="hidden gap-6 lg:flex">
+        <div
+          className="relative hidden flex-1 items-center justify-center lg:flex"
+          onMouseLeave={closeMenus}
+        >
+          <nav className="flex items-center gap-6">
+            {TOP_NAV.map((item) => {
+              if (item.type === "anchor") {
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href as any}
+                    className="text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                    onFocus={closeMenus}
+                    onMouseEnter={closeMenus}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              }
+
+              const isOpen = openMenu === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+                    isOpen
+                      ? "bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  }`}
+                  onClick={() => toggleMenu(item.id)}
+                  onMouseEnter={() => setOpenMenu(item.id)}
+                  onFocus={() => setOpenMenu(item.id)}
+                  aria-expanded={isOpen}
+                >
+                  {item.label}
+                  <ChevronDown
+                    className={`h-4 w-4 transition ${
+                      isOpen ? "text-[var(--text-status-warning)]" : "text-[var(--icon-tertiary)]"
+                    }`}
+                  />
+                </button>
+              );
+            })}
+          </nav>
+          <MegaMenu open={openMenu === "ecosystem"} sections={NAVIGATION} />
+          <SecondaryMenu open={openMenu === "research"} groups={SECONDARY_MENUS.research} />
+          <SecondaryMenu open={openMenu === "access"} groups={SECONDARY_MENUS.access} />
+          <SecondaryMenu open={openMenu === "company"} groups={SECONDARY_MENUS.company} />
+        </div>
+        <div className="flex items-center gap-3">
+          <Link
+            href={"/platform/login" as any}
+            className="hidden items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
+          >
+            <UserRound className="h-4 w-4 text-[var(--icon-secondary)]" />
+            Sign in
+          </Link>
           <button
             type="button"
-            onMouseEnter={() => setMenuOpen(true)}
-            onFocus={() => setMenuOpen(true)}
-            className="relative text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)] lg:hidden"
+            aria-label="Open navigation"
+            aria-expanded="false"
           >
-            Ecosystem
+            <Menu className="h-5 w-5" />
           </button>
-          <a className="text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]" href="#programs">
-            Programs
-          </a>
-          <a className="text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]" href="#insights">
-            Research
-          </a>
-          <a className="text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]" href="#access">
-            Access
-          </a>
-        </nav>
-      </div>
-      <div className="flex items-center gap-4">
-        <Link
-          href={"/platform/login" as any}
-          className="hidden items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-secondary-default)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--interactive-bg-secondary-hover)] lg:flex"
-        >
-          <UserRound className="h-4 w-4 text-[var(--icon-secondary)]" />
-          Sign in
-        </Link>
-        <button
-          type="button"
-          onClick={() => setMenuOpen((prev) => !prev)}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)]/70 text-[var(--icon-secondary)] transition hover:border-[var(--border-heavy)] hover:text-[var(--text-primary)] lg:hidden"
-          aria-label="Toggle menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-      </div>
-      <div
-        className="hidden lg:block"
-        onMouseEnter={() => setMenuOpen(true)}
-        onMouseLeave={() => setMenuOpen(false)}
-      >
-        <MegaMenu open={menuOpen} sections={NAVIGATION} />
+        </div>
       </div>
     </header>
   );
 }
+
+function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanelGroup[] }) {
+  return (
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.2 }}
+          className="absolute left-0 top-full z-40 w-full border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]"
+        >
+          <div className="mx-auto grid w-full max-w-[1200px] gap-10 px-12 py-10 md:grid-cols-2">
+            {groups.map((group) => (
+              <div key={group.title} className="space-y-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{group.title}</p>
+                <ul className="space-y-3">
+                  {group.items.map((item) => {
+                    const toneClass =
+                      item.tone === "positive"
+                        ? "text-[var(--text-status-warning)]"
+                        : item.tone === "critical"
+                          ? "text-[var(--text-status-error)]"
+                          : "text-[var(--text-primary)]";
+
+                    return (
+                      <li key={item.title}>
+                        <Link
+                          href={item.href as any}
+                          className="group flex items-start justify-between gap-4 rounded-2xl border border-transparent bg-[var(--bg-secondary)] px-4 py-3 transition hover:border-[var(--border-default)]"
+                        >
+                          <div className="space-y-1">
+                            <p className={`text-sm font-semibold ${toneClass}`}>{item.title}</p>
+                            <p className="text-xs leading-relaxed text-[var(--text-secondary)]">{item.description}</p>
+                          </div>
+                          <ChevronRight className="mt-1 h-4 w-4 text-[var(--icon-tertiary)] transition group-hover:translate-x-1" />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}
+

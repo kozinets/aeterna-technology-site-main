@@ -16,8 +16,8 @@ const categories = [
       { label: "Helios docs", href: "/ai/helios/docs" }
     ],
     metrics: [
-      { label: "Exascale", value: "Compute" },
-      { label: "Multi-Agent", value: "Collaboration" }
+      { label: "Exascale", value: "Compute", tone: "positive" as const },
+      { label: "Multi-Agent", value: "Collaboration", tone: "critical" as const }
     ]
   },
   {
@@ -31,8 +31,8 @@ const categories = [
       { label: "EdgeGrid", href: "/network/edge-grid" }
     ],
     metrics: [
-      { label: "<3ms", value: "Latency" },
-      { label: "Orbital", value: "Coverage" }
+      { label: "<3ms", value: "Latency", tone: "positive" as const },
+      { label: "Orbital", value: "Coverage", tone: "positive" as const }
     ]
   },
   {
@@ -46,8 +46,8 @@ const categories = [
       { label: "Vitality Labs", href: "/bio/vitality-labs" }
     ],
     metrics: [
-      { label: "FDA+EU", value: "Compliance" },
-      { label: "SentiMesh", value: "Feedback" }
+      { label: "FDA+EU", value: "Compliance", tone: "critical" as const },
+      { label: "SentiMesh", value: "Feedback", tone: "positive" as const }
     ]
   },
   {
@@ -61,8 +61,8 @@ const categories = [
       { label: "Synthesis Lab", href: "/robots/synthesis" }
     ],
     metrics: [
-      { label: "500+", value: "Fleet" },
-      { label: "99.97%", value: "Uptime" }
+      { label: "500+", value: "Fleet", tone: "positive" as const },
+      { label: "99.97%", value: "Uptime", tone: "positive" as const }
     ]
   },
   {
@@ -76,8 +76,8 @@ const categories = [
       { label: "Consensus Fabric", href: "/crypto/consensus" }
     ],
     metrics: [
-      { label: "PQ-ready", value: "Encryption" },
-      { label: "Tier-0", value: "Recovery" }
+      { label: "PQ-ready", value: "Encryption", tone: "critical" as const },
+      { label: "Tier-0", value: "Recovery", tone: "positive" as const }
     ]
   },
   {
@@ -91,8 +91,8 @@ const categories = [
       { label: "Aeterna Pass", href: "/platform/pass" }
     ],
     metrics: [
-      { label: "42", value: "Nations" },
-      { label: "NeuroOps", value: "Interface" }
+      { label: "42", value: "Nations", tone: "positive" as const },
+      { label: "NeuroOps", value: "Interface", tone: "critical" as const }
     ]
   }
 ];
@@ -104,7 +104,7 @@ export function Programs() {
         <div className="space-y-3">
           <span className="badge">Portfolio atlas</span>
           <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-            Every Aeterna product strengthens the wider architecture.
+            Every Aeterna product strengthens the <span className="text-[var(--text-status-warning)]">wider architecture</span>.
           </h2>
           <p className="max-w-3xl text-base text-[var(--text-secondary)]">
             We design technologies that compound: intelligence trains implants, networks fortify labs, and cryptography establishes trust among autonomous agents.
@@ -112,7 +112,7 @@ export function Programs() {
         </div>
         <Link
           href={"/catalog" as any}
-          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-secondary-default)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--interactive-bg-secondary-hover)]"
+          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
         >
           Full catalog
         </Link>
@@ -129,13 +129,24 @@ export function Programs() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <category.icon className="h-6 w-6 text-[var(--icon-accent)]" />
+                <category.icon className="h-6 w-6 text-[var(--icon-secondary)]" />
                 <span className="text-sm uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{category.title}</span>
               </div>
               <div className="flex gap-3 text-xs text-[var(--text-tertiary)]">
                 {category.metrics.map((metric) => (
                   <span key={metric.label} className="rounded-full border border-[var(--border-light)] px-3 py-1">
-                    <strong className="font-semibold text-[var(--text-primary)]">{metric.label}</strong> {metric.value}
+                    <strong
+                      className={`font-semibold ${
+                        metric.tone === "positive"
+                          ? "text-[var(--text-status-warning)]"
+                          : metric.tone === "critical"
+                            ? "text-[var(--text-status-error)]"
+                            : "text-[var(--text-primary)]"
+                      }`}
+                    >
+                      {metric.label}
+                    </strong>{" "}
+                    {metric.value}
                   </span>
                 ))}
               </div>
@@ -149,8 +160,8 @@ export function Programs() {
                   href={action.href as any}
                   className={`inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition ${
                     action.accent
-                      ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-inverted)] hover:bg-[var(--interactive-bg-accent-hover)]"
-                      : "bg-[var(--interactive-bg-secondary-default)] text-[var(--text-secondary)] hover:bg-[var(--interactive-bg-secondary-hover)]"
+                      ? "bg-[var(--interactive-bg-accent-default)] text-[var(--interactive-label-accent-default)] hover:bg-[var(--interactive-bg-accent-hover)]"
+                      : "bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   {action.label}

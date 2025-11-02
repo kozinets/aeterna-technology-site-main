@@ -10,7 +10,8 @@ const featureStories = [
     description:
       "Synchronize AI models, robotics fleets, implants, and data infrastructure through one orchestrated console.",
     action: "Review mission brief",
-    href: "/missions/continuum"
+    href: "/missions/continuum",
+    tone: "positive" as const
   },
   {
     tag: "Update",
@@ -24,28 +25,38 @@ const featureStories = [
     title: "NeuroWeave immortality trials",
     description: "Clinical-stage implants preserving consciousness continuity with regenerative support.",
     action: "Read research",
-    href: "/insights/neurobionic-immortality"
+    href: "/insights/neurobionic-immortality",
+    tone: "critical" as const
   }
 ];
 
 const missionThreads = [
   {
     title: "Atlas agents draft orbital biosphere",
-    detail: "Multi-agent teams design autonomous orbital habitats with regenerative loops." 
+    detail: "Multi-agent teams design autonomous orbital habitats with regenerative loops.",
+    tone: "positive" as const
   },
   {
     title: "EdgeGrid expands to 42 cities",
-    detail: "Deterministic edge compute arrives in new sovereign corridors across three continents." 
+    detail: "Deterministic edge compute arrives in new sovereign corridors across three continents.",
+    tone: "positive" as const
   },
   {
     title: "Aeterna Pass v3",
-    detail: "Unified biometric credential for accessing AI, biotech, and security facilities." 
+    detail: "Unified biometric credential for accessing AI, biotech, and security facilities.",
+    tone: "critical" as const
   }
+];
+
+const heroMetrics = [
+  { label: "138 labs", caption: "Operational today", tone: "positive" as const },
+  { label: "24/7 neuro-ops", caption: "Global coverage", tone: "critical" as const },
+  { label: ">480 products", caption: "Continuously updated", tone: "positive" as const }
 ];
 
 export function Hero() {
   return (
-    <section className="mx-auto mt-6 flex max-w-[1200px] flex-col gap-12 rounded-[48px] border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]/90 px-10 pb-16 pt-14 shadow-[0_32px_140px_rgba(0,0,0,0.45)]">
+    <section className="mx-auto mt-6 flex max-w-[1200px] flex-col gap-12 rounded-[48px] border border-[var(--border-default)] bg-[var(--bg-elevated-primary)] px-10 pb-16 pt-14">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -56,22 +67,47 @@ export function Hero() {
           <div className="space-y-4">
             <span className="badge">Corporate intelligence</span>
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-[var(--text-primary)] md:text-6xl">
-              What mission can Aeterna accelerate for your civilization?
+              What mission can Aeterna <span className="text-[var(--text-status-warning)]">accelerate</span> for your
+              <span className="text-[var(--text-status-error)]"> civilization?</span>
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
               Aeterna Technology integrates artificial intelligence, neuroengineering, cryptography, robotics, and orbital systems to create one continuous corporate infrastructure. Everything is synchronized, audited, and mission-driven.
             </p>
           </div>
           <div className="space-y-4">
-            <label className="flex items-center justify-between rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] px-6 py-4 text-sm text-[var(--text-tertiary)]">
-              <span>Search products, labs, missions, or briefs</span>
-              <ArrowRight className="h-4 w-4" />
-            </label>
+            <form
+              className="flex items-center gap-4 rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] px-6 py-4 text-sm text-[var(--text-tertiary)]"
+              onSubmit={(event) => event.preventDefault()}
+            >
+              <input
+                type="search"
+                placeholder="Search products, labs, missions, or briefs"
+                className="flex-1 border-none bg-transparent text-base text-[var(--text-secondary)] placeholder:text-[var(--text-tertiary)] focus:outline-none"
+                aria-label="Search products, labs, missions, or briefs"
+              />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-4 py-2 text-sm font-medium text-[var(--interactive-label-accent-default)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+              >
+                Launch query
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
             <div className="grid gap-4 sm:grid-cols-3">
-              {["138 labs", "24/7 neuro-ops", ">480 products"].map((metric) => (
-                <div key={metric} className="rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/80 px-4 py-4">
-                  <p className="text-sm font-medium text-[var(--text-primary)]">{metric}</p>
-                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">Active today</p>
+              {heroMetrics.map((metric) => (
+                <div key={metric.label} className="rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)] px-4 py-4">
+                  <p
+                    className={`text-sm font-semibold ${
+                      metric.tone === "positive"
+                        ? "text-[var(--text-status-warning)]"
+                        : metric.tone === "critical"
+                          ? "text-[var(--text-status-error)]"
+                          : "text-[var(--text-primary)]"
+                    }`}
+                  >
+                    {metric.label}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">{metric.caption}</p>
                 </div>
               ))}
             </div>
@@ -84,9 +120,19 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
-              className="flex flex-col gap-3 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/85 p-6"
+              className="flex flex-col gap-3 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)] p-6"
             >
-              <span className="text-[10px] uppercase tracking-[0.28em] text-[var(--text-tertiary)]">{story.tag}</span>
+              <span
+                className={`text-[10px] uppercase tracking-[0.28em] ${
+                  story.tone === "positive"
+                    ? "text-[var(--text-status-warning)]"
+                    : story.tone === "critical"
+                      ? "text-[var(--text-status-error)]"
+                      : "text-[var(--text-tertiary)]"
+                }`}
+              >
+                {story.tag}
+              </span>
               <h2 className="text-xl font-semibold text-[var(--text-primary)]">{story.title}</h2>
               <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{story.description}</p>
               <a
@@ -109,7 +155,7 @@ export function Hero() {
       >
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
-          className="flex flex-col gap-4 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/85 p-8"
+          className="flex flex-col gap-4 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)] p-8"
         >
           <div className="flex items-center gap-3">
             <Sparkles className="h-5 w-5 text-[var(--icon-secondary)]" />
@@ -117,8 +163,18 @@ export function Hero() {
           </div>
           <ul className="space-y-4">
             {missionThreads.map((thread) => (
-              <li key={thread.title} className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-tertiary)]/60 p-4">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{thread.title}</p>
+              <li key={thread.title} className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-tertiary)] p-4">
+                <p
+                  className={`text-sm font-semibold ${
+                    thread.tone === "positive"
+                      ? "text-[var(--text-status-warning)]"
+                      : thread.tone === "critical"
+                        ? "text-[var(--text-status-error)]"
+                        : "text-[var(--text-primary)]"
+                  }`}
+                >
+                  {thread.title}
+                </p>
                 <p className="mt-1 text-xs text-[var(--text-tertiary)]">{thread.detail}</p>
               </li>
             ))}
@@ -126,7 +182,7 @@ export function Hero() {
         </motion.div>
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
-          className="flex flex-col justify-between gap-6 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/85 p-8"
+          className="flex flex-col justify-between gap-6 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)] p-8"
         >
           <div className="space-y-3">
             <span className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Security posture</span>
@@ -144,7 +200,7 @@ export function Hero() {
           </div>
           <a
             href="#access"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-5 py-3 text-sm font-medium text-[var(--text-inverted)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-5 py-3 text-sm font-medium text-[var(--interactive-label-accent-default)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
           >
             Request authorization
             <Shield className="h-4 w-4" />
@@ -154,3 +210,4 @@ export function Hero() {
     </section>
   );
 }
+

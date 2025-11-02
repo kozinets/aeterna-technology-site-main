@@ -59,9 +59,9 @@ export function MegaMenu({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.2 }}
-          className="absolute left-1/2 top-full z-40 mt-6 w-[min(1200px,90vw)] -translate-x-1/2 overflow-hidden rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]/95 backdrop-blur-xl shadow-[0_40px_140px_rgba(0,0,0,0.45)]"
+          className="absolute left-0 top-full z-40 w-full border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]"
         >
-          <div className="grid gap-10 px-12 py-10 lg:grid-cols-[220px_1fr_320px]">
+          <div className="mx-auto grid w-full max-w-[1200px] gap-10 px-12 py-10 lg:grid-cols-[220px_1fr_320px]">
             <div className="space-y-4 border-r border-[var(--border-light)] pr-6">
               <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Divisions</p>
               <ul className="space-y-2">
@@ -97,7 +97,7 @@ export function MegaMenu({
                   <li key={item.title}>
                     <Link
                       href={item.href as any}
-                      className="group flex items-center justify-between gap-3 rounded-2xl border border-transparent bg-[var(--bg-secondary)]/40 px-4 py-3 transition hover:border-[var(--border-default)] hover:bg-[var(--bg-secondary)]"
+                      className="group flex items-center justify-between gap-3 rounded-2xl border border-transparent bg-[var(--bg-secondary)] px-4 py-3 transition hover:border-[var(--border-default)]"
                       onMouseEnter={() => setActiveItem(item)}
                       onFocus={() => setActiveItem(item)}
                     >
@@ -107,7 +107,7 @@ export function MegaMenu({
                       </div>
                       <div className="flex items-center gap-2">
                         {item.badge ? (
-                          <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-tertiary)] px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-[var(--text-inverted)]">
+                          <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-tertiary)] px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-[var(--text-primary)]">
                             {item.badge}
                           </span>
                         ) : null}
@@ -125,7 +125,7 @@ export function MegaMenu({
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </div>
-            <aside className="flex flex-col gap-5 rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-secondary)]/80 p-6">
+            <aside className="flex flex-col gap-5 rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-secondary)] p-6">
               {activeItem ? (
                 <div className="space-y-4">
                   <div className="space-y-1">
@@ -143,7 +143,7 @@ export function MegaMenu({
                   </ul>
                   <Link
                     href={activeItem.href as any}
-                    className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-4 py-2 text-xs font-medium text-[var(--text-inverted)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+                    className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-4 py-2 text-xs font-medium text-[var(--interactive-label-accent-default)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
                   >
                     Launch program
                     <ArrowUpRight className="h-4 w-4" />

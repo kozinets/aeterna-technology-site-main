@@ -20,7 +20,7 @@ npm run lint    # static analysis with ESLint
 
 ## Design Highlights
 
-- Implements the provided dark neon palette with layered gradients and motion accents.
+- Implements the mandated grayscale corporate palette with solid layering and motion accents.
 - Mega navigation, animated hero sections, and modular content grids highlight the breadth of Aeterna Technology's portfolio.
 - Access tiers, research highlights, and partnership messaging emphasize enterprise readiness and gated experiences.
 

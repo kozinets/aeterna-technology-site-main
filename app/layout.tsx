@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-orbitron" });
+const roboto = Roboto({ subsets: ["latin"], variable: "--font-roboto", weight: ["300", "400", "500", "700"] });
 
 export const metadata: Metadata = {
   title: "Aeterna Technology",
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${orbitron.variable}`}>{children}</body>
+      <body className={roboto.variable}>{children}</body>
     </html>
   );
 }

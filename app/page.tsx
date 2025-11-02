@@ -34,39 +34,43 @@ const ecosystemNodes = [
 ];
 
 const campusStats = [
-  { icon: Cpu, label: "Sentient Cloud", value: "Exascale compute" },
-  { icon: Sparkles, label: "Neural Lattice", value: "Self-learning agents" },
-  { icon: Radar, label: "Aeterna Link", value: "Instant exchange" }
+  { icon: Cpu, label: "Sentient Cloud", value: "Exascale compute", tone: "positive" as const },
+  { icon: Sparkles, label: "Neural Lattice", value: "Self-learning agents", tone: "positive" as const },
+  { icon: Radar, label: "Aeterna Link", value: "Instant exchange", tone: "critical" as const }
 ];
 
 const alliances = [
   {
     icon: Building2,
     title: "Governments",
-    text: "Sovereign clouds, digital twins, and longevity initiatives for national leaders."
+    text: "Sovereign clouds, digital twins, and longevity initiatives for national leaders.",
+    tone: "critical" as const
   },
   {
     icon: Workflow,
     title: "Enterprises",
-    text: "Autonomous production, cybernetic factories, and cognitive operations."
+    text: "Autonomous production, cybernetic factories, and cognitive operations.",
+    tone: "positive" as const
   },
   {
     icon: FlaskConical,
     title: "Universities",
-    text: "Joint research programs, data exchanges, and accelerated discoveries."
+    text: "Joint research programs, data exchanges, and accelerated discoveries.",
+    tone: "positive" as const
   },
   {
     icon: Orbit,
     title: "Orbital missions",
-    text: "Satellites, stations, and drones governed by Atlas Command and Sentient Cloud."
+    text: "Satellites, stations, and drones governed by Atlas Command and Sentient Cloud.",
+    tone: "critical" as const
   }
 ];
 
 const timeline = [
-  "2024 — Quantum Zero Trust deployed across 12 nations",
-  "2025 — Orbital Forge launches with Sentient Cloud v5",
-  "2026 — NeuroWeave immortality programs reach global scale",
-  "2027 — Autonomous cities orchestrated by Atlas"
+  { year: "2024", description: "Quantum Zero Trust deployed across 12 nations", tone: "critical" as const },
+  { year: "2025", description: "Orbital Forge launches with Sentient Cloud v5", tone: "positive" as const },
+  { year: "2026", description: "NeuroWeave immortality programs reach global scale", tone: "positive" as const },
+  { year: "2027", description: "Autonomous cities orchestrated by Atlas", tone: "positive" as const }
 ];
 
 export default function Page() {
@@ -82,7 +86,7 @@ export default function Page() {
                 <div className="space-y-3">
                   <span className="badge">Integrated ecosystems</span>
                   <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-                    The Aeterna ecosystem is a living corporate organism.
+                    The Aeterna ecosystem is a <span className="text-[var(--text-status-warning)]">living corporate organism</span>.
                   </h2>
                   <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                     Subterranean labs, orbital foundries, quantum networks, and longevity programs operate under one mission console.
@@ -91,10 +95,28 @@ export default function Page() {
                 <div className="grid gap-4">
                   {campusStats.map((item) => (
                     <div key={item.label} className="glass-panel flex items-center gap-3 p-5">
-                      <item.icon className="h-6 w-6 text-[var(--icon-secondary)]" />
+                      <item.icon
+                        className={`h-6 w-6 ${
+                          item.tone === "positive"
+                            ? "text-[var(--text-status-warning)]"
+                            : item.tone === "critical"
+                              ? "text-[var(--text-status-error)]"
+                              : "text-[var(--icon-secondary)]"
+                        }`}
+                      />
                       <div>
                         <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</span>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">{item.value}</p>
+                        <p
+                          className={`text-sm font-semibold ${
+                            item.tone === "positive"
+                              ? "text-[var(--text-status-warning)]"
+                              : item.tone === "critical"
+                                ? "text-[var(--text-status-error)]"
+                                : "text-[var(--text-primary)]"
+                          }`}
+                        >
+                          {item.value}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -135,9 +157,23 @@ export default function Page() {
               <div className="mt-8 grid gap-5">
                 {alliances.map((unit) => (
                   <div key={unit.title} className="glass-panel flex gap-4 p-5">
-                    <unit.icon className="mt-1 h-6 w-6 text-[var(--icon-secondary)]" />
+                    <unit.icon
+                      className={`mt-1 h-6 w-6 ${
+                        unit.tone === "positive"
+                          ? "text-[var(--text-status-warning)]"
+                          : "text-[var(--text-status-error)]"
+                      }`}
+                    />
                     <div>
-                      <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{unit.title}</h3>
+                      <h3
+                        className={`text-sm font-semibold uppercase tracking-[0.18em] ${
+                          unit.tone === "positive"
+                            ? "text-[var(--text-status-warning)]"
+                            : "text-[var(--text-status-error)]"
+                        }`}
+                      >
+                        {unit.title}
+                      </h3>
                       <p className="mt-2 text-sm text-[var(--text-secondary)]">{unit.text}</p>
                     </div>
                   </div>
@@ -151,13 +187,24 @@ export default function Page() {
               </h2>
               <div className="mt-8 space-y-6">
                 {timeline.map((milestone) => (
-                  <div key={milestone} className="border-l border-[var(--border-default)] pl-6">
-                    <p className="text-sm text-[var(--text-secondary)]">{milestone}</p>
+                  <div key={milestone.year} className="border-l border-[var(--border-default)] pl-6">
+                    <p className="text-sm text-[var(--text-secondary)]">
+                      <span
+                        className={`font-semibold ${
+                          milestone.tone === "positive"
+                            ? "text-[var(--text-status-warning)]"
+                            : "text-[var(--text-status-error)]"
+                        }`}
+                      >
+                        {milestone.year}
+                      </span>{" "}
+                      — {milestone.description}
+                    </p>
                   </div>
                 ))}
               </div>
-              <div className="mt-10 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/70 p-6 text-sm text-[var(--text-secondary)]">
-                Every roadmap entry is governed by Atlas Mission Control with compliance checks, partner review boards, and biometric authorization through Aeterna Pass.
+              <div className="mt-10 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)] p-6 text-sm text-[var(--text-secondary)]">
+                Every roadmap entry is governed by Atlas Mission Control with compliance checks, partner review boards, and biometric authorization through <span className="text-[var(--text-status-warning)]">Aeterna Pass</span>.
               </div>
             </div>
           </div>
