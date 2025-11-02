@@ -52,7 +52,7 @@ export function RealtimePulse() {
   const activeTransmission = useMemo(() => transmissions[index], [index]);
 
   return (
-    <section className="mx-auto mt-28 w-full max-w-[1400px] px-2 sm:px-6">
+    <section className="mt-28">
       <div className="flex flex-col gap-10">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="space-y-3">
@@ -67,7 +67,8 @@ export function RealtimePulse() {
         </div>
         <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
           <div className="space-y-6">
-            <div className="border border-[var(--border-default)] p-6">
+            <div className="relative space-y-3 rounded-none border-0 pl-6">
+              <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
               <span className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Priority transmission</span>
               <AnimatePresence mode="wait">
                 <motion.div
@@ -76,7 +77,7 @@ export function RealtimePulse() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.4 }}
-                  className="mt-4 space-y-3"
+                  className="mt-2 space-y-3"
                 >
                   <p
                     className={`text-lg font-semibold ${
@@ -100,8 +101,9 @@ export function RealtimePulse() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.4 }}
                   transition={{ duration: 0.4, delay: sensorIndex * 0.05 }}
-                  className="flex items-center gap-4 border-l border-[var(--border-default)] pl-5"
+                  className="relative flex items-center gap-4 pl-5"
                 >
+                  <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
                   <item.icon className="h-5 w-5 text-[var(--icon-secondary)]" />
                   <div>
                     <p className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</p>
@@ -121,7 +123,10 @@ export function RealtimePulse() {
               className="space-y-3"
             >
               {streamEvents.map((event, eventIndex) => (
-                <li key={event.label} className="flex items-start justify-between gap-4 border-b border-[var(--border-light)] pb-3">
+                <li
+                  key={event.label}
+                  className="flex items-start justify-between gap-4 border-b border-[var(--border-light)] pb-3 last:border-b-0 last:pb-0"
+                >
                   <div>
                     <p
                       className={`text-sm font-semibold ${

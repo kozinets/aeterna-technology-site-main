@@ -1,11 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronRight, Menu, UserRound } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, Search, UserRound } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MegaMenu } from "./mega-menu";
 import { AeternaLogo } from "./aeterna-logo";
+import { AuthModal } from "./auth-modal";
+import { SearchModal } from "./search-modal";
 
 type NavigationItem = {
   title: string;
@@ -339,6 +341,20 @@ const TOP_NAV: TopNavItem[] = [
 
 export function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const closeMenus = () => setOpenMenu(null);
 
@@ -348,16 +364,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border-default)] bg-[var(--bg-primary)]">
-      <div className="flex w-full items-center gap-6 px-6 py-4 lg:px-12">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-4 py-4 lg:px-12">
         <Link
           href="/"
-          className="flex items-center gap-3 text-lg font-semibold tracking-wider"
+          className="flex items-center text-lg font-semibold tracking-wider"
           aria-label="Aeterna Technology — home"
         >
-          <AeternaLogo className="h-8 lg:h-10 shrink-0" />
-          <span className="hidden text-sm tracking-[0.32em] text-[var(--text-secondary)] lg:inline">
-            Aeterna Technology
-          </span>
+          <AeternaLogo className="h-8 shrink-0 lg:h-9" />
         </Link>
         <div className="relative hidden flex-1 lg:flex" onMouseLeave={closeMenus}>
           <nav className="flex w-full items-center gap-6">
@@ -367,7 +380,7 @@ export function Header() {
                   <Link
                     key={item.id}
                     href={item.href as any}
-                    className="text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                    className="flex items-center gap-2 border-b-2 border-transparent pb-3 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
                     onFocus={closeMenus}
                     onMouseEnter={closeMenus}
                   >
@@ -381,7 +394,7 @@ export function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  className={`flex items-center gap-2 border-b-2 px-0 pb-2 text-sm font-medium transition ${
+                  className={`flex items-center gap-2 border-b-2 px-0 pb-3 text-sm font-medium transition ${
                     isOpen
                       ? "border-[var(--text-status-warning)] text-[var(--text-primary)]"
                       : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -407,13 +420,22 @@ export function Header() {
           <SecondaryMenu open={openMenu === "company"} groups={SECONDARY_MENUS.company} />
         </div>
         <div className="ml-auto flex items-center gap-3">
-          <Link
-            href={"/platform/login" as any}
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="hidden items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
+          >
+            <Search className="h-4 w-4 text-[var(--icon-secondary)]" />
+            Search
+          </button>
+          <button
+            type="button"
+            onClick={() => setAuthOpen(true)}
             className="hidden items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
           >
             <UserRound className="h-4 w-4 text-[var(--icon-secondary)]" />
             Sign in
-          </Link>
+          </button>
           <button
             type="button"
             className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)] lg:hidden"
@@ -424,6 +446,8 @@ export function Header() {
           </button>
         </div>
       </div>
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }
@@ -437,9 +461,9 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.2 }}
-          className="absolute left-0 right-0 top-full z-40 border-t border-[var(--border-default)] bg-[var(--bg-primary)]"
+          className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
-          <div className="mx-auto grid w-full gap-10 px-6 py-10 md:grid-cols-2 lg:px-12">
+          <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-10 md:grid-cols-2 lg:px-12">
             {groups.map((group) => (
               <div key={group.title} className="space-y-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{group.title}</p>

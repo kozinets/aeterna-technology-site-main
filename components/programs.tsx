@@ -99,7 +99,7 @@ const categories = [
 
 export function Programs() {
   return (
-    <section id="programs" className="mx-auto mt-24 w-full max-w-[1400px] px-2 sm:px-6">
+    <section id="programs" className="mt-24">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-3">
           <span className="badge">Portfolio atlas</span>
@@ -125,8 +125,9 @@ export function Programs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
-            className="group flex flex-col gap-5 border-l border-[var(--border-default)] pl-6"
+            className="group relative flex flex-col gap-5 pl-6"
           >
+            <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)] transition group-hover:bg-[var(--text-status-warning)]" aria-hidden="true" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <category.icon className="h-6 w-6 text-[var(--icon-secondary)]" />
@@ -158,14 +159,21 @@ export function Programs() {
                 <Link
                   key={action.label}
                   href={action.href as any}
-                  className={`inline-flex items-center gap-2 border border-[var(--border-default)] px-4 py-2 transition ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 transition ${
                     action.accent
-                      ? "text-[var(--text-status-warning)]"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      ? "rounded-full bg-[var(--interactive-bg-accent-default)] text-[var(--text-status-warning)]"
+                      : "rounded-full border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   {action.label}
                 </Link>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
+              {category.metrics.map((metric) => (
+                <span key={`${category.title}-${metric.label}`} className="rounded-full border border-[var(--border-light)] px-3 py-1">
+                  #{metric.label.replace(/[^a-zA-Z0-9]+/g, "")}
+                </span>
               ))}
             </div>
           </motion.article>

@@ -45,7 +45,7 @@ const tiers = [
 
 export function AccessPortal() {
   return (
-    <section id="access" className="mx-auto mt-28 w-full max-w-[1400px] px-2 sm:px-6">
+    <section id="access" className="mt-28">
       <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,8 +71,9 @@ export function AccessPortal() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ delay: index * 0.05, duration: 0.4 }}
-                className="flex flex-col gap-3 border-l border-[var(--border-default)] pl-5"
+                className="relative flex flex-col gap-3 pl-5"
               >
+                <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
                 <Icon
                   className={`h-6 w-6 ${
                     index % 2 === 0 ? "text-[var(--text-status-warning)]" : "text-[var(--text-status-error)]"
@@ -96,7 +97,13 @@ export function AccessPortal() {
           className="flex flex-col gap-6"
         >
           {tiers.map((tier) => (
-            <div key={tier.title} className="flex flex-col gap-4 border border-[var(--border-default)] p-5">
+            <div key={tier.title} className="relative flex flex-col gap-4 pl-6">
+              <span
+                className={`absolute left-0 top-0 h-full w-px ${
+                  tier.accent ? "bg-[var(--text-status-warning)]" : "bg-[var(--border-default)]"
+                }`}
+                aria-hidden="true"
+              />
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-[var(--text-primary)]">{tier.title}</h3>
                 <span
@@ -120,12 +127,19 @@ export function AccessPortal() {
                   </li>
                 ))}
               </ul>
+              <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
+                {tier.features.slice(0, 2).map((feature) => (
+                  <span key={`${tier.title}-${feature}`} className="rounded-full border border-[var(--border-light)] px-3 py-1">
+                    #{feature.split(" ")[0]}
+                  </span>
+                ))}
+              </div>
               <Link
                 href={tier.href as any}
-                className={`inline-flex items-center justify-center border border-[var(--border-default)] px-4 py-2 text-sm font-medium transition ${
+                className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition ${
                   tier.accent
-                    ? "text-[var(--text-status-warning)]"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    ? "rounded-full bg-[var(--interactive-bg-accent-default)] text-[var(--text-status-warning)]"
+                    : "rounded-full border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 {tier.cta}

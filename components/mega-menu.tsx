@@ -59,9 +59,9 @@ export function MegaMenu({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.2 }}
-          className="absolute left-0 right-0 top-full z-40 border-t border-[var(--border-default)] bg-[var(--bg-primary)]"
+          className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
-          <div className="mx-auto w-full px-6 py-10 lg:px-12">
+          <div className="mx-auto w-full max-w-[1440px] px-6 py-10 lg:px-12">
             <div className="grid gap-10 lg:grid-cols-[240px_1fr_320px]">
               <div className="space-y-5">
                 <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Divisions</p>

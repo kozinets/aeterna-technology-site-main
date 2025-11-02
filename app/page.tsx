@@ -79,9 +79,9 @@ export default function Page() {
   return (
     <main>
       <Header />
-      <div className="px-2 pb-24 pt-12 sm:px-6">
+      <div className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-12 sm:px-8">
         <Hero />
-        <section className="mx-auto mt-24 w-full max-w-[1400px]">
+        <section className="mt-24">
           <div className="grid gap-14 lg:grid-cols-[280px_1fr]">
             <div className="space-y-8">
               <div className="space-y-3">
@@ -95,7 +95,8 @@ export default function Page() {
               </div>
               <div className="space-y-4">
                 {campusStats.map((item) => (
-                  <div key={item.label} className="flex items-center gap-3 border-l border-[var(--border-default)] pl-4">
+                  <div key={item.label} className="relative flex items-center gap-3 pl-4">
+                    <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
                     <item.icon
                       className={`h-6 w-6 ${
                         item.tone === "positive"
@@ -125,7 +126,10 @@ export default function Page() {
             </div>
             <div className="grid gap-10 md:grid-cols-2">
               {ecosystemNodes.map((node) => (
-                <div key={node.title} className="flex flex-col gap-4 border-b border-[var(--border-light)] pb-6">
+                <div
+                  key={node.title}
+                  className="relative flex flex-col gap-4 pb-6 after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-[var(--border-light)] after:content-[''] last:after:hidden"
+                >
                   <div>
                     <h3 className="text-xl font-semibold text-[var(--text-primary)]">{node.title}</h3>
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">{node.description}</p>
@@ -133,8 +137,8 @@ export default function Page() {
                   <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{node.detail}</p>
                   <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
                     {node.streams.map((stream) => (
-                      <span key={stream} className="border-b border-[var(--border-default)] pb-1">
-                        {stream}
+                      <span key={stream} className="rounded-full border border-[var(--border-default)] px-3 py-1">
+                        #{stream.replace(/\s+/g, "")}
                       </span>
                     ))}
                   </div>
@@ -144,7 +148,7 @@ export default function Page() {
           </div>
         </section>
         <Programs />
-        <section className="mx-auto mt-28 w-full max-w-[1400px]">
+        <section className="mt-28">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr]">
             <div className="space-y-6">
               <span className="badge">Alliance network</span>
@@ -156,7 +160,8 @@ export default function Page() {
               </p>
               <div className="grid gap-5">
                 {alliances.map((unit) => (
-                  <div key={unit.title} className="flex gap-4 border-l border-[var(--border-default)] pl-5">
+                  <div key={unit.title} className="relative flex gap-4 pl-5">
+                    <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
                     <unit.icon
                       className={`mt-1 h-6 w-6 ${
                         unit.tone === "positive"
@@ -185,7 +190,8 @@ export default function Page() {
               <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">Expansion roadmap.</h2>
               <div className="space-y-6">
                 {timeline.map((milestone) => (
-                  <div key={milestone.year} className="border-l border-[var(--border-default)] pl-6">
+                  <div key={milestone.year} className="relative pl-6">
+                    <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
                     <p className="text-sm text-[var(--text-secondary)]">
                       <span
                         className={`font-semibold ${

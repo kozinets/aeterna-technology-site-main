@@ -51,7 +51,7 @@ const signals = [
 
 export function Insights() {
   return (
-    <section id="insights" className="mx-auto mt-28 w-full max-w-[1400px] px-2 sm:px-6">
+    <section id="insights" className="mt-28">
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div className="space-y-4">
           <span className="badge">Signals from the future</span>
@@ -81,7 +81,7 @@ export function Insights() {
               transition={{ duration: 0.4, delay: index * 0.06 }}
               className="flex flex-col gap-3 border-b border-[var(--border-light)] pb-6"
             >
-              <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{article.tag}</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">#{article.tag}</span>
               <h3 className="text-xl font-semibold text-[var(--text-primary)]">{article.title}</h3>
               <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{article.description}</p>
               <div className="mt-auto flex items-center justify-between pt-4 text-xs text-[var(--text-tertiary)]">
@@ -102,8 +102,9 @@ export function Insights() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex flex-col gap-6 border border-[var(--border-default)] p-6"
+          className="relative flex flex-col gap-6 pl-6"
         >
+          <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
           <div className="flex items-center gap-3">
             <Sparkles className="h-5 w-5 text-[var(--icon-secondary)]" />
             <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Live missions</span>
@@ -113,7 +114,8 @@ export function Insights() {
           </p>
           <ul className="space-y-4">
             {signals.map((signal, index) => (
-              <li key={signal.title} className="border-l border-[var(--border-light)] pl-4">
+              <li key={signal.title} className="relative pl-4">
+                <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-light)]" aria-hidden="true" />
                 <div className="flex items-center gap-3">
                   <signal.icon className="h-5 w-5 text-[var(--icon-secondary)]" />
                   <span

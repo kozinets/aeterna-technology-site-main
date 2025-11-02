@@ -35,10 +35,10 @@ const featureStories = [
   },
   {
     tag: "Insight",
-    title: "NeuroWeave immortality",
-    description: "Clinical-stage implants preserving consciousness continuity with regenerative support.",
+    title: "Continuity Initiative",
+    description: "Longevity guilds combine cellular reprogramming, cryonics, and neural twins for civilization-scale memory.",
     action: "Read research",
-    href: "/insights/neurobionic-immortality",
+    href: "/insights/continuity-initiative",
     tone: "critical" as const
   }
 ];
@@ -62,9 +62,9 @@ const missionThreads = [
 ];
 
 const heroMetrics = [
-  { label: "138 labs", caption: "Operational today", tone: "positive" as const },
-  { label: "24/7 neuro-ops", caption: "Global coverage", tone: "critical" as const },
-  { label: ">480 products", caption: "Continuously updated", tone: "positive" as const }
+  { label: "#138Labs", caption: "Operational today", tone: "positive" as const },
+  { label: "#NeuroOps", caption: "Global coverage", tone: "critical" as const },
+  { label: "#480Programs", caption: "Continuously updated", tone: "positive" as const }
 ];
 
 const tickerItems = [
@@ -102,7 +102,7 @@ export function Hero() {
   const duplicatedTicker = useMemo(() => [...tickerItems, ...tickerItems], []);
 
   return (
-    <section className="mx-auto flex w-full max-w-[1400px] flex-col gap-14 px-2 sm:px-6">
+    <section className="flex flex-col gap-14">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -185,7 +185,8 @@ export function Hero() {
           </div>
         </div>
         <div className="flex flex-col gap-6">
-          <div className="border-l border-[var(--border-default)] pl-6">
+          <div className="relative pl-6">
+            <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
             <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Live mission thread</span>
             <AnimatePresence mode="wait">
               <motion.div
@@ -217,7 +218,7 @@ export function Hero() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                className="border-b border-[var(--border-light)] pb-5"
+                className="relative pb-5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-[var(--border-light)] after:content-[''] last:after:hidden"
               >
                 <span
                   className={`text-[10px] uppercase tracking-[0.28em] ${
@@ -242,7 +243,8 @@ export function Hero() {
               </motion.article>
             ))}
           </div>
-          <div className="space-y-4 border border-[var(--border-default)] px-5 py-4">
+          <div className="relative flex flex-col gap-3 pl-6">
+            <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
             <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
               <Shield className="h-4 w-4 text-[var(--icon-secondary)]" />
               Security posture

@@ -41,11 +41,10 @@ export function Footer() {
 
   return (
     <footer className="mt-32 border-t border-[var(--border-default)] bg-[var(--bg-primary)]">
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-12 px-6 py-14 md:flex-row md:justify-between">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-12 px-6 py-14 md:flex-row md:justify-between">
         <div className="max-w-md space-y-4">
-          <Link href="/" aria-label="Aeterna Technology home" className="flex items-center gap-3">
+          <Link href="/" aria-label="Aeterna Technology home" className="flex items-center">
             <AeternaLogo className="h-8" />
-            <span className="text-sm tracking-[0.3em] text-[var(--text-secondary)]">Aeterna Technology</span>
           </Link>
           <p className="text-sm leading-relaxed text-[var(--text-tertiary)]">
             Full-spectrum corporation across AI, networks, cryptography, biomedicine, robotics, and orbital systems. We engineer the technological substrate for civilization's next era.
