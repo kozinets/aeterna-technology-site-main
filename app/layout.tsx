@@ -2,35 +2,20 @@ import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-inter"
-});
-
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  variable: "--font-orbitron",
-  weight: ["400", "500", "600", "700"]
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-orbitron" });
 
 export const metadata: Metadata = {
   title: "Aeterna Technology",
-  description: "Aeterna Technology — корпорация полного цикла в области ИИ, сетей, криптографии, биомедицины и робототехники.",
-  icons: {
-    icon: "/favicon.ico"
-  }
+  description:
+    "Aeterna Technology pioneers autonomous intelligence, cryptographic networks, biomedicine, robotics, and orbital systems for sovereign innovation.",
+  metadataBase: new URL("https://aeterna.technology")
 };
 
-export default function RootLayout({
-  children
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${inter.variable} ${orbitron.variable}`}>
-      <body>
-        {children}
-      </body>
+    <html lang="en">
+      <body className={`${inter.variable} ${orbitron.variable}`}>{children}</body>
     </html>
   );
 }

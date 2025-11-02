@@ -7,13 +7,13 @@ import Link from "next/link";
 const categories = [
   {
     icon: BrainCircuit,
-    title: "Интеллект",
-    headline: "Генеративные и самообучающиеся модели",
+    title: "Intelligence",
+    headline: "Generative and self-learning models",
     description:
-      "Эволюция от адаптивных языковых агентов до когнитивных систем управления экосистемами. Atlas, Helios и Synapse AI доступны в облаке и on-premise.",
+      "From adaptive language agents to cognitive governance systems. Atlas, Helios, and Synapse AI are available across cloud and sovereign deployments.",
     actions: [
-      { label: "Запуск Atlas", href: "/ai/atlas", accent: true },
-      { label: "Документация Helios", href: "/ai/helios/docs" }
+      { label: "Launch Atlas", href: "/ai/atlas", accent: true },
+      { label: "Helios docs", href: "/ai/helios/docs" }
     ],
     metrics: [
       { label: "Exascale", value: "Compute" },
@@ -22,10 +22,10 @@ const categories = [
   },
   {
     icon: Network,
-    title: "Сети",
-    headline: "Квантовые и распределённые коммуникации",
+    title: "Networks",
+    headline: "Quantum-secure and distributed communications",
     description:
-      "Построение гиперустойчивых сетей для роботов, дронов и биосенсоров. Нулевой трест, деперсонализация и гибридные протоколы.",
+      "Build hyper-resilient networks for robots, drones, and biosensors with zero trust, anonymization, and hybrid protocols.",
     actions: [
       { label: "NOVA Free Proxy", href: "/network/nova-proxy", accent: true },
       { label: "EdgeGrid", href: "/network/edge-grid" }
@@ -37,10 +37,10 @@ const categories = [
   },
   {
     icon: Microscope,
-    title: "Биомедицина",
-    headline: "Импланты, протезы и долголетие",
+    title: "Biomedicine",
+    headline: "Implants, prosthetics, and longevity",
     description:
-      "Конвергенция биологии и цифровых систем. Нейроинтерфейсы, тканевые принтеры, программы бессмертия и регенерации.",
+      "Where biology meets code. Neural interfaces, tissue printers, immortality programs, and regenerative therapeutics.",
     actions: [
       { label: "NeuroWeave", href: "/bio/neuro-weave", accent: true },
       { label: "Vitality Labs", href: "/bio/vitality-labs" }
@@ -52,10 +52,10 @@ const categories = [
   },
   {
     icon: CircuitBoard,
-    title: "Робототехника",
-    headline: "Самоорганизующиеся производственные контуры",
+    title: "Robotics",
+    headline: "Self-orchestrating production loops",
     description:
-      "Адаптивные роботы, автономные фабрики и кибернетические лаборатории. Управление миссиями и парком устройств через Sentient Cloud.",
+      "Adaptive robots, autonomous factories, and cybernetic labs managed through Sentient Cloud mission control.",
     actions: [
       { label: "Orbital Forge", href: "/robots/orbital-forge", accent: true },
       { label: "Synthesis Lab", href: "/robots/synthesis" }
@@ -67,10 +67,10 @@ const categories = [
   },
   {
     icon: ShieldHalf,
-    title: "Безопасность",
-    headline: "Глобальная киберустойчивость",
+    title: "Security",
+    headline: "Global cyber resilience",
     description:
-      "Quantum Zero Trust, оркестрация секретов, цифровые идентичности. Ключевая опора для оборонных и корпоративных программ.",
+      "Quantum Zero Trust, secret orchestration, and digital identity for defense and enterprise ecosystems.",
     actions: [
       { label: "Quantum Zero Trust", href: "/security/quantum", accent: true },
       { label: "Consensus Fabric", href: "/crypto/consensus" }
@@ -82,10 +82,10 @@ const categories = [
   },
   {
     icon: Globe2,
-    title: "Глобальные операции",
-    headline: "Объединённые миссии и инфраструктура",
+    title: "Global Ops",
+    headline: "Unified missions and infrastructure",
     description:
-      "Единый контрольный центр над флотами дронов, биолабораториями, дата-центрами и космическими платформами.",
+      "One control plane for drone fleets, biolabs, data centers, and orbital platforms.",
     actions: [
       { label: "Mission Ops", href: "/ops/mission", accent: true },
       { label: "Aeterna Pass", href: "/platform/pass" }
@@ -102,19 +102,19 @@ export function Programs() {
     <section id="programs" className="mx-auto mt-24 max-w-[1200px] space-y-12">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-3">
-          <span className="badge">Энциклопедия направлений</span>
+          <span className="badge">Portfolio atlas</span>
           <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-            Каждый продукт Aeterna — часть взаимосвязанной архитектуры.
+            Every Aeterna product strengthens the wider architecture.
           </h2>
           <p className="max-w-3xl text-base text-[var(--text-secondary)]">
-            Мы проектируем технологии, которые усиливают друг друга: ИИ обучает импланты, сети защищают лаборатории, а криптография обеспечивает доверие между автономными агентами.
+            We design technologies that compound: intelligence trains implants, networks fortify labs, and cryptography establishes trust among autonomous agents.
           </p>
         </div>
         <Link
-          href="/catalog"
+          href={"/catalog" as any}
           className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-secondary-default)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--interactive-bg-secondary-hover)]"
         >
-          Полный каталог
+          Full catalog
         </Link>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
@@ -146,7 +146,7 @@ export function Programs() {
               {category.actions.map((action) => (
                 <Link
                   key={action.label}
-                  href={action.href}
+                  href={action.href as any}
                   className={`inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition ${
                     action.accent
                       ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)] hover:bg-[var(--interactive-bg-accent-hover)]"

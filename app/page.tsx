@@ -9,46 +9,46 @@ import { Building2, Cpu, FlaskConical, Orbit, Radar, Sparkles, Workflow } from "
 const ecosystemModules = [
   {
     title: "Aeterna Genesis",
-    description: "Инкубатор для гиперпрорывных проектов: биопринтинг органов, синтез материалов и нанороботы.",
-    detail: "18 направлений, связаны с Sentient Cloud и Vitality Labs"
+    description: "Incubator for breakthrough ventures: organ bioprinting, material synthesis, and nanorobotics.",
+    detail: "18 divisions connected through Sentient Cloud and Vitality Labs"
   },
   {
     title: "Continuum Campus",
-    description: "Университет будущего: нейроаудитории, квантовые вычислители и роботизированные лаборатории.",
-    detail: "32 000 исследователей и студентов"
+    description: "University of the future with neural lecture halls, quantum computers, and robotic laboratories.",
+    detail: "32,000 researchers and students"
   },
   {
     title: "Orbital Forge",
-    description: "Космическая производственная платформа для имплантов, спутников и автономных станций.",
-    detail: "Орбиты LEO/MEO с квантовым каналом"
+    description: "Space manufacturing platform for implants, satellites, and autonomous stations.",
+    detail: "LEO/MEO orbits linked by quantum channels"
   },
   {
     title: "Aeterna Network Fabric",
-    description: "Глобальная сеть прокси, DePIN и квантовой связи для данных, роботов и имплантов.",
-    detail: "NOVA Proxy, Synapse Mesh, Quantum Zero Trust"
+    description: "Global proxy, DePIN, and quantum communications network for data, robots, and implants.",
+    detail: "Powered by NOVA Proxy, Synapse Mesh, and Quantum Zero Trust"
   }
 ];
 
 const alliance = [
   {
     icon: Building2,
-    title: "Государства",
-    text: "Суверенные облака, цифровые двойники инфраструктуры и программы бессмертия для ключевых персон."
+    title: "Governments",
+    text: "Sovereign clouds, digital twins of infrastructure, and longevity programs for critical leaders."
   },
   {
     icon: Workflow,
-    title: "Корпорации",
-    text: "Оркестрация автономных производств, биофабрик и цифровых ассистентов."
+    title: "Enterprises",
+    text: "Autonomous production, biofoundries, and cognitive operations orchestration."
   },
   {
     icon: FlaskConical,
-    title: "Университеты",
-    text: "Доступ к лабораториям Aeterna, совместные исследования, обмен данными и моделями."
+    title: "Universities",
+    text: "Access to Aeterna labs, joint research, data exchanges, and model co-creation."
   },
   {
     icon: Orbit,
-    title: "Орбитальные миссии",
-    text: "Флот спутников, станции и дроны, управляемые Atlas Command и Sentient Cloud."
+    title: "Orbital missions",
+    text: "Satellite fleets, stations, and drones governed by Atlas Command and Sentient Cloud."
   }
 ];
 
@@ -65,10 +65,10 @@ export default function Page() {
               <div className="max-w-2xl space-y-4">
                 <span className="badge">Integrated ecosystems</span>
                 <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-                  Экосистема Aeterna раскрывает технологии через живые кампусы и орбитальные платформы.
+                  The Aeterna ecosystem unfolds technology through living campuses and orbital platforms.
                 </h2>
                 <p className="text-base leading-relaxed text-[var(--text-secondary)]">
-                  От подземных лабораторий до орбитальных заводов — каждая площадка соединена через Sentient Cloud и Quantum Zero Trust. Мы строим сеть, где цифровые и биологические системы эволюционируют синхронно.
+                  From subterranean labs to orbital foundries, every site is synchronized via Sentient Cloud and Quantum Zero Trust. We build a network where digital and biological systems evolve in unison.
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -76,17 +76,17 @@ export default function Page() {
                   {
                     icon: Cpu,
                     label: "Sentient Cloud",
-                    value: "Экзаскейл вычисления"
+                    value: "Exascale compute"
                   },
                   {
                     icon: Sparkles,
                     label: "Neural Lattice",
-                    value: "Самообучающиеся агенты"
+                    value: "Self-learning agents"
                   },
                   {
                     icon: Radar,
                     label: "Aeterna Link",
-                    value: "Мгновенный обмен"
+                    value: "Instant exchange"
                   }
                 ].map((item) => (
                   <div key={item.label} className="glass-panel flex flex-col gap-2 p-5">
@@ -113,10 +113,10 @@ export default function Page() {
             <div className="section-shell px-10 py-12">
               <span className="badge">Alliance</span>
               <h2 className="mt-4 text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-                Партнёрские программы Aeterna.
+                Aeterna partnership programs.
               </h2>
               <p className="mt-4 text-base text-[var(--text-secondary)]">
-                Мы работаем с правительствами, корпорациями и университетами для запуска совместных программ, поддерживаем совместное владение инфраструктурой и развиваем глобальные миссии.
+                We collaborate with governments, enterprises, and universities to launch joint programs, co-own infrastructure, and advance global missions.
               </p>
               <div className="mt-8 grid gap-5">
                 {alliance.map((unit) => (
@@ -132,9 +132,14 @@ export default function Page() {
             </div>
             <div className="section-shell px-10 py-12">
               <span className="badge">Continuum timeline</span>
-              <h2 className="mt-4 text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">Дорожная карта эволюции Aeterna.</h2>
+              <h2 className="mt-4 text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">Aeterna evolution roadmap.</h2>
               <div className="mt-8 space-y-6">
-                {["2024 — Quantum Zero Trust развернут в 12 странах", "2025 — запуск Orbital Forge и Sentient Cloud v3", "2026 — массовое внедрение NeuroWeave и биогенеза", "2027 — автономные города под управлением Atlas"].map((milestone) => (
+                {[
+                  "2024 — Quantum Zero Trust deployed across 12 nations",
+                  "2025 — Orbital Forge launches with Sentient Cloud v3",
+                  "2026 — NeuroWeave immortality programs reach global scale",
+                  "2027 — Autonomous cities orchestrated by Atlas"
+                ].map((milestone) => (
                   <div key={milestone} className="border-l border-[var(--border-default)] pl-6">
                     <p className="text-sm text-[var(--text-secondary)]">{milestone}</p>
                   </div>

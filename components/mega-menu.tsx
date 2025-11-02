@@ -21,19 +21,19 @@ const securityHighlights = [
   {
     icon: Sparkles,
     title: "Neural Access Fabric",
-    description: "Единая нейросеть для персонализации интерфейсов доступа к исследованиям и продуктам.",
+    description: "Unified neural interface that personalizes entry points into every product and lab.",
     href: "/platform/fabric"
   },
   {
     icon: ShieldCheck,
     title: "Quantum Zero Trust",
-    description: "Мгновенная проверка подлинности на квантовых ключах для корпоративных и государственных клиентов.",
+    description: "Instant verification on quantum keys for government and enterprise missions.",
     href: "/platform/quantum-zero-trust"
   },
   {
     icon: Lock,
     title: "Aeterna Pass",
-    description: "Единый пропуск в тестовые среды, облака и биомедицинские лаборатории Aeterna.",
+    description: "Single credential for Aeterna's sandboxes, clouds, and biomedical facilities.",
     href: "/platform/pass"
   }
 ];
@@ -78,7 +78,7 @@ export function MegaMenu({
                         {section.items.map((item) => (
                           <li key={item.title}>
                             <Link
-                              href={item.href}
+                              href={item.href as any}
                               className="group flex items-start justify-between gap-3 rounded-2xl border border-transparent bg-[var(--bg-secondary)]/30 px-4 py-3 transition-colors hover:border-[var(--border-default)] hover:bg-[var(--interactive-bg-secondary-hover)]"
                             >
                               <div>
@@ -104,16 +104,16 @@ export function MegaMenu({
             </div>
             <aside className="flex flex-col justify-between rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-secondary)]/80 p-6">
               <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Доступ и безопасность</p>
+                <p className="text-sm uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Access & Security</p>
                 <h3 className="mt-3 font-display text-2xl text-[var(--text-primary)]">
-                  Консолидированный доступ к исследовательской экосистеме Aeterna
+                  Consolidated entry into the Aeterna research ecosystem
                 </h3>
               </div>
               <ul className="mt-6 space-y-5">
                 {securityHighlights.map((item) => (
                   <li key={item.title}>
                     <Link
-                      href={item.href}
+                      href={item.href as any}
                       className="group flex items-start gap-4 rounded-2xl border border-transparent bg-[var(--bg-secondary)]/30 p-4 transition hover:border-[var(--border-default)] hover:bg-[var(--interactive-bg-secondary-hover)]"
                     >
                       <item.icon className="mt-1 h-6 w-6 text-[var(--icon-accent)]" />
@@ -126,10 +126,10 @@ export function MegaMenu({
                 ))}
               </ul>
               <Link
-                href="/access"
+                href={"/access" as any}
                 className="mt-8 inline-flex items-center justify-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-5 py-3 text-sm font-medium text-[var(--text-accent)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
               >
-                Запросить доступ к закрытым программам
+                Request access to restricted programs
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </aside>

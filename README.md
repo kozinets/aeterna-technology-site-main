@@ -1,30 +1,35 @@
-# Aeterna Technology Corporate Site
+# Aeterna Technology Experience
 
-Главная страница экосистемы **Aeterna Technology** построена на базе [Next.js 14](https://nextjs.org/) с использованием современных UI-паттернов, анимаций на `framer-motion` и иконок `lucide-react`.
+The corporate landing experience for **Aeterna Technology** is built with [Next.js 14](https://nextjs.org/) and showcases a futuristic ecosystem spanning AI, networking, cryptography, biomedicine, robotics, and orbital infrastructure.
 
-## Скрипты
+## Scripts
 
 ```bash
-npm run dev     # запуск дев-сервера
-npm run build   # production-сборка
-npm run start   # запуск production-сервера
-npm run lint    # статический анализ
+npm run dev     # start the development server
+npm run build   # create a production build
+npm run start   # run the production server
+npm run lint    # static analysis with ESLint
 ```
 
-## Структура
+## Structure
 
-- `app/` — layout и главная страница с современным дизайном и компонентами разделов.
-- `components/` — переиспользуемые UI-блоки (Hero, Programs, Insights, AccessPortal, Header, Footer).
-- `app/globals.css` — глобальные стили, палитра и утилитарные классы.
-- `tailwind.config.ts` — подключение палитры для утилитарных классов.
+- `app/` – root layout and the primary landing page composition.
+- `components/` – reusable UI blocks (Hero, Programs, Insights, AccessPortal, Header, Footer, MegaMenu).
+- `app/globals.css` – global styles, CSS variables, and animation primitives.
+- `tailwind.config.ts` – Tailwind configuration wired to the supplied color palette.
 
-## Особенности дизайна
+## Design Highlights
 
-- Использована палитра, указанная в задании, с акцентом на тёмную тему и неоновые подсветки.
-- Реализован мегаменю с подробными подразделами и карточками продуктов.
-- Добавлены секции с программами, исследованиями, дорожной картой и доступом в систему Aeterna Pass.
-- Анимации появления и интерактивные карточки создают ощущение высокотехнологичного интерфейса.
+- Implements the provided dark neon palette with layered gradients and motion accents.
+- Mega navigation, animated hero sections, and modular content grids highlight the breadth of Aeterna Technology's portfolio.
+- Access tiers, research highlights, and partnership messaging emphasize enterprise readiness and gated experiences.
 
-## Установка зависимостей
+## Installing Dependencies
 
-Установка пакетов выполняется стандартной командой `npm install`. В изолированных средах без доступа к `registry.npmjs.org` потребуется настроить зеркала или офлайн-репозиторий пакетов.
+Install packages using the standard command:
+
+```bash
+npm install
+```
+
+If the environment lacks access to `registry.npmjs.org`, configure a private registry mirror or offline cache before installing.

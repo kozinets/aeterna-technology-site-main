@@ -2,23 +2,22 @@
 
 import { motion } from "framer-motion";
 import { ArrowUpRight, Shield, Sparkles } from "lucide-react";
-import Link from "next/link";
 
 const highlights = [
   {
     label: "138",
-    suffix: " лабораторий",
-    description: "Интегрированная сеть R&D центров на 5 континентах"
+    suffix: " labs",
+    description: "Integrated R&D campuses across five continents"
   },
   {
     label: "24/7",
     suffix: " neuro-ops",
-    description: "Цифровая операционная система для автономных производств"
+    description: "Digital operations system for autonomous production"
   },
   {
     label: ">480",
-    suffix: " продуктов",
-    description: "Программы и платформы от имплантов до облачных ИИ"
+    suffix: " products",
+    description: "Programs spanning implants, AI clouds, robotics, and orbital systems"
   }
 ];
 
@@ -34,26 +33,26 @@ export function Hero() {
         <div className="flex-1 space-y-8">
           <span className="badge">Future of integrated intelligence</span>
           <h1 className="text-4xl font-semibold leading-tight tracking-tight text-[var(--text-primary)] md:text-6xl">
-            Aeterna Technology объединяет искусственный интеллект, биоинженерию и автономные сети в единую экосистему.
+            Aeterna Technology fuses artificial intelligence, bioengineering, and autonomous networks into one ecosystem.
           </h1>
           <p className="max-w-2xl text-lg leading-relaxed text-[var(--text-secondary)]">
-            Мы создаём инфраструктуру для бессмертных цифровых и биологических систем: от мозговых имплантов и квантовой криптографии до облачных платформ генеративного ИИ и робототехнических фабрик.
+            We engineer infrastructure for immortal digital and biological systems—from neural implants and quantum cryptography to generative AI platforms and autonomous factories.
           </p>
           <div className="flex flex-wrap items-center gap-4">
-            <Link
+            <a
               href="#access"
               className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-6 py-3 text-sm font-medium text-[var(--text-accent)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
             >
-              Запросить авторизацию
+              Request authorization
               <ArrowUpRight className="h-4 w-4" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="#programs"
               className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-secondary-default)] px-6 py-3 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--interactive-bg-secondary-hover)]"
             >
-              Каталог направлений
+              Explore divisions
               <Shield className="h-4 w-4 text-[var(--icon-secondary)]" />
-            </Link>
+            </a>
           </div>
         </div>
         <motion.div
@@ -67,21 +66,21 @@ export function Hero() {
             <Sparkles className="h-5 w-5 text-[var(--icon-accent)]" />
           </div>
           <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-            Трансформируйте данные, материалы и биосистемы в самообучающиеся продукты. Наши нейронные шлейфы связывают лаборатории, дрон-флот и импланты в реальном времени.
+            Transform data, materials, and biosystems into self-learning products. Our neural lacing links labs, drone fleets, and implants in real time.
           </p>
           <div className="space-y-3">
             {[
               {
                 title: "Sentient Cloud",
-                text: "Квантово-устойчивая вычислительная ткань для моделей любого масштаба."
+                text: "Quantum-resilient compute fabric for models at planetary scale."
               },
               {
                 title: "BioSymphony",
-                text: "Биоцифровые двойники человека с обратной связью через импланты и протезы."
+                text: "Bio-digital human twins with neural feedback via implants and prosthetics."
               },
               {
                 title: "Atlas Command",
-                text: "Нейрокомпозиторы сценариев для автономных исследовательских миссий."
+                text: "Neuro-composers drafting autonomous research missions across Earth and orbit."
               }
             ].map((item) => (
               <div key={item.title} className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-tertiary)]/40 p-3">

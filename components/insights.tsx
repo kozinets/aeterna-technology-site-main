@@ -7,26 +7,26 @@ import Link from "next/link";
 const articles = [
   {
     tag: "Research",
-    title: "Нейробионический протокол бессмертия",
+    title: "Neurobionic Immortality Protocol",
     description:
-      "Интеграция иммерсивных имплантов NeuroWeave с регенеративными матрицами для непрерывной синхронизации сознания.",
-    readingTime: "12 мин",
+      "Immersive NeuroWeave implants synchronized with regenerative matrices to preserve consciousness continuity.",
+    readingTime: "12 min",
     href: "/insights/neurobionic-immortality"
   },
   {
     tag: "AI",
-    title: "Atlas 5.0: агенты-архитекторы",
+    title: "Atlas 5.0: Architect Agents",
     description:
-      "Новая версия Atlas обучает автономные команды, планирующие орбитальные миссии и развитие городов для биоинженерии.",
-    readingTime: "8 мин",
+      "The latest Atlas release trains autonomous teams to plan orbital missions and bioengineered cities.",
+    readingTime: "8 min",
     href: "/insights/atlas-agents"
   },
   {
     tag: "Crypto",
     title: "DePIN Orchestration Network",
     description:
-      "Управление физическими сетями от дронов до энергетики с криптографическим распределением доходов и композитными DAO.",
-    readingTime: "9 мин",
+      "Govern physical networks from drones to energy grids with cryptographic revenue sharing and composite DAOs.",
+    readingTime: "9 min",
     href: "/insights/depin"
   }
 ];
@@ -35,17 +35,17 @@ const signals = [
   {
     icon: Binary,
     title: "Neuro-Sat Grid",
-    description: "Орбитальная сеть для мгновенной передачи данных имплантов и дронов без наземных узлов."
+    description: "Orbital relays delivering instantaneous data for implants and drones without ground latency."
   },
   {
     icon: RadioTower,
     title: "Synthesis Fields",
-    description: "Городские площадки с роботизированными биореакторами и автономной логистикой."
+    description: "Urban sites with robotic bioreactors and autonomous logistics corridors."
   },
   {
     icon: Beaker,
     title: "Immortality Trials",
-    description: "Долгосрочные исследования перепрограммирования клеток и цифровой памяти."
+    description: "Long-horizon studies in cellular reprogramming and digital memory fidelity."
   }
 ];
 
@@ -57,17 +57,17 @@ export function Insights() {
           <div className="space-y-4">
             <span className="badge">Signals from the future</span>
             <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-              Аналитика, исследования и миссии Aeterna.
+              Intelligence, research, and missions from Aeterna.
             </h2>
             <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
-              Погрузитесь в новейшие открытия и операционные отчёты. От нейрогенетики до кибернетических городов, наши команды публикуют результаты в режиме реального времени.
+              Dive into our latest discoveries and operational briefings. From neurogenetics to cybernetic cities, Aeterna teams publish insights in real time.
             </p>
           </div>
           <Link
-            href="/insights"
+            href={"/insights" as any}
             className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-secondary-default)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--interactive-bg-secondary-hover)]"
           >
-            Все материалы
+            View all
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
@@ -88,8 +88,8 @@ export function Insights() {
                 <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.description}</p>
                 <div className="mt-auto flex items-center justify-between pt-6 text-xs text-[var(--text-tertiary)]">
                   <span>{article.readingTime}</span>
-                  <Link href={article.href} className="flex items-center gap-2 text-[var(--text-accent)]">
-                    Читать
+                  <Link href={article.href as any} className="flex items-center gap-2 text-[var(--text-accent)]">
+                    Read
                     <ArrowUpRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -108,7 +108,7 @@ export function Insights() {
               <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Live missions</span>
             </div>
             <p className="mt-4 text-lg font-semibold text-[var(--text-primary)]">
-              Наши миссии синхронизируют лаборатории, орбиту и метапространства для ускорения прогресса.
+              Our missions synchronize labs, orbit, and metaspaces to accelerate progress.
             </p>
             <ul className="mt-6 space-y-5">
               {signals.map((signal) => (
@@ -122,10 +122,10 @@ export function Insights() {
               ))}
             </ul>
             <Link
-              href="/missions"
+              href={"/missions" as any}
               className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[var(--text-accent)]"
             >
-              Действующие миссии
+              Active missions
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </motion.div>

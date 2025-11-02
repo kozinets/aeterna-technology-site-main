@@ -7,37 +7,37 @@ import Link from "next/link";
 const tiers = [
   {
     title: "Open Research",
-    description: "Общедоступные демо, тестовые прокси, открытые модели и наборы данных для исследователей.",
+    description: "Public demos, free proxies, open models, and datasets for rapid exploration.",
     features: [
-      "Atlas Playground и языковые модели",
-      "NOVA Free Proxy и SDK",
-      "Публичные отчёты и API"
+      "Atlas Playground and language models",
+      "NOVA Free Proxy with SDK",
+      "Transparency reports and public APIs"
     ],
-    cta: "Получить доступ",
+    cta: "Get access",
     href: "/access/open",
     accent: false
   },
   {
     title: "Strategic",
-    description: "Расширенный доступ к защищённым продуктам, оркестрации DePIN и робототехническим миссиям.",
+    description: "Expanded entry to secured products, DePIN orchestration, and robotics missions.",
     features: [
-      "Sentient Cloud & EdgeGrid",
+      "Sentient Cloud and EdgeGrid",
       "DePIN Orchestration Network",
-      "Робототехника и биомед испытания"
+      "Robotics and biomed test environments"
     ],
-    cta: "Запросить консультацию",
+    cta: "Book a consultation",
     href: "/access/strategic",
     accent: true
   },
   {
     title: "Sovereign",
-    description: "Полная кастомизация, собственные дата-центры, квантовая криптография и совместные лаборатории.",
+    description: "Full customization with dedicated data centers, quantum cryptography, and joint labs.",
     features: [
-      "Quantum Zero Trust",
-      "NeuroWeave и протоколы бессмертия",
-      "Совместные исследовательские миссии"
+      "Quantum Zero Trust deployments",
+      "NeuroWeave immortality protocols",
+      "Joint research and mission governance"
     ],
-    cta: "Согласовать аудит",
+    cta: "Schedule an audit",
     href: "/access/sovereign",
     accent: false
   }
@@ -57,10 +57,10 @@ export function AccessPortal() {
           <div className="space-y-5">
             <span className="badge">Unified access</span>
             <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-              Авторизация в экосистеме Aeterna Pass.
+              Authorization across the Aeterna Pass ecosystem.
             </h2>
             <p className="max-w-2xl text-base text-[var(--text-secondary)]">
-              Один пропуск к облачным ИИ, биомедицинским лабораториям, роботизированным фабрикам и закрытым исследованиям. Управление доступом на базе нейросетей и квантовой криптографии.
+              One credential for AI clouds, biomedical labs, autonomous factories, and classified research. Access is coordinated by neural governance and quantum-grade cryptography.
             </p>
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
@@ -75,10 +75,10 @@ export function AccessPortal() {
               >
                 <Icon className="h-6 w-6 text-[var(--icon-accent)]" />
                 <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                  {index === 0 && "Биометрическая авторизация и нейро-подписи"}
-                  {index === 1 && "Post-Quantum шифрование и ключевые матрицы"}
-                  {index === 2 && "Гибридное развертывание в облаке и on-premise"}
-                  {index === 3 && "Управление ролями для команд, государств и корпораций"}
+                  {index === 0 && "Biometric authorization with neural signatures"}
+                  {index === 1 && "Post-quantum encryption and key matrices"}
+                  {index === 2 && "Hybrid cloud and on-prem orchestration"}
+                  {index === 3 && "Role governance for teams, nations, and enterprises"}
                 </p>
               </motion.div>
             ))}
@@ -107,7 +107,7 @@ export function AccessPortal() {
                 ))}
               </ul>
               <Link
-                href={tier.href}
+                href={tier.href as any}
                 className={`mt-6 inline-flex items-center justify-center rounded-full border border-[var(--border-default)] px-5 py-2 text-sm font-medium transition ${
                   tier.accent
                     ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)] hover:bg-[var(--interactive-bg-accent-hover)]"

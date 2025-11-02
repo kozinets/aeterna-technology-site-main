@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const footerLinks = [
   {
-    title: "Экосистема",
+    title: "Ecosystem",
     links: [
       { label: "Atlas Cognitive Engine", href: "/ai/atlas" },
       { label: "NeuroWeave", href: "/bio/neuro-weave" },
@@ -11,21 +11,21 @@ const footerLinks = [
     ]
   },
   {
-    title: "Решения",
+    title: "Solutions",
     links: [
-      { label: "Государственные программы", href: "/solutions/government" },
-      { label: "Корпоративный сектор", href: "/solutions/enterprise" },
-      { label: "Лаборатории и университеты", href: "/solutions/research" },
-      { label: "Роботизированные фабрики", href: "/solutions/industry" }
+      { label: "Government programs", href: "/solutions/government" },
+      { label: "Enterprise sector", href: "/solutions/enterprise" },
+      { label: "Labs & universities", href: "/solutions/research" },
+      { label: "Robotic factories", href: "/solutions/industry" }
     ]
   },
   {
-    title: "Ресурсы",
+    title: "Resources",
     links: [
-      { label: "Документация", href: "/docs" },
-      { label: "Партнёрская программа", href: "/partners" },
+      { label: "Documentation", href: "/docs" },
+      { label: "Partner network", href: "/partners" },
       { label: "Aeterna Pass", href: "/platform/pass" },
-      { label: "Медиацентр", href: "/media" }
+      { label: "Media center", href: "/media" }
     ]
   }
 ];
@@ -42,12 +42,12 @@ export function Footer() {
             <span className="font-display text-sm uppercase tracking-[0.3em] text-[var(--text-secondary)]">Aeterna Technology</span>
           </div>
           <p className="text-sm leading-relaxed text-[var(--text-tertiary)]">
-            Корпорация полного цикла: искусственный интеллект, сети, криптография, биомедицина, робототехника и бессмертие. Мы строим технологический фундамент будущего цивилизации.
+            Full-spectrum corporation across AI, networks, cryptography, biomedicine, robotics, and orbital systems. We engineer the technological substrate for civilization's next era.
           </p>
           <div className="flex gap-4 text-xs text-[var(--text-tertiary)]">
             <span>© {new Date().getFullYear()} Aeterna Technology</span>
-            <Link href="/privacy">Конфиденциальность</Link>
-            <Link href="/terms">Условия</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
           </div>
         </div>
         <div className="grid flex-1 gap-8 sm:grid-cols-3">
@@ -57,7 +57,7 @@ export function Footer() {
               <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <Link className="transition hover:text-[var(--text-accent)]" href={link.href}>
+                    <Link className="transition hover:text-[var(--text-accent)]" href={link.href as any}>
                       {link.label}
                     </Link>
                   </li>
