@@ -45,14 +45,14 @@ const tiers = [
 
 export function AccessPortal() {
   return (
-    <section id="access" className="mx-auto mt-28 max-w-[1200px]">
+    <section id="access" className="mx-auto mt-28 w-full max-w-[1400px] px-2 sm:px-6">
       <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.4 }}
-          className="section-shell px-10 py-12"
+          className="flex flex-col gap-8"
         >
           <div className="space-y-5">
             <span className="badge">Unified access</span>
@@ -63,7 +63,7 @@ export function AccessPortal() {
               One credential for AI clouds, biomedical labs, autonomous factories, and classified research. Access is coordinated by neural governance and quantum-grade cryptography.
             </p>
           </div>
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {[Fingerprint, LockKeyhole, ServerCog, Users].map((Icon, index) => (
               <motion.div
                 key={index}
@@ -71,10 +71,14 @@ export function AccessPortal() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ delay: index * 0.05, duration: 0.4 }}
-                className="rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)] p-5"
+                className="flex flex-col gap-3 border-l border-[var(--border-default)] pl-5"
               >
-                <Icon className={`h-6 w-6 ${index % 2 === 0 ? "text-[var(--text-status-warning)]" : "text-[var(--text-status-error)]"}`} />
-                <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                <Icon
+                  className={`h-6 w-6 ${
+                    index % 2 === 0 ? "text-[var(--text-status-warning)]" : "text-[var(--text-status-error)]"
+                  }`}
+                />
+                <p className="text-sm text-[var(--text-secondary)]">
                   {index === 0 && "Biometric authorization with neural signatures"}
                   {index === 1 && "Post-quantum encryption and key matrices"}
                   {index === 2 && "Hybrid cloud and on-prem orchestration"}
@@ -92,7 +96,7 @@ export function AccessPortal() {
           className="flex flex-col gap-6"
         >
           {tiers.map((tier) => (
-            <div key={tier.title} className="grid-card">
+            <div key={tier.title} className="flex flex-col gap-4 border border-[var(--border-default)] p-5">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-[var(--text-primary)]">{tier.title}</h3>
                 <span
@@ -103,8 +107,8 @@ export function AccessPortal() {
                   Access tier
                 </span>
               </div>
-              <p className="mt-3 text-sm text-[var(--text-secondary)]">{tier.description}</p>
-              <ul className="mt-4 space-y-3 text-sm text-[var(--text-tertiary)]">
+              <p className="text-sm text-[var(--text-secondary)]">{tier.description}</p>
+              <ul className="space-y-3 text-sm text-[var(--text-tertiary)]">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
                     <CheckCircle2
@@ -118,10 +122,10 @@ export function AccessPortal() {
               </ul>
               <Link
                 href={tier.href as any}
-                className={`mt-6 inline-flex items-center justify-center rounded-full border border-[var(--border-default)] px-5 py-2 text-sm font-medium transition ${
+                className={`inline-flex items-center justify-center border border-[var(--border-default)] px-4 py-2 text-sm font-medium transition ${
                   tier.accent
-                    ? "bg-[var(--interactive-bg-accent-default)] text-[var(--interactive-label-accent-default)] hover:bg-[var(--interactive-bg-accent-hover)]"
-                    : "bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    ? "text-[var(--text-status-warning)]"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 {tier.cta}

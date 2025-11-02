@@ -183,19 +183,6 @@ main {
 }
 
 
-.section-shell {
-  position: relative;
-  border-radius: 36px;
-  border: 1px solid var(--border-default);
-  background-color: var(--bg-elevated-primary);
-}
-
-.glass-panel {
-  background-color: var(--bg-secondary);
-  border-radius: 28px;
-  border: 1px solid var(--border-light);
-}
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -208,30 +195,4 @@ main {
   border: 1px solid var(--border-default);
   color: var(--text-status-warning);
   background: var(--bg-status-warning);
-}
-
-.grid-card {
-  position: relative;
-  border-radius: 28px;
-  padding: 2rem;
-  border: 1px solid var(--border-light);
-  background: var(--bg-elevated-primary);
-  transition: transform 0.4s ease, border-color 0.4s ease;
-}
-
-.grid-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-default);
-}
-
-.gradient-divider {
-  height: 1px;
-  background: var(--border-light);
-  border: none;
-}
-
-@media (max-width: 960px) {
-  .section-shell {
-    border-radius: 28px;
-  }
 }

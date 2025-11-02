@@ -1,4 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { LanguageModal } from "./language-modal";
+import { AeternaLogo } from "./aeterna-logo";
+import { Globe2 } from "lucide-react";
 
 const footerLinks = [
   {
@@ -31,23 +37,31 @@ const footerLinks = [
 ];
 
 export function Footer() {
+  const [languageOpen, setLanguageOpen] = useState(false);
+
   return (
-    <footer className="mt-32 border-t border-[var(--border-default)] bg-[var(--bg-elevated-secondary)]">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-8 py-14 md:flex-row md:justify-between">
+    <footer className="mt-32 border-t border-[var(--border-default)] bg-[var(--bg-primary)]">
+      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-12 px-6 py-14 md:flex-row md:justify-between">
         <div className="max-w-md space-y-4">
-          <div className="flex items-center gap-3 text-lg font-semibold">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] font-display text-sm uppercase text-[var(--text-status-warning)]">
-              AT
-            </span>
-            <span className="font-display text-sm uppercase tracking-[0.3em] text-[var(--text-secondary)]">Aeterna Technology</span>
-          </div>
+          <Link href="/" aria-label="Aeterna Technology home" className="flex items-center gap-3">
+            <AeternaLogo className="h-8" />
+            <span className="text-sm tracking-[0.3em] text-[var(--text-secondary)]">Aeterna Technology</span>
+          </Link>
           <p className="text-sm leading-relaxed text-[var(--text-tertiary)]">
             Full-spectrum corporation across AI, networks, cryptography, biomedicine, robotics, and orbital systems. We engineer the technological substrate for civilization's next era.
           </p>
-          <div className="flex gap-4 text-xs text-[var(--text-tertiary)]">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--text-tertiary)]">
             <span className="text-[var(--text-status-warning)]">© {new Date().getFullYear()} Aeterna Technology</span>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>
+            <button
+              type="button"
+              onClick={() => setLanguageOpen(true)}
+              className="inline-flex items-center gap-2 border border-[var(--border-default)] px-3 py-1 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+            >
+              <Globe2 className="h-4 w-4" />
+              Language & region
+            </button>
           </div>
         </div>
         <div className="grid flex-1 gap-8 sm:grid-cols-3">
@@ -67,6 +81,7 @@ export function Footer() {
           ))}
         </div>
       </div>
+      <LanguageModal open={languageOpen} onClose={() => setLanguageOpen(false)} />
     </footer>
   );
 }

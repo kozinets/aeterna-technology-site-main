@@ -10,7 +10,7 @@ const categories = [
     title: "Intelligence",
     headline: "Generative and self-learning models",
     description:
-      "From adaptive language agents to cognitive governance systems. Atlas, Helios, and Synapse AI are available across cloud and sovereign deployments.",
+      "From adaptive language agents to cognitive governance systems. Atlas, Helios, and Synapse AI operate across cloud and sovereign deployments.",
     actions: [
       { label: "Launch Atlas", href: "/ai/atlas", accent: true },
       { label: "Helios docs", href: "/ai/helios/docs" }
@@ -99,7 +99,7 @@ const categories = [
 
 export function Programs() {
   return (
-    <section id="programs" className="mx-auto mt-24 max-w-[1200px] space-y-12">
+    <section id="programs" className="mx-auto mt-24 w-full max-w-[1400px] px-2 sm:px-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-3">
           <span className="badge">Portfolio atlas</span>
@@ -107,34 +107,34 @@ export function Programs() {
             Every Aeterna product strengthens the <span className="text-[var(--text-status-warning)]">wider architecture</span>.
           </h2>
           <p className="max-w-3xl text-base text-[var(--text-secondary)]">
-            We design technologies that compound: intelligence trains implants, networks fortify labs, and cryptography establishes trust among autonomous agents.
+            Technologies compound across divisions: intelligence trains implants, networks fortify labs, and cryptography establishes trust among autonomous agents.
           </p>
         </div>
         <Link
           href={"/catalog" as any}
-          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
         >
           Full catalog
         </Link>
       </div>
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="mt-10 grid gap-10 lg:grid-cols-2">
         {categories.map((category, index) => (
           <motion.article
             key={category.title}
-            initial={{ opacity: 0, y: 32 }}
+            initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.4, delay: index * 0.04 }}
-            className="grid-card"
+            transition={{ duration: 0.5, delay: index * 0.05 }}
+            className="group flex flex-col gap-5 border-l border-[var(--border-default)] pl-6"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <category.icon className="h-6 w-6 text-[var(--icon-secondary)]" />
-                <span className="text-sm uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{category.title}</span>
+                <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{category.title}</span>
               </div>
               <div className="flex gap-3 text-xs text-[var(--text-tertiary)]">
                 {category.metrics.map((metric) => (
-                  <span key={metric.label} className="rounded-full border border-[var(--border-light)] px-3 py-1">
+                  <span key={metric.label} className="flex items-center gap-1">
                     <strong
                       className={`font-semibold ${
                         metric.tone === "positive"
@@ -145,23 +145,23 @@ export function Programs() {
                       }`}
                     >
                       {metric.label}
-                    </strong>{" "}
+                    </strong>
                     {metric.value}
                   </span>
                 ))}
               </div>
             </div>
-            <h3 className="mt-6 text-2xl font-semibold text-[var(--text-primary)]">{category.headline}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{category.description}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <h3 className="text-2xl font-semibold text-[var(--text-primary)]">{category.headline}</h3>
+            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{category.description}</p>
+            <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.16em]">
               {category.actions.map((action) => (
                 <Link
                   key={action.label}
                   href={action.href as any}
-                  className={`inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition ${
+                  className={`inline-flex items-center gap-2 border border-[var(--border-default)] px-4 py-2 transition ${
                     action.accent
-                      ? "bg-[var(--interactive-bg-accent-default)] text-[var(--interactive-label-accent-default)] hover:bg-[var(--interactive-bg-accent-hover)]"
-                      : "bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      ? "text-[var(--text-status-warning)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   {action.label}

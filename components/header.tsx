@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, Menu, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { MegaMenu } from "./mega-menu";
+import { AeternaLogo } from "./aeterna-logo";
 
 type NavigationItem = {
   title: string;
@@ -347,20 +348,19 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border-default)] bg-[var(--bg-primary)]">
-      <div className="mx-auto flex w-full max-w-[1200px] items-center gap-8 px-8 py-4">
-        <Link href="/" className="flex items-center gap-3 text-lg font-semibold tracking-wider">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] font-display text-sm text-[var(--text-status-warning)]">
-            AT
-          </span>
-          <span className="font-display text-sm tracking-[0.32em] text-[var(--text-secondary)]">
+      <div className="flex w-full items-center gap-6 px-6 py-4 lg:px-12">
+        <Link
+          href="/"
+          className="flex items-center gap-3 text-lg font-semibold tracking-wider"
+          aria-label="Aeterna Technology — home"
+        >
+          <AeternaLogo className="h-8 lg:h-10 shrink-0" />
+          <span className="hidden text-sm tracking-[0.32em] text-[var(--text-secondary)] lg:inline">
             Aeterna Technology
           </span>
         </Link>
-        <div
-          className="relative hidden flex-1 items-center justify-center lg:flex"
-          onMouseLeave={closeMenus}
-        >
-          <nav className="flex items-center gap-6">
+        <div className="relative hidden flex-1 lg:flex" onMouseLeave={closeMenus}>
+          <nav className="flex w-full items-center gap-6">
             {TOP_NAV.map((item) => {
               if (item.type === "anchor") {
                 return (
@@ -381,10 +381,10 @@ export function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+                  className={`flex items-center gap-2 border-b-2 px-0 pb-2 text-sm font-medium transition ${
                     isOpen
-                      ? "bg-[var(--bg-secondary)] text-[var(--text-primary)]"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      ? "border-[var(--text-status-warning)] text-[var(--text-primary)]"
+                      : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
                   onClick={() => toggleMenu(item.id)}
                   onMouseEnter={() => setOpenMenu(item.id)}
@@ -406,19 +406,19 @@ export function Header() {
           <SecondaryMenu open={openMenu === "access"} groups={SECONDARY_MENUS.access} />
           <SecondaryMenu open={openMenu === "company"} groups={SECONDARY_MENUS.company} />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-3">
           <Link
             href={"/platform/login" as any}
-            className="hidden items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
+            className="hidden items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
           >
             <UserRound className="h-4 w-4 text-[var(--icon-secondary)]" />
             Sign in
           </Link>
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)] lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)] lg:hidden"
             aria-label="Open navigation"
-            aria-expanded="false"
+            aria-expanded={openMenu !== null}
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -437,9 +437,9 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.2 }}
-          className="absolute left-0 top-full z-40 w-full border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]"
+          className="absolute left-0 right-0 top-full z-40 border-t border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
-          <div className="mx-auto grid w-full max-w-[1200px] gap-10 px-12 py-10 md:grid-cols-2">
+          <div className="mx-auto grid w-full gap-10 px-6 py-10 md:grid-cols-2 lg:px-12">
             {groups.map((group) => (
               <div key={group.title} className="space-y-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{group.title}</p>
@@ -456,7 +456,7 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
                       <li key={item.title}>
                         <Link
                           href={item.href as any}
-                          className="group flex items-start justify-between gap-4 rounded-2xl border border-transparent bg-[var(--bg-secondary)] px-4 py-3 transition hover:border-[var(--border-default)]"
+                          className="group flex items-start justify-between gap-4 border-b border-[var(--border-light)] pb-4"
                         >
                           <div className="space-y-1">
                             <p className={`text-sm font-semibold ${toneClass}`}>{item.title}</p>
