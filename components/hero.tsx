@@ -1,119 +1,156 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, Shield, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Shield, Sparkles } from "lucide-react";
 
-const highlights = [
+const featureStories = [
   {
-    label: "138",
-    suffix: " labs",
-    description: "Integrated R&D campuses across five continents"
+    tag: "Launch",
+    title: "Introducing Continuum Mission Control",
+    description:
+      "Synchronize AI models, robotics fleets, implants, and data infrastructure through one orchestrated console.",
+    action: "Review mission brief",
+    href: "/missions/continuum"
   },
   {
-    label: "24/7",
-    suffix: " neuro-ops",
-    description: "Digital operations system for autonomous production"
+    tag: "Update",
+    title: "Sentient Cloud 5 now live",
+    description: "Planetary-scale compute fabric with autonomous failover, sovereign regions, and orbital relays.",
+    action: "See capabilities",
+    href: "/platform/sentient-cloud"
   },
   {
-    label: ">480",
-    suffix: " products",
-    description: "Programs spanning implants, AI clouds, robotics, and orbital systems"
+    tag: "Insight",
+    title: "NeuroWeave immortality trials",
+    description: "Clinical-stage implants preserving consciousness continuity with regenerative support.",
+    action: "Read research",
+    href: "/insights/neurobionic-immortality"
+  }
+];
+
+const missionThreads = [
+  {
+    title: "Atlas agents draft orbital biosphere",
+    detail: "Multi-agent teams design autonomous orbital habitats with regenerative loops." 
+  },
+  {
+    title: "EdgeGrid expands to 42 cities",
+    detail: "Deterministic edge compute arrives in new sovereign corridors across three continents." 
+  },
+  {
+    title: "Aeterna Pass v3",
+    detail: "Unified biometric credential for accessing AI, biotech, and security facilities." 
   }
 ];
 
 export function Hero() {
   return (
-    <section className="relative mx-auto flex max-w-[1200px] flex-col gap-16 overflow-hidden rounded-[48px] border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]/80 px-10 pb-16 pt-20 shadow-[0_30px_120px_rgba(2,133,255,0.2)]">
+    <section className="mx-auto mt-6 flex max-w-[1200px] flex-col gap-12 rounded-[48px] border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]/90 px-10 pb-16 pt-14 shadow-[0_32px_140px_rgba(0,0,0,0.45)]">
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col gap-12 lg:flex-row lg:items-start"
+        className="grid gap-12 lg:grid-cols-[1.2fr_1fr]"
       >
-        <div className="flex-1 space-y-8">
-          <span className="badge">Future of integrated intelligence</span>
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight text-[var(--text-primary)] md:text-6xl">
-            Aeterna Technology fuses artificial intelligence, bioengineering, and autonomous networks into one ecosystem.
-          </h1>
-          <p className="max-w-2xl text-lg leading-relaxed text-[var(--text-secondary)]">
-            We engineer infrastructure for immortal digital and biological systems—from neural implants and quantum cryptography to generative AI platforms and autonomous factories.
-          </p>
-          <div className="flex flex-wrap items-center gap-4">
-            <a
-              href="#access"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-6 py-3 text-sm font-medium text-[var(--text-accent)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
-            >
-              Request authorization
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
-            <a
-              href="#programs"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-secondary-default)] px-6 py-3 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--interactive-bg-secondary-hover)]"
-            >
-              Explore divisions
-              <Shield className="h-4 w-4 text-[var(--icon-secondary)]" />
-            </a>
+        <div className="flex flex-col gap-8">
+          <div className="space-y-4">
+            <span className="badge">Corporate intelligence</span>
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-[var(--text-primary)] md:text-6xl">
+              What mission can Aeterna accelerate for your civilization?
+            </h1>
+            <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
+              Aeterna Technology integrates artificial intelligence, neuroengineering, cryptography, robotics, and orbital systems to create one continuous corporate infrastructure. Everything is synchronized, audited, and mission-driven.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <label className="flex items-center justify-between rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] px-6 py-4 text-sm text-[var(--text-tertiary)]">
+              <span>Search products, labs, missions, or briefs</span>
+              <ArrowRight className="h-4 w-4" />
+            </label>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {["138 labs", "24/7 neuro-ops", ">480 products"].map((metric) => (
+                <div key={metric} className="rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/80 px-4 py-4">
+                  <p className="text-sm font-medium text-[var(--text-primary)]">{metric}</p>
+                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">Active today</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <motion.div
-          initial={{ scale: 0.94, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="relative flex max-w-md flex-col gap-6 rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)]/70 p-6 backdrop-blur"
-        >
-          <div className="flex items-center justify-between">
-            <span className="badge">Neural Mission Control</span>
-            <Sparkles className="h-5 w-5 text-[var(--icon-accent)]" />
-          </div>
-          <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-            Transform data, materials, and biosystems into self-learning products. Our neural lacing links labs, drone fleets, and implants in real time.
-          </p>
-          <div className="space-y-3">
-            {[
-              {
-                title: "Sentient Cloud",
-                text: "Quantum-resilient compute fabric for models at planetary scale."
-              },
-              {
-                title: "BioSymphony",
-                text: "Bio-digital human twins with neural feedback via implants and prosthetics."
-              },
-              {
-                title: "Atlas Command",
-                text: "Neuro-composers drafting autonomous research missions across Earth and orbit."
-              }
-            ].map((item) => (
-              <div key={item.title} className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-tertiary)]/40 p-3">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{item.title}</p>
-                <p className="mt-1 text-xs text-[var(--text-tertiary)]">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        <div className="flex flex-col gap-4">
+          {featureStories.map((story, index) => (
+            <motion.article
+              key={story.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.08 }}
+              className="flex flex-col gap-3 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/85 p-6"
+            >
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[var(--text-tertiary)]">{story.tag}</span>
+              <h2 className="text-xl font-semibold text-[var(--text-primary)]">{story.title}</h2>
+              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{story.description}</p>
+              <a
+                href={story.href}
+                className="mt-auto inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+              >
+                {story.action}
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            </motion.article>
+          ))}
+        </div>
       </motion.div>
       <motion.div
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         transition={{ staggerChildren: 0.15 }}
-        className="grid gap-6 md:grid-cols-3"
+        className="grid gap-6 md:grid-cols-[1.4fr_1fr]"
       >
-        {highlights.map((item) => (
-          <motion.div
-            key={item.label}
-            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
-            className="grid-card"
-          >
-            <p className="text-3xl font-semibold text-[var(--text-accent)]">
-              {item.label}
-              <span className="text-base font-normal text-[var(--text-secondary)]">{item.suffix}</span>
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+          className="flex flex-col gap-4 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/85 p-8"
+        >
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-5 w-5 text-[var(--icon-secondary)]" />
+            <span className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Active threads</span>
+          </div>
+          <ul className="space-y-4">
+            {missionThreads.map((thread) => (
+              <li key={thread.title} className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-tertiary)]/60 p-4">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{thread.title}</p>
+                <p className="mt-1 text-xs text-[var(--text-tertiary)]">{thread.detail}</p>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+          className="flex flex-col justify-between gap-6 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/85 p-8"
+        >
+          <div className="space-y-3">
+            <span className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Security posture</span>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Quantum Zero Trust across every facility.</h3>
+            <p className="text-sm text-[var(--text-secondary)]">
+              Biometric, cryptographic, and behavioral defenses converge in the Aeterna Pass—governing autonomous labs and national partners.
             </p>
-            <p className="mt-3 text-sm text-[var(--text-tertiary)]">{item.description}</p>
-          </motion.div>
-        ))}
+          </div>
+          <div className="flex flex-wrap gap-3 text-xs text-[var(--text-tertiary)]">
+            {["Post-quantum", "Zero trust", "Neural biometrics", "Continuous audit"].map((label) => (
+              <span key={label} className="rounded-full border border-[var(--border-default)] px-3 py-1">
+                {label}
+              </span>
+            ))}
+          </div>
+          <a
+            href="#access"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-5 py-3 text-sm font-medium text-[var(--text-inverted)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+          >
+            Request authorization
+            <Shield className="h-4 w-4" />
+          </a>
+        </motion.div>
       </motion.div>
-      <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[var(--bg-accent-static)]/20 blur-3xl" />
-      <div className="absolute -bottom-16 -left-12 h-64 w-64 rounded-full bg-[var(--bg-accent-static)]/10 blur-3xl" />
     </section>
   );
 }

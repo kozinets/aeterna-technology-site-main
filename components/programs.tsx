@@ -135,7 +135,7 @@ export function Programs() {
               <div className="flex gap-3 text-xs text-[var(--text-tertiary)]">
                 {category.metrics.map((metric) => (
                   <span key={metric.label} className="rounded-full border border-[var(--border-light)] px-3 py-1">
-                    <strong className="font-semibold text-[var(--text-accent)]">{metric.label}</strong> {metric.value}
+                    <strong className="font-semibold text-[var(--text-primary)]">{metric.label}</strong> {metric.value}
                   </span>
                 ))}
               </div>
@@ -149,7 +149,7 @@ export function Programs() {
                   href={action.href as any}
                   className={`inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition ${
                     action.accent
-                      ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)] hover:bg-[var(--interactive-bg-accent-hover)]"
+                      ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-inverted)] hover:bg-[var(--interactive-bg-accent-hover)]"
                       : "bg-[var(--interactive-bg-secondary-default)] text-[var(--text-secondary)] hover:bg-[var(--interactive-bg-secondary-hover)]"
                   }`}
                 >

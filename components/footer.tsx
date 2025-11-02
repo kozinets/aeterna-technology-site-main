@@ -36,7 +36,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-8 py-14 md:flex-row md:justify-between">
         <div className="max-w-md space-y-4">
           <div className="flex items-center gap-3 text-lg font-semibold">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] font-display text-sm uppercase text-[var(--text-accent)]">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] font-display text-sm uppercase text-[var(--text-inverted)]">
               AT
             </span>
             <span className="font-display text-sm uppercase tracking-[0.3em] text-[var(--text-secondary)]">Aeterna Technology</span>
@@ -57,7 +57,7 @@ export function Footer() {
               <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <Link className="transition hover:text-[var(--text-accent)]" href={link.href as any}>
+                    <Link className="transition hover:text-[var(--text-primary)]" href={link.href as any}>
                       {link.label}
                     </Link>
                   </li>

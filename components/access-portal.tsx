@@ -73,7 +73,7 @@ export function AccessPortal() {
                 transition={{ delay: index * 0.05, duration: 0.4 }}
                 className="rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/60 p-5"
               >
-                <Icon className="h-6 w-6 text-[var(--icon-accent)]" />
+                <Icon className="h-6 w-6 text-[var(--icon-secondary)]" />
                 <p className="mt-3 text-sm text-[var(--text-secondary)]">
                   {index === 0 && "Biometric authorization with neural signatures"}
                   {index === 1 && "Post-quantum encryption and key matrices"}
@@ -101,7 +101,7 @@ export function AccessPortal() {
               <ul className="mt-4 space-y-3 text-sm text-[var(--text-tertiary)]">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[var(--icon-accent)]" />
+                    <CheckCircle2 className="h-4 w-4 text-[var(--icon-secondary)]" />
                     {feature}
                   </li>
                 ))}
@@ -110,7 +110,7 @@ export function AccessPortal() {
                 href={tier.href as any}
                 className={`mt-6 inline-flex items-center justify-center rounded-full border border-[var(--border-default)] px-5 py-2 text-sm font-medium transition ${
                   tier.accent
-                    ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)] hover:bg-[var(--interactive-bg-accent-hover)]"
+                    ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-inverted)] hover:bg-[var(--interactive-bg-accent-hover)]"
                     : "bg-[var(--interactive-bg-secondary-default)] text-[var(--text-secondary)] hover:bg-[var(--interactive-bg-secondary-hover)]"
                 }`}
               >

@@ -88,7 +88,10 @@ export function Insights() {
                 <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{article.description}</p>
                 <div className="mt-auto flex items-center justify-between pt-6 text-xs text-[var(--text-tertiary)]">
                   <span>{article.readingTime}</span>
-                  <Link href={article.href as any} className="flex items-center gap-2 text-[var(--text-accent)]">
+                  <Link
+                    href={article.href as any}
+                    className="flex items-center gap-2 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                  >
                     Read
                     <ArrowUpRight className="h-4 w-4" />
                   </Link>
@@ -104,7 +107,7 @@ export function Insights() {
             className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-secondary)]/80 p-8"
           >
             <div className="flex items-center gap-3">
-              <Sparkles className="h-5 w-5 text-[var(--icon-accent)]" />
+              <Sparkles className="h-5 w-5 text-[var(--icon-secondary)]" />
               <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Live missions</span>
             </div>
             <p className="mt-4 text-lg font-semibold text-[var(--text-primary)]">
@@ -114,7 +117,7 @@ export function Insights() {
               {signals.map((signal) => (
                 <li key={signal.title} className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-tertiary)]/40 p-4">
                   <div className="flex items-center gap-3">
-                    <signal.icon className="h-5 w-5 text-[var(--icon-accent)]" />
+                    <signal.icon className="h-5 w-5 text-[var(--icon-secondary)]" />
                     <span className="text-sm font-semibold text-[var(--text-primary)]">{signal.title}</span>
                   </div>
                   <p className="mt-2 text-xs text-[var(--text-tertiary)]">{signal.description}</p>
@@ -123,7 +126,7 @@ export function Insights() {
             </ul>
             <Link
               href={"/missions" as any}
-              className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[var(--text-accent)]"
+              className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
             >
               Active missions
               <ArrowUpRight className="h-4 w-4" />

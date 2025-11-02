@@ -1,42 +1,27 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowUpRight, ChevronRight, Dot } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type MegaMenuItem = {
+  title: string;
+  summary: string;
+  href: string;
+  badge?: string;
+  focus: string;
+  preview: string;
+  metrics: string[];
+};
 
 type MegaMenuSection = {
   id: string;
   title: string;
   description: string;
-  items: {
-    title: string;
-    summary: string;
-    href: string;
-    badge?: string;
-  }[];
+  meta: string;
+  items: MegaMenuItem[];
 };
-
-const securityHighlights = [
-  {
-    icon: Sparkles,
-    title: "Neural Access Fabric",
-    description: "Unified neural interface that personalizes entry points into every product and lab.",
-    href: "/platform/fabric"
-  },
-  {
-    icon: ShieldCheck,
-    title: "Quantum Zero Trust",
-    description: "Instant verification on quantum keys for government and enterprise missions.",
-    href: "/platform/quantum-zero-trust"
-  },
-  {
-    icon: Lock,
-    title: "Aeterna Pass",
-    description: "Single credential for Aeterna's sandboxes, clouds, and biomedical facilities.",
-    href: "/platform/pass"
-  }
-];
 
 export function MegaMenu({
   open,
@@ -45,14 +30,26 @@ export function MegaMenu({
   open: boolean;
   sections: MegaMenuSection[];
 }) {
-  const columns = useMemo(() => {
-    const colCount = 3;
-    return sections.reduce<MegaMenuSection[][]>((acc, section, index) => {
-      const columnIndex = index % colCount;
-      acc[columnIndex] = acc[columnIndex] ? [...acc[columnIndex], section] : [section];
-      return acc;
-    }, Array.from({ length: 3 }, () => [] as MegaMenuSection[]));
+  const initialSection = useMemo(() => sections[0]?.id ?? "", [sections]);
+  const [activeSectionId, setActiveSectionId] = useState(initialSection);
+  const activeSection = useMemo(
+    () => sections.find((section) => section.id === activeSectionId) ?? sections[0],
+    [activeSectionId, sections]
+  );
+  const [activeItem, setActiveItem] = useState<MegaMenuItem | null>(activeSection?.items[0] ?? null);
+
+  useEffect(() => {
+    setActiveSectionId((current) => {
+      if (sections.some((section) => section.id === current)) {
+        return current;
+      }
+      return sections[0]?.id ?? "";
+    });
   }, [sections]);
+
+  useEffect(() => {
+    setActiveItem(activeSection?.items[0] ?? null);
+  }, [activeSection]);
 
   return (
     <AnimatePresence>
@@ -62,76 +59,97 @@ export function MegaMenu({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.2 }}
-          className="absolute left-1/2 top-full z-40 mt-6 w-[min(1200px,90vw)] -translate-x-1/2 overflow-hidden rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]/95 backdrop-blur-lg shadow-[0_40px_120px_rgba(2,133,255,0.2)]"
+          className="absolute left-1/2 top-full z-40 mt-6 w-[min(1200px,90vw)] -translate-x-1/2 overflow-hidden rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-primary)]/95 backdrop-blur-xl shadow-[0_40px_140px_rgba(0,0,0,0.45)]"
         >
-          <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[2fr_1fr]">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-              {columns.map((column, columnIndex) => (
-                <div key={`column-${columnIndex}`} className="space-y-10">
-                  {column.map((section) => (
-                    <div key={section.id} className="space-y-4">
-                      <div>
-                        <p className="text-sm uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{section.title}</p>
-                        <p className="mt-2 text-sm text-[var(--text-secondary)]">{section.description}</p>
-                      </div>
-                      <ul className="space-y-4">
-                        {section.items.map((item) => (
-                          <li key={item.title}>
-                            <Link
-                              href={item.href as any}
-                              className="group flex items-start justify-between gap-3 rounded-2xl border border-transparent bg-[var(--bg-secondary)]/30 px-4 py-3 transition-colors hover:border-[var(--border-default)] hover:bg-[var(--interactive-bg-secondary-hover)]"
-                            >
-                              <div>
-                                <p className="font-medium text-[var(--text-primary)]">{item.title}</p>
-                                <p className="mt-1 text-sm leading-relaxed text-[var(--text-tertiary)]">{item.summary}</p>
-                              </div>
-                              <div className="flex flex-col items-end gap-2">
-                                {item.badge ? (
-                                  <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-tertiary)] px-3 py-0.5 text-xs uppercase tracking-[0.12em] text-[var(--text-accent)]">
-                                    {item.badge}
-                                  </span>
-                                ) : null}
-                                <ChevronRight className="mt-auto h-4 w-4 text-[var(--icon-tertiary)] transition-transform group-hover:translate-x-1" />
-                              </div>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              ))}
+          <div className="grid gap-10 px-12 py-10 lg:grid-cols-[220px_1fr_320px]">
+            <div className="space-y-4 border-r border-[var(--border-light)] pr-6">
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Divisions</p>
+              <ul className="space-y-2">
+                {sections.map((section) => {
+                  const isActive = section.id === activeSection?.id;
+                  return (
+                    <li key={section.id}>
+                      <button
+                        type="button"
+                        onMouseEnter={() => setActiveSectionId(section.id)}
+                        onFocus={() => setActiveSectionId(section.id)}
+                        className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
+                          isActive
+                            ? "border-[var(--border-default)] bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+                            : "border-transparent text-[var(--text-tertiary)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]"
+                        }`}
+                      >
+                        <span className="text-sm font-medium">{section.title}</span>
+                        <p className="mt-1 text-xs text-[var(--text-tertiary)]">{section.meta}</p>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <aside className="flex flex-col justify-between rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-secondary)]/80 p-6">
+            <div className="space-y-6">
               <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Access & Security</p>
-                <h3 className="mt-3 font-display text-2xl text-[var(--text-primary)]">
-                  Consolidated entry into the Aeterna research ecosystem
-                </h3>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Programs</p>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">{activeSection?.description}</p>
               </div>
-              <ul className="mt-6 space-y-5">
-                {securityHighlights.map((item) => (
+              <ul className="space-y-3">
+                {activeSection?.items.map((item) => (
                   <li key={item.title}>
                     <Link
                       href={item.href as any}
-                      className="group flex items-start gap-4 rounded-2xl border border-transparent bg-[var(--bg-secondary)]/30 p-4 transition hover:border-[var(--border-default)] hover:bg-[var(--interactive-bg-secondary-hover)]"
+                      className="group flex items-center justify-between gap-3 rounded-2xl border border-transparent bg-[var(--bg-secondary)]/40 px-4 py-3 transition hover:border-[var(--border-default)] hover:bg-[var(--bg-secondary)]"
+                      onMouseEnter={() => setActiveItem(item)}
+                      onFocus={() => setActiveItem(item)}
                     >
-                      <item.icon className="mt-1 h-6 w-6 text-[var(--icon-accent)]" />
                       <div>
-                        <p className="font-medium text-[var(--text-primary)]">{item.title}</p>
-                        <p className="mt-1 text-sm text-[var(--text-tertiary)]">{item.description}</p>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">{item.title}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-[var(--text-tertiary)]">{item.summary}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {item.badge ? (
+                          <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-tertiary)] px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-[var(--text-inverted)]">
+                            {item.badge}
+                          </span>
+                        ) : null}
+                        <ChevronRight className="h-4 w-4 text-[var(--icon-tertiary)] transition group-hover:translate-x-1" />
                       </div>
                     </Link>
                   </li>
                 ))}
               </ul>
               <Link
-                href={"/access" as any}
-                className="mt-8 inline-flex items-center justify-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-5 py-3 text-sm font-medium text-[var(--text-accent)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+                href={"/ecosystem" as any}
+                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
               >
-                Request access to restricted programs
-                <ChevronRight className="h-4 w-4" />
+                View entire ecosystem
+                <ArrowUpRight className="h-4 w-4" />
               </Link>
+            </div>
+            <aside className="flex flex-col gap-5 rounded-3xl border border-[var(--border-default)] bg-[var(--bg-elevated-secondary)]/80 p-6">
+              {activeItem ? (
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase tracking-[0.24em] text-[var(--text-tertiary)]">{activeItem.focus}</span>
+                    <h3 className="text-xl font-semibold text-[var(--text-primary)]">{activeItem.title}</h3>
+                  </div>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{activeItem.preview}</p>
+                  <ul className="space-y-2 text-xs text-[var(--text-tertiary)]">
+                    {activeItem.metrics.map((metric) => (
+                      <li key={metric} className="flex items-center gap-2">
+                        <Dot className="h-4 w-4 text-[var(--icon-secondary)]" />
+                        {metric}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={activeItem.href as any}
+                    className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--interactive-bg-accent-default)] px-4 py-2 text-xs font-medium text-[var(--text-inverted)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+                  >
+                    Launch program
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              ) : null}
             </aside>
           </div>
         </motion.div>

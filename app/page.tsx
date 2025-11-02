@@ -6,122 +6,136 @@ import { Insights } from "@/components/insights";
 import { Programs } from "@/components/programs";
 import { Building2, Cpu, FlaskConical, Orbit, Radar, Sparkles, Workflow } from "lucide-react";
 
-const ecosystemModules = [
+const ecosystemNodes = [
   {
     title: "Aeterna Genesis",
-    description: "Incubator for breakthrough ventures: organ bioprinting, material synthesis, and nanorobotics.",
-    detail: "18 divisions connected through Sentient Cloud and Vitality Labs"
+    description: "Incubator for breakthrough ventures in organ bioprinting, material synthesis, and nanorobotics.",
+    detail: "18 divisions synchronized with Sentient Cloud and Vitality Labs",
+    streams: ["Biofoundry", "Quantum materials", "Longevity"]
   },
   {
     title: "Continuum Campus",
-    description: "University of the future with neural lecture halls, quantum computers, and robotic laboratories.",
-    detail: "32,000 researchers and students"
+    description: "A living university with neural lecture halls, quantum compute, and autonomous laboratories.",
+    detail: "32,000 researchers and students operating across immersive environments",
+    streams: ["Neural curriculum", "Shared datasets", "Joint missions"]
   },
   {
     title: "Orbital Forge",
     description: "Space manufacturing platform for implants, satellites, and autonomous stations.",
-    detail: "LEO/MEO orbits linked by quantum channels"
+    detail: "LEO/MEO orbits connected through quantum channels and robotic foundries",
+    streams: ["Zero-G assembly", "Station autonomy", "Launch cadence"]
   },
   {
     title: "Aeterna Network Fabric",
-    description: "Global proxy, DePIN, and quantum communications network for data, robots, and implants.",
-    detail: "Powered by NOVA Proxy, Synapse Mesh, and Quantum Zero Trust"
+    description: "Global proxy, DePIN, and quantum communications lattice for data, robots, and implants.",
+    detail: "Powered by NOVA Proxy, Synapse Mesh, and Quantum Zero Trust governance",
+    streams: ["Proxy mesh", "Edge orchestration", "Telemetry"]
   }
 ];
 
-const alliance = [
+const campusStats = [
+  { icon: Cpu, label: "Sentient Cloud", value: "Exascale compute" },
+  { icon: Sparkles, label: "Neural Lattice", value: "Self-learning agents" },
+  { icon: Radar, label: "Aeterna Link", value: "Instant exchange" }
+];
+
+const alliances = [
   {
     icon: Building2,
     title: "Governments",
-    text: "Sovereign clouds, digital twins of infrastructure, and longevity programs for critical leaders."
+    text: "Sovereign clouds, digital twins, and longevity initiatives for national leaders."
   },
   {
     icon: Workflow,
     title: "Enterprises",
-    text: "Autonomous production, biofoundries, and cognitive operations orchestration."
+    text: "Autonomous production, cybernetic factories, and cognitive operations."
   },
   {
     icon: FlaskConical,
     title: "Universities",
-    text: "Access to Aeterna labs, joint research, data exchanges, and model co-creation."
+    text: "Joint research programs, data exchanges, and accelerated discoveries."
   },
   {
     icon: Orbit,
     title: "Orbital missions",
-    text: "Satellite fleets, stations, and drones governed by Atlas Command and Sentient Cloud."
+    text: "Satellites, stations, and drones governed by Atlas Command and Sentient Cloud."
   }
+];
+
+const timeline = [
+  "2024 — Quantum Zero Trust deployed across 12 nations",
+  "2025 — Orbital Forge launches with Sentient Cloud v5",
+  "2026 — NeuroWeave immortality programs reach global scale",
+  "2027 — Autonomous cities orchestrated by Atlas"
 ];
 
 export default function Page() {
   return (
     <main>
       <Header />
-      <div className="px-6 pb-24 pt-20">
+      <div className="px-6 pb-24 pt-12">
         <Hero />
-        <Programs />
-        <section className="mx-auto mt-28 max-w-[1200px]">
+        <section className="mx-auto mt-24 max-w-[1200px]">
           <div className="section-shell px-10 py-12">
-            <div className="flex flex-col gap-6 md:flex-row md:justify-between">
-              <div className="max-w-2xl space-y-4">
-                <span className="badge">Integrated ecosystems</span>
-                <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-                  The Aeterna ecosystem unfolds technology through living campuses and orbital platforms.
-                </h2>
-                <p className="text-base leading-relaxed text-[var(--text-secondary)]">
-                  From subterranean labs to orbital foundries, every site is synchronized via Sentient Cloud and Quantum Zero Trust. We build a network where digital and biological systems evolve in unison.
-                </p>
+            <div className="grid gap-12 lg:grid-cols-[260px_1fr]">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <span className="badge">Integrated ecosystems</span>
+                  <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
+                    The Aeterna ecosystem is a living corporate organism.
+                  </h2>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                    Subterranean labs, orbital foundries, quantum networks, and longevity programs operate under one mission console.
+                  </p>
+                </div>
+                <div className="grid gap-4">
+                  {campusStats.map((item) => (
+                    <div key={item.label} className="glass-panel flex items-center gap-3 p-5">
+                      <item.icon className="h-6 w-6 text-[var(--icon-secondary)]" />
+                      <div>
+                        <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</span>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {[
-                  {
-                    icon: Cpu,
-                    label: "Sentient Cloud",
-                    value: "Exascale compute"
-                  },
-                  {
-                    icon: Sparkles,
-                    label: "Neural Lattice",
-                    value: "Self-learning agents"
-                  },
-                  {
-                    icon: Radar,
-                    label: "Aeterna Link",
-                    value: "Instant exchange"
-                  }
-                ].map((item) => (
-                  <div key={item.label} className="glass-panel flex flex-col gap-2 p-5">
-                    <item.icon className="h-6 w-6 text-[var(--icon-accent)]" />
-                    <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</span>
-                    <p className="text-sm font-semibold text-[var(--text-primary)]">{item.value}</p>
+              <div className="grid gap-6 md:grid-cols-2">
+                {ecosystemNodes.map((node) => (
+                  <div key={node.title} className="grid-card space-y-4">
+                    <div>
+                      <h3 className="text-xl font-semibold text-[var(--text-primary)]">{node.title}</h3>
+                      <p className="mt-2 text-sm text-[var(--text-secondary)]">{node.description}</p>
+                    </div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{node.detail}</p>
+                    <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+                      {node.streams.map((stream) => (
+                        <span key={stream} className="rounded-full border border-[var(--border-default)] px-3 py-1">
+                          {stream}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2">
-              {ecosystemModules.map((module) => (
-                <div key={module.title} className="grid-card">
-                  <h3 className="text-xl font-semibold text-[var(--text-primary)]">{module.title}</h3>
-                  <p className="mt-2 text-sm text-[var(--text-secondary)]">{module.description}</p>
-                  <p className="mt-4 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{module.detail}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
+        <Programs />
         <section className="mx-auto mt-28 max-w-[1200px]">
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
+          <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
             <div className="section-shell px-10 py-12">
-              <span className="badge">Alliance</span>
+              <span className="badge">Alliance network</span>
               <h2 className="mt-4 text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-                Aeterna partnership programs.
+                Strategic partners extend Aeterna's reach.
               </h2>
               <p className="mt-4 text-base text-[var(--text-secondary)]">
-                We collaborate with governments, enterprises, and universities to launch joint programs, co-own infrastructure, and advance global missions.
+                Governments, enterprises, and universities integrate with our infrastructure to launch joint missions and co-own progress.
               </p>
               <div className="mt-8 grid gap-5">
-                {alliance.map((unit) => (
+                {alliances.map((unit) => (
                   <div key={unit.title} className="glass-panel flex gap-4 p-5">
-                    <unit.icon className="mt-1 h-6 w-6 text-[var(--icon-accent)]" />
+                    <unit.icon className="mt-1 h-6 w-6 text-[var(--icon-secondary)]" />
                     <div>
                       <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{unit.title}</h3>
                       <p className="mt-2 text-sm text-[var(--text-secondary)]">{unit.text}</p>
@@ -132,18 +146,18 @@ export default function Page() {
             </div>
             <div className="section-shell px-10 py-12">
               <span className="badge">Continuum timeline</span>
-              <h2 className="mt-4 text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">Aeterna evolution roadmap.</h2>
+              <h2 className="mt-4 text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
+                Expansion roadmap.
+              </h2>
               <div className="mt-8 space-y-6">
-                {[
-                  "2024 — Quantum Zero Trust deployed across 12 nations",
-                  "2025 — Orbital Forge launches with Sentient Cloud v3",
-                  "2026 — NeuroWeave immortality programs reach global scale",
-                  "2027 — Autonomous cities orchestrated by Atlas"
-                ].map((milestone) => (
+                {timeline.map((milestone) => (
                   <div key={milestone} className="border-l border-[var(--border-default)] pl-6">
                     <p className="text-sm text-[var(--text-secondary)]">{milestone}</p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-10 rounded-3xl border border-[var(--border-light)] bg-[var(--bg-secondary)]/70 p-6 text-sm text-[var(--text-secondary)]">
+                Every roadmap entry is governed by Atlas Mission Control with compliance checks, partner review boards, and biometric authorization through Aeterna Pass.
               </div>
             </div>
           </div>
