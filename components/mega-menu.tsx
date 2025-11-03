@@ -55,10 +55,10 @@ export function MegaMenu({
     <AnimatePresence>
       {open ? (
         <motion.div
-          initial={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
+          initial={{ opacity: 0, clipPath: "inset(100% 0% 0% 0%)" }}
           animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
-          exit={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
-          transition={{ duration: 0.24, ease: "easeOut" }}
+          exit={{ opacity: 0, clipPath: "inset(100% 0% 0% 0%)" }}
+          transition={{ duration: 0.26, ease: "easeOut" }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
           <div className="mx-auto w-full max-w-[1440px] px-6 py-10 lg:px-12">

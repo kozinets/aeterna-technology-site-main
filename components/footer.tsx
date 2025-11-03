@@ -13,53 +13,53 @@ type FooterColumn = {
 
 const footerColumns: FooterColumn[] = [
   {
-    title: "Intelligence fabric",
+    title: "Corporate",
     links: [
-      { label: "Atlas Council", href: "/ecosystem/atlas-council" },
-      { label: "Sentient Cloud", href: "/platform/sentient-cloud" },
-      { label: "Neural Lattice", href: "/ai/neural-lattice" },
-      { label: "Continuum Campus", href: "/ecosystem/continuum-campus" },
-      { label: "Civic twin", href: "/ecosystem/civic-twin" }
+      { label: "Overview", href: "/company/overview" },
+      { label: "Leadership", href: "/company/leadership" },
+      { label: "Careers", href: "/company/careers" },
+      { label: "Newsroom", href: "/company/newsroom" },
+      { label: "Global facilities", href: "/company/facilities" }
     ]
   },
   {
-    title: "Infrastructure",
+    title: "Operations",
     links: [
-      { label: "Orbital Forge", href: "/infrastructure/orbital-forge" },
-      { label: "EdgeGrid", href: "/network/edge-grid" },
-      { label: "NOVA Proxy", href: "/network/nova-proxy" },
-      { label: "Synapse Mesh", href: "/network/synapse-mesh" },
-      { label: "Quantum Zero Trust", href: "/security/quantum-zero-trust" }
+      { label: "Mission control", href: "/operations/control-center" },
+      { label: "Atlas operations", href: "/operations/atlas" },
+      { label: "Edge deployments", href: "/operations/edge-hubs" },
+      { label: "Biomed network", href: "/operations/biomed" },
+      { label: "Orbital logistics", href: "/operations/orbital" }
     ]
   },
   {
-    title: "Compliance",
+    title: "Programs",
     links: [
-      { label: "Transparency reports", href: "/reports" },
-      { label: "Containment framework", href: "/security/containment" },
-      { label: "Audit console", href: "/platform/audit" },
-      { label: "Risk response", href: "/security/response" },
-      { label: "Incident archive", href: "/security/archive" }
+      { label: "Neural integrity", href: "/programs/neural-integrity" },
+      { label: "Orbital autonomy", href: "/programs/orbital-autonomy" },
+      { label: "Quantum finance", href: "/programs/quantum-finance" },
+      { label: "Longevity guilds", href: "/programs/longevity-guilds" },
+      { label: "Robotics continuum", href: "/programs/robotics-continuum" }
     ]
   },
   {
-    title: "Engagement",
+    title: "Trust & compliance",
     links: [
-      { label: "Alliance program", href: "/partners/alliances" },
-      { label: "Sovereign onboarding", href: "/access/sovereign" },
-      { label: "Academic fellowships", href: "/careers/fellowships" },
-      { label: "Mission briefs", href: "/briefs" },
-      { label: "Investment desk", href: "/partners/invest" }
+      { label: "Security posture", href: "/trust/security-posture" },
+      { label: "Compliance hub", href: "/trust/compliance" },
+      { label: "Transparency", href: "/trust/transparency" },
+      { label: "Incident response", href: "/trust/incident-response" },
+      { label: "Responsible AI", href: "/trust/responsible-ai" }
     ]
   },
   {
-    title: "Media & insights",
+    title: "Developers",
     links: [
-      { label: "Press room", href: "/media" },
-      { label: "Research library", href: "/insights" },
-      { label: "Event schedule", href: "/events" },
-      { label: "Documentation", href: "/docs" },
-      { label: "Developer updates", href: "/developers" }
+      { label: "Start building", href: "/developers/start" },
+      { label: "API catalog", href: "/developers/api" },
+      { label: "SDK downloads", href: "/developers/sdks" },
+      { label: "Changelog", href: "/developers/changelog" },
+      { label: "Support center", href: "/developers/support" }
     ]
   }
 ];
@@ -68,7 +68,9 @@ const operationsContacts = [
   { label: "Mission command", value: "command@aeterna.global" },
   { label: "Security desk", value: "security@aeterna.global" },
   { label: "Payments desk", value: "pay@aeterna.global" },
-  { label: "Press", value: "press@aeterna.global" }
+  { label: "Life sciences", value: "vitality@aeterna.global" },
+  { label: "Orbital ops", value: "orbit@aeterna.global" },
+  { label: "Media", value: "press@aeterna.global" }
 ];
 
 const statusBadges = [
@@ -120,7 +122,7 @@ export function Footer() {
           </div>
         </div>
         <div className="flex flex-col gap-8 border-t border-[var(--border-light)] pt-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="grid gap-4 text-sm text-[var(--text-secondary)] sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 text-sm text-[var(--text-secondary)] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {operationsContacts.map((contact) => (
               <div key={contact.label} className="space-y-1">
                 <span className="text-[10px] uppercase tracking-[0.24em] text-[var(--text-tertiary)]">{contact.label}</span>

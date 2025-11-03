@@ -158,7 +158,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
             layout
-            className={`w-full overflow-hidden border border-[var(--border-default)] bg-[var(--bg-primary)] p-6 ${
+            className={`flex w-full max-h-[90vh] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-primary)] p-6 ${
               selectedEntry ? "max-w-5xl" : "max-w-2xl"
             }`}
             onClick={(event) => event.stopPropagation()}
@@ -183,14 +183,15 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            {selectedEntry ? (
-              <div className="mt-6 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{selectedEntry.accent}</p>
-                      <h3 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">{selectedEntry.title} pipeline</h3>
-                    </div>
+            <div className="mt-6 flex-1 overflow-y-auto pr-1">
+              {selectedEntry ? (
+                <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{selectedEntry.accent}</p>
+                        <h3 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">{selectedEntry.title} pipeline</h3>
+                      </div>
                     <button
                       type="button"
                       onClick={() => setSelectedEntry(null)}
@@ -259,7 +260,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
               </div>
             ) : (
               <>
-                <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+                <ul className="grid gap-4 sm:grid-cols-3">
                   {entryPoints.map((entry) => (
                     <li key={entry.title} className="group flex flex-col gap-3 border border-[var(--border-light)] p-4 transition hover:border-[var(--border-default)]">
                       <div className="flex items-center gap-3">
@@ -283,6 +284,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
                 </p>
               </>
             )}
+            </div>
           </motion.div>
         </motion.div>
       ) : null}

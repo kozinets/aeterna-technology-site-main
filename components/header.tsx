@@ -124,6 +124,16 @@ const NAVIGATION: NavigationSection[] = [
     meta: "Trusted autonomy",
     items: [
       {
+        title: "Aeterna Pay",
+        summary: "Zero-fee wallets and programmable settlement for individuals and enterprises.",
+        href: "/crypto/aeterna-pay",
+        badge: "launch",
+        focus: "Commerce fabric",
+        preview:
+          "Aeterna Pay fuses biometric identity, multi-asset wallets, and automated treasury orchestration under one control plane.",
+        metrics: ["Zero fee", "NFC transfers", "Treasury APIs"]
+      },
+      {
         title: "DePIN Orchestration Network",
         summary: "Programmable economy for physical networks and autonomy fleets.",
         href: "/crypto/depin",
@@ -383,7 +393,7 @@ export function Header() {
                   <Link
                     key={item.id}
                     href={item.href as any}
-                    className="flex h-full items-center gap-2 border-b-2 border-transparent px-0 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                    className="flex h-full items-center gap-2 border-b-2 border-transparent px-0 pb-1 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
                     onFocus={closeMenus}
                     onMouseEnter={closeMenus}
                   >
@@ -397,7 +407,7 @@ export function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  className={`flex h-full items-center gap-2 border-b-2 px-0 leading-none transition ${
+                  className={`flex h-full items-center gap-2 border-b-2 px-0 pb-1 leading-none transition ${
                     isOpen
                       ? "border-[var(--text-status-warning)] text-[var(--text-primary)]"
                       : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -464,10 +474,10 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
     <AnimatePresence>
       {open ? (
         <motion.div
-          initial={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
+          initial={{ opacity: 0, clipPath: "inset(100% 0% 0% 0%)" }}
           animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
-          exit={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
-          transition={{ duration: 0.24, ease: "easeOut" }}
+          exit={{ opacity: 0, clipPath: "inset(100% 0% 0% 0%)" }}
+          transition={{ duration: 0.26, ease: "easeOut" }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
           <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-10 md:grid-cols-2 lg:grid-cols-3 lg:px-12">

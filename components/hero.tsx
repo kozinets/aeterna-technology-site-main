@@ -98,6 +98,35 @@ const tickerItems = [
   { label: "Sentient Cloud", detail: "Orbital relay sync", tone: "positive" as const }
 ];
 
+const maxVerbCharacters = missionVerbs.reduce((longest, verb) => Math.max(longest, verb.length), 0);
+
+const missionAnalytics = [
+  {
+    signal: "#ProxyFlux",
+    value: "3.8B packets/hour",
+    detail: "NOVA validators maintain deterministic handoffs across 184 regions.",
+    tone: "positive" as const
+  },
+  {
+    signal: "#Continuity",
+    value: "412 immortality fellows",
+    detail: "Longevity guilds complete synthesis cycles without containment drift.",
+    tone: "critical" as const
+  },
+  {
+    signal: "#AtlasCommand",
+    value: "102 autonomous councils",
+    detail: "Mission planners resolved 1,204 scenarios in the last 90 minutes.",
+    tone: "positive" as const
+  },
+  {
+    signal: "#EdgeGrid",
+    value: "42 deterministic cities",
+    detail: "Quantum-secure corridors sustain 99.999% uptime for robotics fleets.",
+    tone: "positive" as const
+  }
+];
+
 export function Hero() {
   const [verbIndex, setVerbIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -127,6 +156,7 @@ export function Hero() {
   const activeOperations = useMemo(() => operationsFeed[operationsIndex], [operationsIndex]);
 
   const duplicatedTicker = useMemo(() => [...tickerItems, ...tickerItems], []);
+  const rotatingWidth = `${maxVerbCharacters + 2}ch`;
 
   return (
     <section className="flex flex-col gap-14">
@@ -144,19 +174,24 @@ export function Hero() {
             </span>
             <h1 className="text-4xl font-semibold leading-tight text-[var(--text-primary)] md:text-6xl">
               What mission can Aeterna
-              <span className="relative ml-3 inline-flex h-[1.2em] w-[9.5rem] items-center justify-start overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={activeVerb}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                    className="absolute left-0 top-0 w-full whitespace-nowrap text-[var(--text-status-warning)]"
-                  >
-                    {activeVerb}
-                  </motion.span>
-                </AnimatePresence>
+              <span className="relative ml-3 inline-flex items-center">
+                <span
+                  className="relative inline-flex h-[1.2em] items-center overflow-hidden rounded-sm bg-[var(--interactive-bg-tertiary-hover)] px-3"
+                  style={{ width: rotatingWidth }}
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={activeVerb}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -16 }}
+                      transition={{ duration: 0.35 }}
+                      className="absolute inset-0 flex items-center whitespace-nowrap text-[var(--text-status-warning)]"
+                    >
+                      {activeVerb}
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
               </span>
               <span className="text-[var(--text-status-error)]"> your civilization?</span>
             </h1>
@@ -219,7 +254,7 @@ export function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.4 }}
-                  className="mt-3 space-y-1 min-h-[4.25rem]"
+                  className="mt-3 min-h-[5.5rem] space-y-1"
                 >
                   <p
                     className={`text-sm font-semibold ${
@@ -234,9 +269,34 @@ export function Hero() {
                 </motion.div>
               </AnimatePresence>
             </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {missionAnalytics.map((item) => (
+                <motion.div
+                  key={item.signal}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.35 }}
+                  className="relative flex flex-col gap-1 overflow-hidden pl-4"
+                >
+                  <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-light)]" aria-hidden="true" />
+                  <span
+                    className={`text-[10px] uppercase tracking-[0.24em] ${
+                      item.tone === "critical"
+                        ? "text-[var(--text-status-error)]"
+                        : "text-[var(--text-status-warning)]"
+                    }`}
+                  >
+                    {item.signal}
+                  </span>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{item.value}</p>
+                  <p className="text-xs leading-relaxed text-[var(--text-secondary)]">{item.detail}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           <div className="relative pl-6">
             <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
             <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Live mission thread</span>
@@ -247,7 +307,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.4 }}
-                className="mt-4 space-y-2 min-h-[6.5rem]"
+                className="mt-4 space-y-2"
               >
                 <p
                   className={`text-lg font-semibold ${
@@ -255,6 +315,12 @@ export function Hero() {
                       ? "text-[var(--text-status-warning)]"
                       : "text-[var(--text-status-error)]"
                   }`}
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical" as const,
+                    overflow: "hidden"
+                  }}
                 >
                   {activeThread.title}
                 </p>
@@ -272,38 +338,45 @@ export function Hero() {
               </motion.div>
             </AnimatePresence>
           </div>
-          <div className="flex flex-col gap-5">
-            {featureStories.map((story, index) => (
-              <motion.article
-                key={story.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.4, delay: index * 0.08 }}
-                className="relative pb-5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-[var(--border-light)] after:content-[''] last:after:hidden"
-              >
-                <span
-                  className={`text-[10px] uppercase tracking-[0.28em] ${
-                    story.tone === "positive"
-                      ? "text-[var(--text-status-warning)]"
-                      : story.tone === "critical"
-                        ? "text-[var(--text-status-error)]"
-                        : "text-[var(--text-tertiary)]"
-                  }`}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+              <span>Mission stories</span>
+              <span className="text-[var(--text-tertiary)]">Swipe to explore</span>
+            </div>
+            <div className="relative -mx-2 flex snap-x snap-mandatory gap-5 overflow-x-auto px-2 pb-2">
+              {featureStories.map((story, index) => (
+                <motion.article
+                  key={story.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.35, delay: index * 0.04 }}
+                  className="relative flex min-w-[260px] flex-1 snap-start flex-col gap-3 pl-5"
                 >
-                  {story.tag}
-                </span>
-                <h2 className="mt-3 text-xl font-semibold text-[var(--text-primary)]">{story.title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{story.description}</p>
-                <Link
-                  href={story.href as any}
-                  className="mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-                >
-                  {story.action}
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </motion.article>
-            ))}
+                  <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-light)]" aria-hidden="true" />
+                  <span
+                    className={`text-[10px] uppercase tracking-[0.28em] ${
+                      story.tone === "positive"
+                        ? "text-[var(--text-status-warning)]"
+                        : story.tone === "critical"
+                          ? "text-[var(--text-status-error)]"
+                          : "text-[var(--text-tertiary)]"
+                    }`}
+                  >
+                    {story.tag}
+                  </span>
+                  <h2 className="text-lg font-semibold text-[var(--text-primary)]">{story.title}</h2>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{story.description}</p>
+                  <Link
+                    href={story.href as any}
+                    className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                  >
+                    {story.action}
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </motion.article>
+              ))}
+            </div>
           </div>
           <div className="relative flex flex-col gap-3 pl-6">
             <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />

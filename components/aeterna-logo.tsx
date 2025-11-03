@@ -6,7 +6,7 @@ type Props = {
 export function AeternaLogo({ className, title = "Aeterna" }: Props) {
   return (
     <svg
-      viewBox="0 10 1000 214"
+      viewBox="140 10 880 214"
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label={title}
