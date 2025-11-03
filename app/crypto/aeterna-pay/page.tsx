@@ -1,6 +1,7 @@
 import { AccessPortal } from "@/components/access-portal";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { AeternaPayAnalytics } from "@/components/charts/aeterna-pay-analytics";
 import { ArrowRight, Banknote, CheckCircle2, Fingerprint, Lock, Smartphone, Wallet } from "lucide-react";
 import Link from "next/link";
 
@@ -208,6 +209,17 @@ export default function AeternaPayPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="mt-20 space-y-8">
+          <div className="space-y-3">
+            <h2 className="text-3xl font-semibold text-[var(--text-primary)]">Realtime finance intelligence.</h2>
+            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+              Observe weekly payment momentum, settlement mixes, and corridor latency across the commerce network. D3-powered
+              telemetry lets payment teams sense health instantly.
+            </p>
+          </div>
+          <AeternaPayAnalytics />
         </section>
 
         <AccessPortal />

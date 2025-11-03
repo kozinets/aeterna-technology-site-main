@@ -354,6 +354,9 @@ export function Header() {
   const [authOpen, setAuthOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  const navItemBase =
+    "relative flex h-full items-center gap-2 px-3 text-sm font-medium leading-none transition-colors duration-150 after:absolute after:bottom-[-3px] after:left-0 after:h-[2px] after:w-full after:rounded-full after:transition-colors after:duration-150";
+
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -383,17 +386,17 @@ export function Header() {
           className="flex items-center"
           aria-label="Aeterna Technology — home"
         >
-          <AeternaLogo className="h-8 shrink-0 lg:h-9" />
+          <AeternaLogo className="h-7 shrink-0 lg:h-8" />
         </Link>
-        <div className="hidden flex-1 items-stretch lg:flex">
-          <nav className="flex h-full flex-1 items-stretch gap-2 text-sm font-medium">
+        <div className="hidden flex-1 items-center lg:flex">
+          <nav className="flex h-full flex-1 items-center gap-1 text-sm font-medium">
             {TOP_NAV.map((item) => {
               if (item.type === "anchor") {
                 return (
                   <Link
                     key={item.id}
                     href={item.href as any}
-                    className="flex h-full items-center gap-2 border-b-2 border-transparent px-0 pb-1 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                    className={`${navItemBase} text-[var(--text-secondary)] after:bg-transparent hover:text-[var(--text-primary)] hover:after:bg-[var(--border-default)]`}
                     onFocus={closeMenus}
                     onMouseEnter={closeMenus}
                   >
@@ -407,10 +410,10 @@ export function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  className={`flex h-full items-center gap-2 border-b-2 px-0 pb-1 leading-none transition ${
+                  className={`${navItemBase} ${
                     isOpen
-                      ? "border-[var(--text-status-warning)] text-[var(--text-primary)]"
-                      : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      ? "text-[var(--text-primary)] after:bg-[var(--text-status-warning)]"
+                      : "text-[var(--text-secondary)] after:bg-transparent hover:text-[var(--text-primary)] hover:after:bg-[var(--border-default)]"
                   }`}
                   onClick={() => toggleMenu(item.id)}
                   onMouseEnter={() => setOpenMenu(item.id)}
@@ -474,9 +477,9 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
     <AnimatePresence>
       {open ? (
         <motion.div
-          initial={{ opacity: 0, clipPath: "inset(100% 0% 0% 0%)" }}
+          initial={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
           animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
-          exit={{ opacity: 0, clipPath: "inset(100% 0% 0% 0%)" }}
+          exit={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
           transition={{ duration: 0.26, ease: "easeOut" }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >

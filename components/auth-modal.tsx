@@ -143,7 +143,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-[var(--bg-scrim)] px-4"
+          className="fixed inset-0 z-[110] flex items-start justify-center overflow-y-auto bg-[var(--bg-scrim)] px-4 py-10 sm:items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -159,7 +159,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
             transition={{ duration: 0.2 }}
             layout
             className={`flex w-full max-h-[90vh] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-primary)] p-6 ${
-              selectedEntry ? "max-w-5xl" : "max-w-2xl"
+              selectedEntry ? "max-w-[90vw] lg:max-w-5xl" : "max-w-[90vw] sm:max-w-2xl"
             }`}
             onClick={(event) => event.stopPropagation()}
           >

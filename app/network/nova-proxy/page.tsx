@@ -1,6 +1,7 @@
 import { AccessPortal } from "@/components/access-portal";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { NovaProxyAnalytics } from "@/components/charts/nova-proxy-analytics";
 import { CheckCircle2, Download, Globe, Layers, Shield, Zap } from "lucide-react";
 import Link from "next/link";
 
@@ -220,6 +221,17 @@ export default function NovaProxyPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="mt-20 space-y-8">
+          <div className="space-y-3">
+            <h2 className="text-3xl font-semibold text-[var(--text-primary)]">Mesh telemetry visualized.</h2>
+            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+              Real-time packet density, revenue allocation, and resilience envelopes drive how NOVA balances community traffic
+              with sovereign-grade workloads. These charts update continuously inside the live console.
+            </p>
+          </div>
+          <NovaProxyAnalytics />
         </section>
 
         <AccessPortal />
