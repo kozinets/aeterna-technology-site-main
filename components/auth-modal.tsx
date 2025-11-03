@@ -157,7 +157,10 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="w-full max-w-2xl overflow-hidden border border-[var(--border-default)] bg-[var(--bg-primary)] p-6"
+            layout
+            className={`w-full overflow-hidden border border-[var(--border-default)] bg-[var(--bg-primary)] p-6 ${
+              selectedEntry ? "max-w-5xl" : "max-w-2xl"
+            }`}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-6">

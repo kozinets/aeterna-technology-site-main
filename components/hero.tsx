@@ -61,6 +61,29 @@ const missionThreads = [
   }
 ];
 
+const operationsFeed = [
+  {
+    label: "Atlas",
+    detail: "102 autonomous councils synthesizing planetary strategies.",
+    tone: "positive" as const
+  },
+  {
+    label: "NOVA",
+    detail: "Proxy mesh absorbed 3.1B encrypted packets in the last hour.",
+    tone: "positive" as const
+  },
+  {
+    label: "Continuity",
+    detail: "Immortality Initiative onboarded 412 longevity fellows this week.",
+    tone: "critical" as const
+  },
+  {
+    label: "Sentient Cloud",
+    detail: "Orbital relays balanced 28% more bio-signal workloads overnight.",
+    tone: "positive" as const
+  }
+];
+
 const heroMetrics = [
   { label: "#138Labs", caption: "Operational today", tone: "positive" as const },
   { label: "#NeuroOps", caption: "Global coverage", tone: "critical" as const },
@@ -79,6 +102,7 @@ export function Hero() {
   const [verbIndex, setVerbIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [threadIndex, setThreadIndex] = useState(0);
+  const [operationsIndex, setOperationsIndex] = useState(0);
 
   useEffect(() => {
     const verbTimer = setInterval(() => setVerbIndex((index) => (index + 1) % missionVerbs.length), 2600);
@@ -87,17 +111,20 @@ export function Hero() {
       3200
     );
     const threadTimer = setInterval(() => setThreadIndex((index) => (index + 1) % missionThreads.length), 4200);
+    const operationsTimer = setInterval(() => setOperationsIndex((index) => (index + 1) % operationsFeed.length), 3600);
 
     return () => {
       clearInterval(verbTimer);
       clearInterval(placeholderTimer);
       clearInterval(threadTimer);
+      clearInterval(operationsTimer);
     };
   }, []);
 
   const activeThread = useMemo(() => missionThreads[threadIndex], [threadIndex]);
   const activeVerb = missionVerbs[verbIndex];
   const activePlaceholder = searchExamples[placeholderIndex];
+  const activeOperations = useMemo(() => operationsFeed[operationsIndex], [operationsIndex]);
 
   const duplicatedTicker = useMemo(() => [...tickerItems, ...tickerItems], []);
 
@@ -107,7 +134,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="grid gap-12 lg:grid-cols-[1.25fr_1fr]"
+        className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]"
       >
         <div className="flex flex-col gap-8">
           <div className="space-y-5">
@@ -117,15 +144,15 @@ export function Hero() {
             </span>
             <h1 className="text-4xl font-semibold leading-tight text-[var(--text-primary)] md:text-6xl">
               What mission can Aeterna
-              <span className="relative ml-3 inline-flex min-w-[10rem] items-center justify-start">
-                <AnimatePresence mode="popLayout">
+              <span className="relative ml-3 inline-flex h-[1.2em] w-[9.5rem] items-center justify-start overflow-hidden">
+                <AnimatePresence mode="wait">
                   <motion.span
                     key={activeVerb}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -16 }}
-                    transition={{ duration: 0.4 }}
-                    className="text-[var(--text-status-warning)]"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4 }}
+                    className="absolute left-0 top-0 w-full whitespace-nowrap text-[var(--text-status-warning)]"
                   >
                     {activeVerb}
                   </motion.span>
@@ -182,6 +209,31 @@ export function Hero() {
                 </motion.div>
               ))}
             </div>
+            <div className="relative pl-4">
+              <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
+              <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Operational signals</span>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeOperations.label}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.4 }}
+                  className="mt-3 space-y-1 min-h-[4.25rem]"
+                >
+                  <p
+                    className={`text-sm font-semibold ${
+                      activeOperations.tone === "critical"
+                        ? "text-[var(--text-status-error)]"
+                        : "text-[var(--text-status-warning)]"
+                    }`}
+                  >
+                    #{activeOperations.label}
+                  </p>
+                  <p className="text-sm text-[var(--text-secondary)]">{activeOperations.detail}</p>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-6">
@@ -195,7 +247,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.4 }}
-                className="mt-4 space-y-2"
+                className="mt-4 space-y-2 min-h-[6.5rem]"
               >
                 <p
                   className={`text-lg font-semibold ${
@@ -206,7 +258,17 @@ export function Hero() {
                 >
                   {activeThread.title}
                 </p>
-                <p className="text-sm text-[var(--text-secondary)]">{activeThread.detail}</p>
+                <p
+                  className="text-sm text-[var(--text-secondary)]"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical" as const,
+                    overflow: "hidden"
+                  }}
+                >
+                  {activeThread.detail}
+                </p>
               </motion.div>
             </AnimatePresence>
           </div>

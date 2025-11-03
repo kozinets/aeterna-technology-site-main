@@ -13,58 +13,53 @@ type FooterColumn = {
 
 const footerColumns: FooterColumn[] = [
   {
-    title: "Divisions",
+    title: "Intelligence fabric",
     links: [
-      { label: "Atlas Cognitive Engine", href: "/ai/atlas" },
-      { label: "Helios Model Suite", href: "/ai/helios" },
-      { label: "NOVA Free Proxy", href: "/network/nova-proxy" },
-      { label: "Synapse Mesh", href: "/network/synapse-mesh" },
-      { label: "NeuroWeave", href: "/bio/neuro-weave" },
-      { label: "Aeterna EdgeGrid", href: "/network/edge-grid" }
-    ]
-  },
-  {
-    title: "Solutions",
-    links: [
-      { label: "Sovereign agencies", href: "/solutions/government" },
-      { label: "Enterprise corridors", href: "/solutions/enterprise" },
-      { label: "Defense & aerospace", href: "/solutions/defense" },
-      { label: "Biomedical alliances", href: "/solutions/biomed" },
-      { label: "Academic partnerships", href: "/solutions/research" },
-      { label: "Orbital operations", href: "/solutions/orbital" }
-    ]
-  },
-  {
-    title: "Platforms",
-    links: [
-      { label: "Mission Control", href: "/missions/continuum" },
-      { label: "Aeterna Pass", href: "/platform/pass" },
-      { label: "Aeterna Pay", href: "/platform/aeterna-pay" },
+      { label: "Atlas Council", href: "/ecosystem/atlas-council" },
       { label: "Sentient Cloud", href: "/platform/sentient-cloud" },
-      { label: "Consensus Fabric", href: "/crypto/consensus" },
-      { label: "Edge Robotics", href: "/robots/synthesis" }
+      { label: "Neural Lattice", href: "/ai/neural-lattice" },
+      { label: "Continuum Campus", href: "/ecosystem/continuum-campus" },
+      { label: "Civic twin", href: "/ecosystem/civic-twin" }
     ]
   },
   {
-    title: "Resources",
+    title: "Infrastructure",
     links: [
-      { label: "Documentation", href: "/docs" },
+      { label: "Orbital Forge", href: "/infrastructure/orbital-forge" },
+      { label: "EdgeGrid", href: "/network/edge-grid" },
+      { label: "NOVA Proxy", href: "/network/nova-proxy" },
+      { label: "Synapse Mesh", href: "/network/synapse-mesh" },
+      { label: "Quantum Zero Trust", href: "/security/quantum-zero-trust" }
+    ]
+  },
+  {
+    title: "Compliance",
+    links: [
       { label: "Transparency reports", href: "/reports" },
-      { label: "Security bulletins", href: "/security/bulletins" },
-      { label: "Research library", href: "/insights" },
-      { label: "Developer portal", href: "/developers" },
-      { label: "Media center", href: "/media" }
+      { label: "Containment framework", href: "/security/containment" },
+      { label: "Audit console", href: "/platform/audit" },
+      { label: "Risk response", href: "/security/response" },
+      { label: "Incident archive", href: "/security/archive" }
     ]
   },
   {
-    title: "Company",
+    title: "Engagement",
     links: [
-      { label: "Manifesto", href: "/company/manifesto" },
-      { label: "Governance", href: "/company/governance" },
-      { label: "Leadership", href: "/company/leadership" },
-      { label: "Careers", href: "/careers/missions" },
-      { label: "Alliances", href: "/partners" },
-      { label: "Contact", href: "/company/contact" }
+      { label: "Alliance program", href: "/partners/alliances" },
+      { label: "Sovereign onboarding", href: "/access/sovereign" },
+      { label: "Academic fellowships", href: "/careers/fellowships" },
+      { label: "Mission briefs", href: "/briefs" },
+      { label: "Investment desk", href: "/partners/invest" }
+    ]
+  },
+  {
+    title: "Media & insights",
+    links: [
+      { label: "Press room", href: "/media" },
+      { label: "Research library", href: "/insights" },
+      { label: "Event schedule", href: "/events" },
+      { label: "Documentation", href: "/docs" },
+      { label: "Developer updates", href: "/developers" }
     ]
   }
 ];
@@ -129,11 +124,11 @@ export function Footer() {
             {operationsContacts.map((contact) => (
               <div key={contact.label} className="space-y-1">
                 <span className="text-[10px] uppercase tracking-[0.24em] text-[var(--text-tertiary)]">{contact.label}</span>
-                <span>{contact.value}</span>
+                <span className="break-all">{contact.value}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--text-tertiary)]">
+          <div className="flex flex-col items-start gap-3 text-xs text-[var(--text-tertiary)] sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <span className="text-[var(--text-status-warning)]">© {new Date().getFullYear()} Aeterna Technology</span>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>

@@ -367,7 +367,7 @@ export function Header() {
       className="sticky top-0 z-50 border-b border-[var(--border-default)] bg-[var(--bg-primary)]"
       onMouseLeave={closeMenus}
     >
-      <div className="relative mx-auto flex w-full max-w-[1440px] items-center gap-8 px-4 py-4 lg:px-12">
+      <div className="relative mx-auto flex h-20 w-full max-w-[1440px] items-center gap-8 px-4 lg:px-12">
         <Link
           href="/"
           className="flex items-center"
@@ -376,14 +376,14 @@ export function Header() {
           <AeternaLogo className="h-8 shrink-0 lg:h-9" />
         </Link>
         <div className="hidden flex-1 items-stretch lg:flex">
-          <nav className="flex flex-1 items-stretch gap-2 text-sm font-medium">
+          <nav className="flex h-full flex-1 items-stretch gap-2 text-sm font-medium">
             {TOP_NAV.map((item) => {
               if (item.type === "anchor") {
                 return (
                   <Link
                     key={item.id}
                     href={item.href as any}
-                    className="inline-flex items-center gap-2 border-b-2 border-transparent px-0 py-3 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                    className="flex h-full items-center gap-2 border-b-2 border-transparent px-0 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
                     onFocus={closeMenus}
                     onMouseEnter={closeMenus}
                   >
@@ -397,7 +397,7 @@ export function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  className={`inline-flex items-center gap-2 border-b-2 px-0 py-3 leading-none transition ${
+                  className={`flex h-full items-center gap-2 border-b-2 px-0 leading-none transition ${
                     isOpen
                       ? "border-[var(--text-status-warning)] text-[var(--text-primary)]"
                       : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -464,10 +464,10 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
     <AnimatePresence>
       {open ? (
         <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
+          animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
+          exit={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
+          transition={{ duration: 0.24, ease: "easeOut" }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
           <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-10 md:grid-cols-2 lg:grid-cols-3 lg:px-12">

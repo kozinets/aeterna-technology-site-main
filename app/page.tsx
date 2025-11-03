@@ -79,7 +79,7 @@ export default function Page() {
   return (
     <main>
       <Header />
-      <div className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-12 sm:px-8">
+      <div className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-12 sm:px-8 lg:px-12">
         <Hero />
         <section className="mt-24">
           <div className="grid gap-14 lg:grid-cols-[280px_1fr]">
