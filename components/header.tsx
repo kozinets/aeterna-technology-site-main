@@ -363,24 +363,27 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--border-default)] bg-[var(--bg-primary)]">
-      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-4 py-4 lg:px-12">
+    <header
+      className="sticky top-0 z-50 border-b border-[var(--border-default)] bg-[var(--bg-primary)]"
+      onMouseLeave={closeMenus}
+    >
+      <div className="relative mx-auto flex w-full max-w-[1440px] items-center gap-8 px-4 py-4 lg:px-12">
         <Link
           href="/"
-          className="flex items-center text-lg font-semibold tracking-wider"
+          className="flex items-center"
           aria-label="Aeterna Technology — home"
         >
           <AeternaLogo className="h-8 shrink-0 lg:h-9" />
         </Link>
-        <div className="relative hidden flex-1 lg:flex" onMouseLeave={closeMenus}>
-          <nav className="flex w-full items-center gap-6">
+        <div className="hidden flex-1 items-stretch lg:flex">
+          <nav className="flex flex-1 items-stretch gap-2 text-sm font-medium">
             {TOP_NAV.map((item) => {
               if (item.type === "anchor") {
                 return (
                   <Link
                     key={item.id}
                     href={item.href as any}
-                    className="flex items-center gap-2 border-b-2 border-transparent pb-3 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                    className="inline-flex items-center gap-2 border-b-2 border-transparent px-0 py-3 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
                     onFocus={closeMenus}
                     onMouseEnter={closeMenus}
                   >
@@ -394,7 +397,7 @@ export function Header() {
                 <button
                   key={item.id}
                   type="button"
-                  className={`flex items-center gap-2 border-b-2 px-0 pb-3 text-sm font-medium transition ${
+                  className={`inline-flex items-center gap-2 border-b-2 px-0 py-3 leading-none transition ${
                     isOpen
                       ? "border-[var(--text-status-warning)] text-[var(--text-primary)]"
                       : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -414,12 +417,12 @@ export function Header() {
               );
             })}
           </nav>
-          <MegaMenu open={openMenu === "ecosystem"} sections={NAVIGATION} />
-          <SecondaryMenu open={openMenu === "research"} groups={SECONDARY_MENUS.research} />
-          <SecondaryMenu open={openMenu === "access"} groups={SECONDARY_MENUS.access} />
-          <SecondaryMenu open={openMenu === "company"} groups={SECONDARY_MENUS.company} />
         </div>
-        <div className="ml-auto flex items-center gap-3">
+        <div
+          className="ml-auto flex items-center gap-3"
+          onMouseEnter={closeMenus}
+          onFocusCapture={closeMenus}
+        >
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
@@ -446,6 +449,10 @@ export function Header() {
           </button>
         </div>
       </div>
+      <MegaMenu open={openMenu === "ecosystem"} sections={NAVIGATION} />
+      <SecondaryMenu open={openMenu === "research"} groups={SECONDARY_MENUS.research} />
+      <SecondaryMenu open={openMenu === "access"} groups={SECONDARY_MENUS.access} />
+      <SecondaryMenu open={openMenu === "company"} groups={SECONDARY_MENUS.company} />
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
@@ -463,7 +470,7 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
           transition={{ duration: 0.2 }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
-          <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-10 md:grid-cols-2 lg:px-12">
+          <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-10 md:grid-cols-2 lg:grid-cols-3 lg:px-12">
             {groups.map((group) => (
               <div key={group.title} className="space-y-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{group.title}</p>
