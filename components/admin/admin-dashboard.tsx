@@ -2,18 +2,22 @@
 
 import { useEffect, useMemo, useState, type ComponentType, type CSSProperties } from "react";
 import {
+  AlertTriangle,
   Archive,
   ArrowLeftRight,
   ArrowRight,
   BarChart3,
   BookMarked,
   CheckCircle2,
+  ClipboardList,
+  Copy,
   Download,
   FileDigit,
   FilePlus,
   Filter,
   Flame,
   FolderPlus,
+  History,
   Layers,
   LineChart,
   ListPlus,
@@ -21,10 +25,13 @@ import {
   MonitorSmartphone,
   Move,
   Pencil,
+  Pin,
   Play,
   Save,
   Settings,
+  ShieldCheck,
   SlidersHorizontal,
+  Sparkles,
   Upload,
   Wand2
 } from "lucide-react";
@@ -38,99 +45,31 @@ import {
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import baseConfig from "@/data/site-config.json";
+import siteConfig from "@/lib/cms/site-config";
+import type {
+  AutomationRule,
+  Collections,
+  ContentItem,
+  AccessPortalCollection,
+  DataFeed,
+  FooterCollection,
+  HeroCollection,
+  HomeCollection,
+  InsightsCollection,
+  NavigationNode,
+  PageDefinition,
+  PageModule,
+  ModuleAction,
+  ModuleMedia,
+  ModuleStat,
+  ModuleType,
+  ProgramsCollection,
+  PulseCollection,
+  StaticPageContent,
+  SiteConfig,
+  ThemeCollections
+} from "@/lib/cms/types";
 
-type NavigationNode = {
-  id: string;
-  label: string;
-  href?: string;
-  badge?: string;
-  description?: string;
-  children?: NavigationNode[];
-  type?: "section" | "link";
-};
-
-type ModuleType =
-  | "hero"
-  | "stat-block"
-  | "feature-grid"
-  | "media"
-  | "list"
-  | "feed"
-  | "timeline"
-  | "cta"
-  | "markdown";
-
-type ModuleAction = { label: string; href: string };
-
-type ModuleStat = { label: string; value: string; tone?: "positive" | "critical" };
-
-type ModuleMedia = { type: "image" | "video" | "chart"; src: string; caption?: string };
-
-type PageModule = {
-  id: string;
-  type: ModuleType;
-  title?: string;
-  subtitle?: string;
-  description?: string;
-  body?: string;
-  verb?: string;
-  actions?: ModuleAction[];
-  stats?: ModuleStat[];
-  items?: string[];
-  feedId?: string;
-  layout?: "grid" | "dual" | "list" | "split";
-  media?: ModuleMedia;
-  pinned?: boolean;
-  columns?: { title: string; body: string }[];
-};
-
-type PageDefinition = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  status: "draft" | "review" | "scheduled" | "published";
-  tags: string[];
-  lastUpdated: string;
-  modules: PageModule[];
-};
-
-type ContentItem = {
-  id: string;
-  title: string;
-  type: "article" | "release" | "update" | "brief";
-  author: string;
-  publishedAt: string;
-  status: "draft" | "review" | "published";
-  summary: string;
-  thumbnail?: string;
-  pinned?: boolean;
-  relatedPages: string[];
-};
-
-type DataFeed = {
-  id: string;
-  name: string;
-  description: string;
-  source: string;
-  refreshInterval: string;
-  format: "json" | "csv" | "xml" | "websocket";
-  status: "connected" | "degraded" | "offline";
-  connectedModules: string[];
-};
-
-type SiteConfig = {
-  navigation: NavigationNode[];
-  pages: PageDefinition[];
-  contentLibrary: ContentItem[];
-  dataFeeds: DataFeed[];
-  homepage: {
-    pinnedReleases: string[];
-    featuredModules: string[];
-    spotlightPageId: string | null;
-  };
-};
 
 type AdminTab =
   | "overview"
@@ -139,6 +78,8 @@ type AdminTab =
   | "builder"
   | "library"
   | "feeds"
+  | "collections"
+  | "automations"
   | "settings";
 
 type ModuleTemplate = {
@@ -152,6 +93,15 @@ type ModuleTemplate = {
 type DragMeta =
   | { source: "palette"; moduleType: ModuleType }
   | { source: "canvas"; moduleId: string };
+
+type AuditEntry = {
+  id: string;
+  timestamp: string;
+  actor: string;
+  target: string;
+  summary: string;
+  detail?: string;
+};
 
 const MODULE_LIBRARY: ModuleTemplate[] = [
   {
@@ -266,9 +216,30 @@ const MODULE_LIBRARY: ModuleTemplate[] = [
   }
 ];
 
-const createConfigClone = (): SiteConfig => JSON.parse(JSON.stringify(baseConfig)) as SiteConfig;
+function createModuleFromTemplate(template: ModuleTemplate): PageModule {
+  return {
+    id: generateId("module"),
+    type: template.type,
+    title: template.defaults.title ?? template.label,
+    subtitle: template.defaults.subtitle,
+    description: template.defaults.description,
+    body: template.defaults.body,
+    verb: template.defaults.verb,
+    actions: template.defaults.actions ? JSON.parse(JSON.stringify(template.defaults.actions)) : undefined,
+    stats: template.defaults.stats ? JSON.parse(JSON.stringify(template.defaults.stats)) : undefined,
+    items: template.defaults.items ? [...template.defaults.items] : undefined,
+    feedId: template.defaults.feedId,
+    layout: template.defaults.layout,
+    media: template.defaults.media ? { ...template.defaults.media } : undefined,
+    pinned: template.defaults.pinned,
+    columns: template.defaults.columns ? JSON.parse(JSON.stringify(template.defaults.columns)) : undefined
+  };
+}
+
+const createConfigClone = (): SiteConfig => JSON.parse(JSON.stringify(siteConfig)) as SiteConfig;
 
 const STORAGE_KEY = "aeterna-admin-config";
+const ACTIVITY_STORAGE_KEY = "aeterna-admin-activity";
 
 export function AdminDashboard() {
   const [config, setConfig] = useState<SiteConfig>(() => createConfigClone());
@@ -279,6 +250,7 @@ export function AdminDashboard() {
   });
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [activityLog, setActivityLog] = useState<AuditEntry[]>([]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -297,8 +269,26 @@ export function AdminDashboard() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(ACTIVITY_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as AuditEntry[];
+        setActivityLog(parsed);
+      } catch (error) {
+        console.error("Failed to parse stored activity log", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
   }, [config]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(ACTIVITY_STORAGE_KEY, JSON.stringify(activityLog));
+  }, [activityLog]);
 
   useEffect(() => {
     if (!toastMessage) return;
@@ -317,9 +307,49 @@ export function AdminDashboard() {
     setConfig((current) => updater(JSON.parse(JSON.stringify(current)) as SiteConfig));
   };
 
+  const registerActivity = (entry: Omit<AuditEntry, "id" | "timestamp">) => {
+    setActivityLog((current) => {
+      const next: AuditEntry[] = [
+        { id: generateId("activity"), timestamp: new Date().toISOString(), ...entry },
+        ...current
+      ].slice(0, 80);
+      return next;
+    });
+  };
+
+  const clearActivityLog = () => {
+    setActivityLog([]);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(ACTIVITY_STORAGE_KEY);
+    }
+    setToastMessage("Activity timeline cleared");
+  };
+
+  const handleCollectionsUpdate = (
+    updater: (collections: Collections) => Collections,
+    message?: string,
+    audit?: { summary: string; target?: string; detail?: string }
+  ) => {
+    handleConfigChange((current) => ({ ...current, collections: updater(current.collections) }));
+    const toast = message ?? "Collections updated";
+    setToastMessage(toast);
+    registerActivity({
+      actor: "Operator",
+      target: audit?.target ?? "Collections",
+      summary: audit?.summary ?? toast,
+      detail: audit?.detail
+    });
+  };
+
   const handleNavigationUpdate = (navigation: NavigationNode[]) => {
     handleConfigChange((current) => ({ ...current, navigation }));
     setToastMessage("Navigation updated");
+    registerActivity({
+      actor: "Operator",
+      target: "Navigation",
+      summary: "Updated navigation tree",
+      detail: `${navigation.length} root nodes`
+    });
   };
 
   const handlePageUpdate = (pageId: string, update: (page: PageDefinition) => PageDefinition) => {
@@ -334,9 +364,16 @@ export function AdminDashboard() {
     setSelectedPageId(page.id);
     setSelectedModuleId(page.modules[0]?.id ?? null);
     setToastMessage(`Created page ${page.name}`);
+    registerActivity({
+      actor: "Operator",
+      target: "Pages",
+      summary: `Created page ${page.name}`,
+      detail: page.slug
+    });
   };
 
   const handlePageRemoval = (pageId: string) => {
+    const removedPage = config.pages.find((page) => page.id === pageId);
     handleConfigChange((current) => ({
       ...current,
       pages: current.pages.filter((page) => page.id !== pageId)
@@ -349,14 +386,32 @@ export function AdminDashboard() {
       return currentPage;
     });
     setToastMessage("Page removed");
+    registerActivity({
+      actor: "Operator",
+      target: "Pages",
+      summary: removedPage ? `Removed page ${removedPage.name}` : "Removed page",
+      detail: removedPage?.slug
+    });
   };
 
   const handleLibraryUpdate = (items: ContentItem[]) => {
     handleConfigChange((current) => ({ ...current, contentLibrary: items }));
+    registerActivity({
+      actor: "Operator",
+      target: "Content library",
+      summary: "Updated content assets",
+      detail: `${items.length} entries`
+    });
   };
 
   const handleFeedUpdate = (feeds: DataFeed[]) => {
     handleConfigChange((current) => ({ ...current, dataFeeds: feeds }));
+    registerActivity({
+      actor: "Operator",
+      target: "Data feeds",
+      summary: "Adjusted data feed registry",
+      detail: `${feeds.filter((feed) => feed.status === "connected").length} live sources`
+    });
   };
 
   const handleReset = () => {
@@ -366,6 +421,11 @@ export function AdminDashboard() {
     setSelectedModuleId(null);
     window.localStorage.removeItem(STORAGE_KEY);
     setToastMessage("Configuration restored to baseline");
+    registerActivity({
+      actor: "Operator",
+      target: "System",
+      summary: "Restored baseline configuration"
+    });
   };
 
   const handleExport = () => {
@@ -377,6 +437,11 @@ export function AdminDashboard() {
     anchor.click();
     URL.revokeObjectURL(url);
     setToastMessage("Configuration exported");
+    registerActivity({
+      actor: "Operator",
+      target: "System",
+      summary: "Exported configuration snapshot"
+    });
   };
 
   const handleImport = async (file: File) => {
@@ -387,6 +452,11 @@ export function AdminDashboard() {
       setSelectedPageId(parsed.pages[0]?.id ?? "");
       setSelectedModuleId(null);
       setToastMessage("Configuration imported");
+      registerActivity({
+        actor: "Operator",
+        target: "System",
+        summary: `Imported configuration ${file.name}`
+      });
     } catch (error) {
       console.error("Failed to import configuration", error);
       setToastMessage("Import failed – invalid file");
@@ -395,6 +465,11 @@ export function AdminDashboard() {
 
   const handlePublish = () => {
     setToastMessage("Publishing pipeline triggered – preview queued");
+    registerActivity({
+      actor: "Operator",
+      target: "Publishing",
+      summary: "Queued preview deployment"
+    });
   };
 
   const importInputId = "config-import-input";
@@ -464,7 +539,12 @@ export function AdminDashboard() {
       ) : null}
 
       {activeTab === "overview" ? (
-        <OverviewPanel config={config} totalModules={totalModules} />
+        <OverviewPanel
+          config={config}
+          totalModules={totalModules}
+          activityLog={activityLog}
+          onClearActivity={clearActivityLog}
+        />
       ) : activeTab === "navigation" ? (
         <NavigationManager navigation={config.navigation} onChange={handleNavigationUpdate} />
       ) : null}
@@ -484,13 +564,38 @@ export function AdminDashboard() {
           onSelectModule={setSelectedModuleId}
           selectedModuleId={selectedModuleId}
           onPageUpdate={(updater) => selectedPage && handlePageUpdate(selectedPage.id, updater)}
+          onAudit={(summary, target, detail) =>
+            registerActivity({ actor: "Operator", target, summary, detail })
+          }
         />
       ) : activeTab === "library" ? (
         <ContentLibraryManager items={config.contentLibrary} pages={config.pages} onChange={handleLibraryUpdate} />
       ) : activeTab === "feeds" ? (
         <DataFeedManager feeds={config.dataFeeds} modules={config.pages.flatMap((page) => page.modules)} onChange={handleFeedUpdate} />
+      ) : activeTab === "collections" ? (
+        <CollectionsManager collections={config.collections} onChange={handleCollectionsUpdate} />
+      ) : activeTab === "automations" ? (
+        <AutomationManager
+          automations={config.collections.automations}
+          onChange={(automations) =>
+            handleCollectionsUpdate(
+              (current) => ({ ...current, automations }),
+              "Automation rules updated",
+              {
+                summary: "Adjusted automation flows",
+                target: "Automations",
+                detail: `${automations.length} active rules`
+              }
+            )
+          }
+        />
       ) : (
-        <SettingsPanel config={config} onConfigChange={handleConfigChange} />
+        <SettingsPanel
+          config={config}
+          onConfigChange={handleConfigChange}
+          onClearActivityLog={clearActivityLog}
+          activityCount={activityLog.length}
+        />
       )}
     </section>
   );
@@ -504,6 +609,8 @@ function AdminTabBar({ activeTab, onTabChange }: { activeTab: AdminTab; onTabCha
     { id: "builder", label: "Visual builder", icon: Wand2 },
     { id: "library", label: "Content", icon: Archive },
     { id: "feeds", label: "Data feeds", icon: SlidersHorizontal },
+    { id: "collections", label: "Collections", icon: BookMarked },
+    { id: "automations", label: "Automations", icon: Play },
     { id: "settings", label: "Settings", icon: Settings }
   ];
 
@@ -531,11 +638,23 @@ function AdminTabBar({ activeTab, onTabChange }: { activeTab: AdminTab; onTabCha
   );
 }
 
-function OverviewPanel({ config, totalModules }: { config: SiteConfig; totalModules: number }) {
+function OverviewPanel({
+  config,
+  totalModules,
+  activityLog,
+  onClearActivity
+}: {
+  config: SiteConfig;
+  totalModules: number;
+  activityLog: AuditEntry[];
+  onClearActivity: () => void;
+}) {
   const publishedPages = config.pages.filter((page) => page.status === "published");
   const draftPages = config.pages.length - publishedPages.length;
   const connectedFeeds = config.dataFeeds.filter((feed) => feed.status === "connected");
   const pinnedContent = config.contentLibrary.filter((item) => item.pinned);
+  const qualityReport = useMemo(() => createQualityReport(config), [config]);
+  const recentActivity = activityLog.slice(0, 6);
 
   return (
     <div className="grid gap-10 lg:grid-cols-[360px_1fr]">
@@ -577,6 +696,7 @@ function OverviewPanel({ config, totalModules }: { config: SiteConfig; totalModu
             <ActionLink icon={Pencil} label="Draft research brief" detail="Compose peer-reviewed publications with inline media." />
           </div>
         </div>
+        <QualityScorecard report={qualityReport} />
       </div>
       <div className="space-y-6">
         <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
@@ -615,7 +735,219 @@ function OverviewPanel({ config, totalModules }: { config: SiteConfig; totalModu
             </div>
           ))}
         </div>
+        <ActivityTimeline entries={recentActivity} onClear={onClearActivity} />
       </div>
+    </div>
+  );
+}
+
+type QualityMetric = {
+  id: string;
+  label: string;
+  description: string;
+  tone: "positive" | "warning" | "critical";
+  value: string;
+  icon: ComponentType<{ className?: string }>;
+};
+
+type QualityReport = {
+  score: number;
+  status: "healthy" | "attention" | "critical";
+  metrics: QualityMetric[];
+  liveFeedCount: number;
+};
+
+function createQualityReport(config: SiteConfig): QualityReport {
+  const modules = config.pages.flatMap((page) => page.modules);
+  const moduleCount = modules.length;
+  const modulesWithNarrative = modules.filter(
+    (module) => module.title || module.subtitle || module.description || module.body
+  );
+  const coverage = moduleCount === 0 ? 100 : Math.round((modulesWithNarrative.length / moduleCount) * 100);
+
+  const orphanedContent = config.contentLibrary.filter((item) => item.relatedPages.length === 0);
+  const liveFeeds = config.dataFeeds.filter((feed) => feed.status === "connected");
+  const connectedFeeds = config.dataFeeds.filter((feed) => feed.connectedModules.length > 0);
+
+  const heroCtaModules = modules.filter((module) => module.type === "hero" || module.type === "cta");
+  const actionableModules = heroCtaModules.filter(
+    (module) => module.actions && module.actions.some((action) => action.href && action.href.trim().length > 0)
+  );
+
+  const feedModules = modules.filter((module) => module.type === "feed");
+  const configuredFeedModules = feedModules.filter((module) => Boolean(module.feedId));
+
+  const penalty =
+    orphanedContent.length * 3 +
+    (config.dataFeeds.length - connectedFeeds.length) * 4 +
+    (heroCtaModules.length - actionableModules.length) * 2 +
+    (feedModules.length - configuredFeedModules.length) * 2;
+
+  const score = Math.max(0, Math.round((coverage + Math.max(0, 100 - penalty)) / 2));
+  const status: QualityReport["status"] = score >= 85 ? "healthy" : score >= 65 ? "attention" : "critical";
+
+  const metrics: QualityMetric[] = [
+    {
+      id: "coverage",
+      label: "Content coverage",
+      description: "Modules with complete narrative fields",
+      value: `${coverage}%`,
+      tone: coverage >= 85 ? "positive" : coverage >= 65 ? "warning" : "critical",
+      icon: Sparkles
+    },
+    {
+      id: "orphaned",
+      label: "Orphaned entries",
+      description: "Library assets missing page references",
+      value: `${orphanedContent.length}`,
+      tone: orphanedContent.length === 0 ? "positive" : orphanedContent.length < 3 ? "warning" : "critical",
+      icon: AlertTriangle
+    },
+    {
+      id: "feeds",
+      label: "Feed connectivity",
+      description: "Live data sources linked to modules",
+      value: `${connectedFeeds.length}/${config.dataFeeds.length}`,
+      tone:
+        config.dataFeeds.length === 0 || connectedFeeds.length === config.dataFeeds.length
+          ? "positive"
+          : connectedFeeds.length > 0
+            ? "warning"
+            : "critical",
+      icon: ShieldCheck
+    },
+    {
+      id: "cta",
+      label: "CTA readiness",
+      description: "Hero & CTA modules with actionable links",
+      value: `${actionableModules.length}/${heroCtaModules.length || 0}`,
+      tone:
+        heroCtaModules.length === 0 || actionableModules.length === heroCtaModules.length
+          ? "positive"
+          : actionableModules.length > 0
+            ? "warning"
+            : "critical",
+      icon: ClipboardList
+    },
+    {
+      id: "feedModules",
+      label: "Feed modules configured",
+      description: "Modules wired to live telemetry feeds",
+      value: `${configuredFeedModules.length}/${feedModules.length || 0}`,
+      tone:
+        feedModules.length === 0 || configuredFeedModules.length === feedModules.length
+          ? "positive"
+          : configuredFeedModules.length > 0
+            ? "warning"
+            : "critical",
+      icon: SlidersHorizontal
+    }
+  ];
+
+  return { score, status, metrics, liveFeedCount: liveFeeds.length };
+}
+
+function QualityScorecard({ report }: { report: QualityReport }) {
+  const statusLabel =
+    report.status === "healthy" ? "Healthy" : report.status === "attention" ? "Needs attention" : "Critical";
+  const statusToneClass =
+    report.status === "healthy"
+      ? "text-[var(--text-status-warning)]"
+      : report.status === "attention"
+        ? "text-[var(--text-secondary)]"
+        : "text-[var(--text-status-error)]";
+
+  return (
+    <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold">Experience quality</h2>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Observability signals for the current configuration snapshot.
+          </p>
+        </div>
+        <div className="text-right">
+          <span className={`block text-3xl font-semibold ${statusToneClass}`}>{report.score}</span>
+          <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{statusLabel}</span>
+        </div>
+      </div>
+      <div className="mt-5 space-y-3">
+        {report.metrics.map((metric) => {
+          const toneClass =
+            metric.tone === "positive"
+              ? "text-[var(--text-status-warning)]"
+              : metric.tone === "warning"
+                ? "text-[var(--text-secondary)]"
+                : "text-[var(--text-status-error)]";
+          return (
+            <div
+              key={metric.id}
+              className="flex items-start gap-3 rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4"
+            >
+              <span className={`mt-1 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] ${toneClass}`}>
+                <metric.icon className="h-4 w-4" />
+              </span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between text-sm text-[var(--text-primary)]">
+                  <span className="font-semibold">{metric.label}</span>
+                  <span className={`font-semibold ${toneClass}`}>{metric.value}</span>
+                </div>
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">{metric.description}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-4 text-xs text-[var(--text-tertiary)]">
+        Live feeds online: {report.liveFeedCount}. Score penalizes orphaned content and unconfigured modules.
+      </p>
+    </div>
+  );
+}
+
+function ActivityTimeline({ entries, onClear }: { entries: AuditEntry[]; onClear: () => void }) {
+  return (
+    <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold">Activity timeline</h2>
+          <p className="text-sm text-[var(--text-secondary)]">Recent configuration edits stored locally.</p>
+        </div>
+        <button
+          type="button"
+          onClick={onClear}
+          className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+        >
+          Clear log
+        </button>
+      </div>
+      {entries.length === 0 ? (
+        <p className="mt-4 text-sm text-[var(--text-tertiary)]">No changes recorded yet — adjustments will appear here.</p>
+      ) : (
+        <ol className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
+          {entries.map((entry) => (
+            <li key={entry.id} className="flex items-start gap-3 rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4">
+              <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-warning)]">
+                <History className="h-4 w-4" />
+              </span>
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[var(--text-primary)]">{entry.summary}</span>
+                  <span className="rounded-full border border-[var(--border-default)] px-2 py-[2px] text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+                    {entry.target}
+                  </span>
+                </div>
+                {entry.detail ? (
+                  <p className="mt-1 text-xs text-[var(--text-secondary)]">{entry.detail}</p>
+                ) : null}
+                <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+                  {new Date(entry.timestamp).toLocaleString()}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
     </div>
   );
 }
@@ -644,7 +976,7 @@ function PublishingCadenceChart({ items }: { items: ContentItem[] }) {
   const svgId = "publishing-cadence-chart";
 
   useEffect(() => {
-    const svg = d3.select(`#${svgId}`);
+    const svg = d3.select<SVGSVGElement, unknown>(`#${svgId}`);
     const container = svg.node()?.parentElement;
     if (!svg.node() || !container) return;
 
@@ -1274,9 +1606,10 @@ interface BuilderProps {
   selectedModuleId: string | null;
   onSelectModule: (moduleId: string | null) => void;
   onPageUpdate: (updater: (page: PageDefinition) => PageDefinition) => void;
+  onAudit?: (summary: string, target: string, detail?: string) => void;
 }
 
-function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSelectModule, onPageUpdate }: BuilderProps) {
+function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSelectModule, onPageUpdate, onAudit }: BuilderProps) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const [activeDrag, setActiveDrag] = useState<DragMeta | null>(null);
 
@@ -1289,23 +1622,7 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
   const addModule = (moduleType: ModuleType, targetId?: string) => {
     const template = MODULE_LIBRARY.find((entry) => entry.type === moduleType);
     if (!template) return;
-    const newModule: PageModule = {
-      id: generateId("module"),
-      type: template.type,
-      title: template.defaults.title ?? template.label,
-      subtitle: template.defaults.subtitle,
-      description: template.defaults.description,
-      body: template.defaults.body,
-      verb: template.defaults.verb,
-      actions: template.defaults.actions ? JSON.parse(JSON.stringify(template.defaults.actions)) : undefined,
-      stats: template.defaults.stats ? JSON.parse(JSON.stringify(template.defaults.stats)) : undefined,
-      items: template.defaults.items ? [...template.defaults.items] : undefined,
-      feedId: template.defaults.feedId,
-      layout: template.defaults.layout,
-      media: template.defaults.media ? { ...template.defaults.media } : undefined,
-      pinned: template.defaults.pinned,
-      columns: template.defaults.columns ? JSON.parse(JSON.stringify(template.defaults.columns)) : undefined
-    };
+    const newModule = createModuleFromTemplate(template);
 
     onPageUpdate((current) => {
       const nextModules = [...current.modules];
@@ -1322,6 +1639,7 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
       return { ...current, modules: nextModules, lastUpdated: new Date().toISOString() };
     });
     onSelectModule(newModule.id);
+    onAudit?.(`Added ${template.label}`, page.name, newModule.id);
   };
 
   const updateModule = (moduleId: string, update: (module: PageModule) => PageModule) => {
@@ -1333,6 +1651,7 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
   };
 
   const removeModule = (moduleId: string) => {
+    const removed = modules.find((module) => module.id === moduleId);
     onPageUpdate((current) => ({
       ...current,
       modules: current.modules.filter((module) => module.id !== moduleId),
@@ -1341,6 +1660,48 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
     if (selectedModuleId === moduleId) {
       onSelectModule(null);
     }
+    onAudit?.(
+      removed ? `Removed ${removed.title ?? removed.type}` : "Removed module",
+      page.name,
+      moduleId
+    );
+  };
+
+  const duplicateModule = (moduleId: string) => {
+    const source = modules.find((module) => module.id === moduleId);
+    if (!source) return;
+    const clone = JSON.parse(JSON.stringify(source)) as PageModule;
+    clone.id = generateId("module");
+    if (clone.title) {
+      clone.title = `${clone.title} copy`;
+    }
+    onPageUpdate((current) => {
+      const index = current.modules.findIndex((module) => module.id === moduleId);
+      if (index === -1) {
+        return { ...current, modules: [...current.modules, clone], lastUpdated: new Date().toISOString() };
+      }
+      const nextModules = [...current.modules];
+      nextModules.splice(index + 1, 0, clone);
+      return { ...current, modules: nextModules, lastUpdated: new Date().toISOString() };
+    });
+    onSelectModule(clone.id);
+    onAudit?.(
+      `Duplicated ${source.title ?? source.type}`,
+      page.name,
+      clone.id
+    );
+  };
+
+  const togglePin = (moduleId: string) => {
+    const target = modules.find((module) => module.id === moduleId);
+    if (!target) return;
+    const nextState = !target.pinned;
+    updateModule(moduleId, (module) => ({ ...module, pinned: nextState }));
+    onAudit?.(
+      `${nextState ? "Pinned" : "Unpinned"} ${target.title ?? target.type}`,
+      page.name,
+      moduleId
+    );
   };
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
@@ -1366,6 +1727,7 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
           modules: reordered,
           lastUpdated: new Date().toISOString()
         }));
+        onAudit?.("Moved module to end", page.name, activeMeta.moduleId);
         return;
       }
       const newIndex = modules.findIndex((module) => module.id === over.id);
@@ -1376,6 +1738,7 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
         modules: reordered,
         lastUpdated: new Date().toISOString()
       }));
+      onAudit?.("Reordered module", page.name, activeMeta.moduleId);
     }
   };
 
@@ -1406,6 +1769,8 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
                     isActive={module.id === selectedModuleId}
                     onSelect={() => onSelectModule(module.id)}
                     onRemove={() => removeModule(module.id)}
+                    onDuplicate={() => duplicateModule(module.id)}
+                    onTogglePin={() => togglePin(module.id)}
                   />
                 ))
               )}
@@ -1421,6 +1786,7 @@ function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSele
             if (!selectedModuleId) return;
             updateModule(selectedModuleId, updater);
           }}
+          onAudit={(summary, detail) => onAudit?.(summary, page.name, detail)}
         />
       </div>
       <DragOverlay>
@@ -1534,12 +1900,16 @@ function SortableModuleCard({
   module,
   isActive,
   onSelect,
-  onRemove
+  onRemove,
+  onDuplicate,
+  onTogglePin
 }: {
   module: PageModule;
   isActive: boolean;
   onSelect: () => void;
   onRemove: () => void;
+  onDuplicate: () => void;
+  onTogglePin: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: module.id,
@@ -1549,6 +1919,7 @@ function SortableModuleCard({
     transform: CSS.Transform.toString(transform),
     transition
   };
+  const isPinned = Boolean(module.pinned);
 
   return (
     <div
@@ -1575,6 +1946,24 @@ function SortableModuleCard({
           </button>
           <button
             type="button"
+            onClick={onDuplicate}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-secondary)]"
+            title="Duplicate module"
+          >
+            <Copy className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onTogglePin}
+            className={`flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] ${
+              isPinned ? "text-[var(--text-status-warning)]" : "text-[var(--text-tertiary)]"
+            }`}
+            title={isPinned ? "Unpin module" : "Pin module"}
+          >
+            <Pin className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
             onClick={onRemove}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-error)]"
           >
@@ -1587,11 +1976,17 @@ function SortableModuleCard({
 }
 
 function ModulePreview({ module, dragging = false }: { module: PageModule; dragging?: boolean }) {
+  const requiresFeedBinding = module.type === "feed" && !module.feedId;
   return (
     <div className={`space-y-3 ${dragging ? "pointer-events-none" : ""}`}>
-      <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+      <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
         <span className="rounded-full border border-[var(--border-default)] px-2 py-1">{module.type}</span>
         {module.layout ? <span>layout: {module.layout}</span> : null}
+        {module.pinned ? (
+          <span className="rounded-full border border-[var(--border-default)] px-2 py-1 text-[var(--text-status-warning)]">
+            Pinned
+          </span>
+        ) : null}
       </div>
       {module.title ? <h4 className="text-lg font-semibold text-[var(--text-primary)]">{module.title}</h4> : null}
       {module.subtitle ? <p className="text-sm text-[var(--text-secondary)]">{module.subtitle}</p> : null}
@@ -1647,6 +2042,9 @@ function ModulePreview({ module, dragging = false }: { module: PageModule; dragg
           ))}
         </div>
       ) : null}
+      {requiresFeedBinding ? (
+        <p className="text-xs text-[var(--text-status-error)]">Connect a data feed to activate this module.</p>
+      ) : null}
     </div>
   );
 }
@@ -1655,9 +2053,10 @@ interface ModuleInspectorProps {
   dataFeeds: DataFeed[];
   contentLibrary: ContentItem[];
   onUpdate: (updater: (module: PageModule) => PageModule) => void;
+  onAudit?: (summary: string, detail?: string) => void;
 }
 
-function ModuleInspector({ module, dataFeeds, contentLibrary, onUpdate }: ModuleInspectorProps) {
+function ModuleInspector({ module, dataFeeds, contentLibrary, onUpdate, onAudit }: ModuleInspectorProps) {
   const [activeTab, setActiveTab] = useState<"properties" | "content" | "data">("properties");
 
   useEffect(() => {
@@ -1672,8 +2071,69 @@ function ModuleInspector({ module, dataFeeds, contentLibrary, onUpdate }: Module
     );
   }
 
+  const template = MODULE_LIBRARY.find((entry) => entry.type === module.type);
+
   const update = (partial: Partial<PageModule>) => {
     onUpdate((current) => ({ ...current, ...partial }));
+  };
+
+  const copyBlueprint = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(module, null, 2));
+      onAudit?.("Copied module blueprint", module.id);
+    } catch (error) {
+      console.error("Failed to copy module blueprint", error);
+    }
+  };
+
+  const resetToTemplate = () => {
+    if (!template) return;
+    const base = createModuleFromTemplate(template);
+    onUpdate(() => ({ ...base, id: module.id, pinned: module.pinned }));
+    onAudit?.("Reset module to template", template.label);
+  };
+
+  const applyPreset = () => {
+    if (module.type === "hero" || module.type === "cta") {
+      update({
+        actions: [
+          { label: "Request access", href: "/network/access" },
+          { label: "View roadmap", href: "/network/roadmap" }
+        ],
+        verb: module.verb ?? "activate"
+      });
+      onAudit?.("Autofilled CTA actions", "Primary + secondary calls");
+    } else if (module.type === "stat-block") {
+      update({
+        stats: [
+          { label: "Nodes online", value: "128", tone: "positive" },
+          { label: "Latency", value: "24ms", tone: "positive" },
+          { label: "Incidents", value: "0", tone: "critical" }
+        ]
+      });
+      onAudit?.("Seeded KPI stats", "Nodes / Latency / Incidents");
+    }
+  };
+
+  const syncPinnedFromLibrary = () => {
+    const pinned = contentLibrary.filter((item) => item.pinned);
+    if (pinned.length === 0) {
+      onAudit?.("No pinned releases available");
+      return;
+    }
+    const nextItems = pinned.slice(0, Math.max(3, module.items?.length ?? 3)).map((item) => item.id);
+    update({ items: nextItems });
+    onAudit?.("Linked pinned releases", `${nextItems.length} items`);
+  };
+
+  const connectDefaultFeed = () => {
+    const primary = dataFeeds.find((feed) => feed.status === "connected");
+    if (!primary) {
+      onAudit?.("No live data feeds to connect");
+      return;
+    }
+    update({ feedId: primary.id });
+    onAudit?.("Connected live feed", primary.name);
   };
 
   const updateAction = (index: number, field: keyof ModuleAction, value: string) => {
@@ -1710,31 +2170,58 @@ function ModuleInspector({ module, dataFeeds, contentLibrary, onUpdate }: Module
 
   return (
     <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">Module inspector</h3>
           <p className="text-xs text-[var(--text-tertiary)]">Editing: {module.title ?? module.type}</p>
         </div>
-        <div className="flex gap-2 text-xs">
-          {(["properties", "content", "data"] as const).map((tab) => (
+        <div className="flex flex-wrap gap-2 text-xs">
+          <button
+            type="button"
+            onClick={() => void copyBlueprint()}
+            className="rounded-full border border-[var(--border-default)] px-3 py-1 uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            Copy blueprint
+          </button>
+          {template ? (
             <button
-              key={tab}
               type="button"
-              onClick={() => setActiveTab(tab)}
-              className={`rounded-full px-3 py-1 uppercase tracking-[0.18em] ${
-                activeTab === tab
-                  ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
-                  : "border border-[var(--border-default)] text-[var(--text-secondary)]"
-              }`}
+              onClick={resetToTemplate}
+              className="rounded-full border border-[var(--border-default)] px-3 py-1 uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
             >
-              {tab}
+              Reset template
             </button>
-          ))}
+          ) : null}
         </div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2 text-xs">
+        {(["properties", "content", "data"] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={`rounded-full px-3 py-1 uppercase tracking-[0.18em] ${
+              activeTab === tab
+                ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
       <div className="mt-4 space-y-4 text-sm">
         {activeTab === "properties" ? (
           <div className="space-y-4">
+            {(module.type === "hero" || module.type === "cta" || module.type === "stat-block") ? (
+              <button
+                type="button"
+                onClick={applyPreset}
+                className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+              >
+                Apply preset content
+              </button>
+            ) : null}
             <label className="grid gap-2">
               <span className="text-[var(--text-tertiary)]">Title</span>
               <input className="input" value={module.title ?? ""} onChange={(event) => update({ title: event.target.value })} />
@@ -1915,6 +2402,15 @@ function ModuleInspector({ module, dataFeeds, contentLibrary, onUpdate }: Module
           </div>
         ) : activeTab === "content" ? (
           <div className="space-y-4">
+            {module.type === "list" ? (
+              <button
+                type="button"
+                onClick={syncPinnedFromLibrary}
+                className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+              >
+                Pull pinned releases
+              </button>
+            ) : null}
             <label className="grid gap-2">
               <span className="text-[var(--text-tertiary)]">Description</span>
               <textarea
@@ -2031,6 +2527,13 @@ function ModuleInspector({ module, dataFeeds, contentLibrary, onUpdate }: Module
                 ))}
               </select>
             </label>
+            <button
+              type="button"
+              onClick={connectDefaultFeed}
+              className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+            >
+              Connect first live feed
+            </button>
             {module.feedId ? (
               <p className="text-xs text-[var(--text-secondary)]">
                 Connected to {module.feedId}. Refresh cadence {dataFeeds.find((feed) => feed.id === module.feedId)?.refreshInterval}.
@@ -2123,13 +2626,22 @@ function ContentLibraryManager({ items, pages, onChange }: { items: ContentItem[
     }
   };
 
+  const publishedCount = items.filter((item) => item.status === "published").length;
+  const draftCount = items.filter((item) => item.status !== "published").length;
+  const pinnedCount = items.filter((item) => item.pinned).length;
+  const typeDistribution = items.reduce<Record<string, number>>((acc, item) => {
+    acc[item.type] = (acc[item.type] ?? 0) + 1;
+    return acc;
+  }, {});
+
   return (
-    <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Content library</h2>
-          <button
-            type="button"
+    <div className="space-y-6">
+      <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Content library</h2>
+            <button
+              type="button"
             onClick={createItem}
             className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
           >
@@ -2449,7 +2961,17 @@ function DataFeedManager({ feeds, modules, onChange }: { feeds: DataFeed[]; modu
   );
 }
 
-function SettingsPanel({ config, onConfigChange }: { config: SiteConfig; onConfigChange: (updater: (config: SiteConfig) => SiteConfig) => void }) {
+function SettingsPanel({
+  config,
+  onConfigChange,
+  onClearActivityLog,
+  activityCount
+}: {
+  config: SiteConfig;
+  onConfigChange: (updater: (config: SiteConfig) => SiteConfig) => void;
+  onClearActivityLog: () => void;
+  activityCount: number;
+}) {
   const pinnedContent = config.homepage.pinnedReleases;
   const featuredModules = config.homepage.featuredModules;
 
@@ -2558,6 +3080,50 @@ function SettingsPanel({ config, onConfigChange }: { config: SiteConfig; onConfi
           <li>3. Trigger CI to regenerate static pages via `next export`.</li>
         </ul>
       </div>
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        <h2 className="text-lg font-semibold">Activity ledger</h2>
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">
+          Local-only change history used by the overview timeline. Clear it before switching operators.
+        </p>
+        <div className="mt-4 flex items-center justify-between text-sm text-[var(--text-secondary)]">
+          <span>
+            {activityCount} {activityCount === 1 ? "event" : "events"} tracked
+          </span>
+          <button
+            type="button"
+            onClick={onClearActivityLog}
+            className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            Clear history
+          </button>
+        </div>
+      </div>
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Library analytics</h3>
+        <p className="text-sm text-[var(--text-secondary)]">Snapshot of editorial coverage for cross-checking dynamic modules.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4 text-sm">
+            <p className="text-[var(--text-tertiary)]">Published</p>
+            <p className="text-xl font-semibold text-[var(--text-status-warning)]">{publishedCount}</p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4 text-sm">
+            <p className="text-[var(--text-tertiary)]">Draft & review</p>
+            <p className="text-xl font-semibold text-[var(--text-status-error)]">{draftCount}</p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4 text-sm">
+            <p className="text-[var(--text-tertiary)]">Pinned assets</p>
+            <p className="text-xl font-semibold text-[var(--text-primary)]">{pinnedCount}</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-2 text-xs text-[var(--text-secondary)] sm:grid-cols-2">
+          {Object.entries(typeDistribution).map(([type, count]) => (
+            <div key={type} className="flex items-center justify-between rounded-xl border border-[var(--border-light)] bg-[var(--bg-primary)] px-3 py-2">
+              <span className="uppercase tracking-[0.18em]">{type}</span>
+              <span className="font-semibold text-[var(--text-primary)]">{count}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -2568,4 +3134,565 @@ function PlusIcon() {
 
 function generateId(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function JsonEditorSection({
+  title,
+  description,
+  value,
+  onApply
+}: {
+  title: string;
+  description: string;
+  value: unknown;
+  onApply: (parsed: any) => void;
+}) {
+  const [draft, setDraft] = useState(() => JSON.stringify(value, null, 2));
+  const [error, setError] = useState<string | null>(null);
+  const stats = useMemo(() => {
+    return {
+      lines: draft.split(/\r?\n/).length,
+      characters: draft.length
+    };
+  }, [draft]);
+
+  useEffect(() => {
+    setDraft(JSON.stringify(value, null, 2));
+  }, [value]);
+
+  const beautifyDraft = () => {
+    try {
+      const parsed = JSON.parse(draft);
+      setDraft(JSON.stringify(parsed, null, 2));
+      setError(null);
+    } catch {
+      setError("Beautify failed – invalid JSON");
+    }
+  };
+
+  const handleApply = () => {
+    try {
+      const parsed = JSON.parse(draft);
+      onApply(parsed);
+      setError(null);
+    } catch (err) {
+      setError("Invalid JSON structure");
+    }
+  };
+
+  return (
+    <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">{title}</h3>
+          <p className="text-sm text-[var(--text-secondary)]">{description}</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setDraft(JSON.stringify(value, null, 2))}
+            className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            onClick={beautifyDraft}
+            className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            Beautify
+          </button>
+          <button
+            type="button"
+            onClick={handleApply}
+            className="rounded-full bg-[var(--interactive-bg-accent-default)] px-4 py-1 text-xs font-semibold text-[var(--text-accent)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+      <textarea
+        className="mt-4 h-64 w-full rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4 font-mono text-xs text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+        value={draft}
+        spellCheck={false}
+        onChange={(event) => setDraft(event.target.value)}
+      />
+      {error ? <p className="mt-2 text-xs text-[var(--text-status-error)]">{error}</p> : null}
+      <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+        {stats.lines} lines · {stats.characters} characters
+      </p>
+    </div>
+  );
+}
+
+function ThemeDesigner({ theme, onChange }: { theme: ThemeCollections; onChange: (theme: ThemeCollections) => void }) {
+  const updatePalette = (index: number, update: Partial<ThemeCollections["palettes"][number]>) => {
+    const next = {
+      ...theme,
+      palettes: theme.palettes.map((palette, idx) => (idx === index ? { ...palette, ...update } : palette))
+    };
+    onChange(next);
+  };
+
+  const removePalette = (id: string) => {
+    if (theme.palettes.length <= 1) return;
+    onChange({ ...theme, palettes: theme.palettes.filter((palette) => palette.id !== id) });
+  };
+
+  const addPalette = () => {
+    const next = {
+      ...theme,
+      palettes: [
+        ...theme.palettes,
+        {
+          id: generateId("palette"),
+          name: "New palette",
+          primary: "#ffffff",
+          secondary: "#0f172a",
+          accent: "#38bdf8",
+          background: "#0f172a",
+          useCase: ""
+        }
+      ]
+    };
+    onChange(next);
+  };
+
+  const updateTypography = (index: number, update: Partial<ThemeCollections["typography"][number]>) => {
+    onChange({
+      ...theme,
+      typography: theme.typography.map((token, idx) => (idx === index ? { ...token, ...update } : token))
+    });
+  };
+
+  return (
+    <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Theme palettes</h3>
+          <p className="text-sm text-[var(--text-secondary)]">Curate the color systems used across hero, modules, and automations dashboards.</p>
+        </div>
+        <button
+          type="button"
+          onClick={addPalette}
+          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+        >
+          Add palette
+        </button>
+      </div>
+      <div className="mt-4 grid gap-6 md:grid-cols-2">
+        {theme.palettes.map((palette, index) => (
+          <div key={palette.id} className="space-y-4 rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4">
+            <div className="flex items-center justify-between gap-4">
+              <input
+                className="w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                value={palette.name}
+                onChange={(event) => updatePalette(index, { name: event.target.value })}
+                placeholder="Palette name"
+              />
+              <button
+                type="button"
+                onClick={() => removePalette(palette.id)}
+                className="text-xs text-[var(--text-tertiary)] transition hover:text-[var(--text-status-error)]"
+              >
+                Remove
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <label className="space-y-1">
+                <span className="text-[var(--text-tertiary)]">Primary</span>
+                <input
+                  type="color"
+                  value={palette.primary}
+                  onChange={(event) => updatePalette(index, { primary: event.target.value })}
+                  className="h-10 w-full cursor-pointer rounded"
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[var(--text-tertiary)]">Secondary</span>
+                <input
+                  type="color"
+                  value={palette.secondary}
+                  onChange={(event) => updatePalette(index, { secondary: event.target.value })}
+                  className="h-10 w-full cursor-pointer rounded"
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[var(--text-tertiary)]">Accent</span>
+                <input
+                  type="color"
+                  value={palette.accent}
+                  onChange={(event) => updatePalette(index, { accent: event.target.value })}
+                  className="h-10 w-full cursor-pointer rounded"
+                />
+              </label>
+              <label className="space-y-1 col-span-2">
+                <span className="text-[var(--text-tertiary)]">Background</span>
+                <input
+                  className="w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                  value={palette.background}
+                  onChange={(event) => updatePalette(index, { background: event.target.value })}
+                  placeholder="CSS background value"
+                />
+              </label>
+              <label className="space-y-1 col-span-2">
+                <span className="text-[var(--text-tertiary)]">Use case</span>
+                <input
+                  className="w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                  value={palette.useCase}
+                  onChange={(event) => updatePalette(index, { useCase: event.target.value })}
+                  placeholder="Where this palette is applied"
+                />
+              </label>
+            </div>
+            <div className="rounded-xl border border-[var(--border-default)] p-4" style={{ background: palette.background }}>
+              <p className="text-sm font-semibold" style={{ color: palette.primary }}>
+                Preview headline
+              </p>
+              <p className="text-xs" style={{ color: palette.secondary }}>
+                Body copy using secondary color.
+              </p>
+              <span className="mt-2 inline-flex rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em]" style={{ color: palette.accent }}>
+                Accent signal
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 space-y-4">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Typography scale</h3>
+        <div className="grid gap-3 md:grid-cols-2">
+          {theme.typography.map((token, index) => (
+            <div key={token.token} className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-4">
+              <div className="flex items-center justify-between gap-3 text-xs text-[var(--text-tertiary)]">
+                <span>{token.token}</span>
+              </div>
+              <input
+                className="mt-3 w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                value={token.value}
+                onChange={(event) => updateTypography(index, { value: event.target.value })}
+                placeholder="Value"
+              />
+              <input
+                className="mt-2 w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                value={token.usage}
+                onChange={(event) => updateTypography(index, { usage: event.target.value })}
+                placeholder="Usage"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CollectionsManager({
+  collections,
+  onChange
+}: {
+  collections: Collections;
+  onChange: (
+    updater: (collections: Collections) => Collections,
+    message?: string,
+    audit?: { summary: string; target?: string; detail?: string }
+  ) => void;
+}) {
+  return (
+    <div className="grid gap-8 lg:grid-cols-2">
+      <JsonEditorSection
+        title="Mega navigation"
+        description="Edit the structured navigation powering the mega menu, secondary panels, and top-level anchors."
+        value={collections.navigation}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              navigation: value as Collections["navigation"]
+            }),
+            "Navigation schema updated",
+            { summary: "Updated navigation schema", target: "Navigation" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Hero narrative"
+        description="Mission verbs, rotating search prompts, releases, and analytic signals shown on the homepage hero."
+        value={collections.hero}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              hero: value as HeroCollection
+            }),
+            "Hero collection updated",
+            { summary: "Refined hero narrative", target: "Hero" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Home ecosystem"
+        description="Ecosystem nodes, campus stats, alliance descriptors, and roadmap milestones."
+        value={collections.home}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              home: value as HomeCollection
+            }),
+            "Home ecosystem updated",
+            { summary: "Adjusted home collections", target: "Home" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Program catalog"
+        description="Categories, actions, and metrics for the programs grid."
+        value={collections.programs}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              programs: value as ProgramsCollection
+            }),
+            "Program catalog updated",
+            { summary: "Updated programs", target: "Programs" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Insights feed"
+        description="Editorial articles and signals displayed in the insights module."
+        value={collections.insights}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              insights: value as InsightsCollection
+            }),
+            "Insights feed updated",
+            { summary: "Curated insights", target: "Insights" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Realtime pulse"
+        description="Operations transmissions, sensor readings, and live stream events."
+        value={collections.pulse}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              pulse: value as PulseCollection
+            }),
+            "Realtime pulse updated",
+            { summary: "Maintained pulse streams", target: "Pulse" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Access tiers"
+        description="Portal tiers and security highlights surfaced in the access component."
+        value={collections.accessPortal}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              accessPortal: value as AccessPortalCollection
+            }),
+            "Access portal updated",
+            { summary: "Refined access tiers", target: "Access portal" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Footer architecture"
+        description="Footer columns, contact directories, and live status tags."
+        value={collections.footer}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              footer: value as FooterCollection
+            }),
+            "Footer collection updated",
+            { summary: "Updated footer architecture", target: "Footer" }
+          )
+        }
+      />
+      {Object.entries(collections.pages).map(([slug, content]) => (
+        <JsonEditorSection
+          key={slug}
+          title={`Dynamic page: ${slug}`}
+          description="Module definitions for dynamic routes sourced from the JSON database."
+          value={content}
+          onApply={(value) =>
+            onChange(
+              (current) => ({
+                ...current,
+                pages: { ...current.pages, [slug]: value }
+              }),
+              `Updated JSON for ${slug}`,
+              { summary: `Edited collection for ${slug}`, target: "Dynamic page" }
+            )
+          }
+        />
+      ))}
+      <JsonEditorSection
+        title="Legal content — Terms"
+        description="Update headline, lead, and sections for the terms of use page."
+        value={collections.legal.terms}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              legal: { ...current.legal, terms: value as StaticPageContent }
+            }),
+            "Terms content updated",
+            { summary: "Edited terms of use", target: "Legal" }
+          )
+        }
+      />
+      <JsonEditorSection
+        title="Legal content — Privacy"
+        description="Edit privacy policy sections and lead paragraphs."
+        value={collections.legal.privacy}
+        onApply={(value) =>
+          onChange(
+            (current) => ({
+              ...current,
+              legal: { ...current.legal, privacy: value as StaticPageContent }
+            }),
+            "Privacy content updated",
+            { summary: "Updated privacy policy", target: "Legal" }
+          )
+        }
+      />
+      <div className="lg:col-span-2">
+        <ThemeDesigner
+          theme={collections.theme}
+          onChange={(theme) =>
+            onChange(
+              (current) => ({ ...current, theme }),
+              "Theme tokens updated",
+              { summary: "Refined design system", target: "Theme" }
+            )
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+function AutomationManager({
+  automations,
+  onChange
+}: {
+  automations: AutomationRule[];
+  onChange: (rules: AutomationRule[]) => void;
+}) {
+  const toggleStatus = (id: string) => {
+    onChange(
+      automations.map((rule) =>
+        rule.id === id ? { ...rule, status: rule.status === "active" ? "paused" : "active" } : rule
+      )
+    );
+  };
+
+  const updateRule = (id: string, update: Partial<AutomationRule>) => {
+    onChange(automations.map((rule) => (rule.id === id ? { ...rule, ...update } : rule)));
+  };
+
+  const addRule = () => {
+    onChange([
+      ...automations,
+      {
+        id: generateId("automation"),
+        name: "New automation",
+        description: "Describe what this automation accomplishes.",
+        trigger: "content.created",
+        action: "notify.owners",
+        status: "active"
+      }
+    ]);
+  };
+
+  const removeRule = (id: string) => {
+    onChange(automations.filter((rule) => rule.id !== id));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Automation rules</h2>
+          <p className="text-sm text-[var(--text-secondary)]">Orchestrate webhook triggers, publishing workflows, and alerting pipelines.</p>
+        </div>
+        <button
+          type="button"
+          onClick={addRule}
+          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+        >
+          <PlusIcon /> Add automation
+        </button>
+      </div>
+      <div className="grid gap-5 lg:grid-cols-2">
+        {automations.map((rule) => (
+          <div key={rule.id} className="space-y-4 rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-2">
+                <input
+                  className="w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm font-semibold text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                  value={rule.name}
+                  onChange={(event) => updateRule(rule.id, { name: event.target.value })}
+                />
+                <textarea
+                  className="h-20 w-full rounded-2xl border border-[var(--border-light)] bg-[var(--bg-primary)] p-3 text-xs text-[var(--text-secondary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                  value={rule.description}
+                  onChange={(event) => updateRule(rule.id, { description: event.target.value })}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeRule(rule.id)}
+                className="text-xs text-[var(--text-tertiary)] transition hover:text-[var(--text-status-error)]"
+              >
+                Remove
+              </button>
+            </div>
+            <div className="grid gap-3 text-xs text-[var(--text-secondary)]">
+              <label className="space-y-1">
+                <span>Trigger</span>
+                <input
+                  className="w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                  value={rule.trigger}
+                  onChange={(event) => updateRule(rule.id, { trigger: event.target.value })}
+                />
+              </label>
+              <label className="space-y-1">
+                <span>Action</span>
+                <input
+                  className="w-full rounded-full border border-[var(--border-default)] px-3 py-1 text-sm text-[var(--text-primary)] focus:border-[var(--text-status-warning)] focus:outline-none"
+                  value={rule.action}
+                  onChange={(event) => updateRule(rule.id, { action: event.target.value })}
+                />
+              </label>
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-semibold ${rule.status === "active" ? "text-[var(--text-status-warning)]" : "text-[var(--text-tertiary)]"}`}>
+                  {rule.status === "active" ? "Active" : "Paused"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => toggleStatus(rule.id)}
+                  className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                >
+                  Toggle status
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

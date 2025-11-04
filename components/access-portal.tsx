@@ -3,47 +3,21 @@
 import { motion } from "framer-motion";
 import { CheckCircle2, Fingerprint, LockKeyhole, ServerCog, Users } from "lucide-react";
 import Link from "next/link";
+import { getAccessPortalCollection } from "@/lib/cms/site-config";
+import type { AccessPortalCollection } from "@/lib/cms/types";
 
-const tiers = [
-  {
-    title: "Open Research",
-    description: "Public demos, free proxies, open models, and datasets for rapid exploration.",
-    features: [
-      "Atlas Playground and language models",
-      "NOVA Free Proxy with SDK",
-      "Transparency reports and public APIs"
-    ],
-    cta: "Get access",
-    href: "/access/open",
-    accent: false
-  },
-  {
-    title: "Strategic",
-    description: "Expanded entry to secured products, DePIN orchestration, and robotics missions.",
-    features: [
-      "Sentient Cloud and EdgeGrid",
-      "DePIN Orchestration Network",
-      "Robotics and biomed test environments"
-    ],
-    cta: "Book a consultation",
-    href: "/access/strategic",
-    accent: true
-  },
-  {
-    title: "Sovereign",
-    description: "Full customization with dedicated data centers, quantum cryptography, and joint labs.",
-    features: [
-      "Quantum Zero Trust deployments",
-      "NeuroWeave immortality protocols",
-      "Joint research and mission governance"
-    ],
-    cta: "Schedule an audit",
-    href: "/access/sovereign",
-    accent: false
-  }
-];
+const ICON_MAP = {
+  fingerprint: Fingerprint,
+  "lock-keyhole": LockKeyhole,
+  "server-cog": ServerCog,
+  users: Users
+} as const;
 
-export function AccessPortal() {
+export function AccessPortal({ collection }: { collection?: AccessPortalCollection }) {
+  const data = collection ?? getAccessPortalCollection();
+  const tiers = data.tiers;
+  const highlights = data.highlights;
+
   return (
     <section id="access" className="mt-28">
       <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
@@ -64,29 +38,28 @@ export function AccessPortal() {
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            {[Fingerprint, LockKeyhole, ServerCog, Users].map((Icon, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ delay: index * 0.05, duration: 0.4 }}
-                className="relative flex flex-col gap-3 pl-5"
-              >
-                <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                <Icon
-                  className={`h-6 w-6 ${
-                    index % 2 === 0 ? "text-[var(--text-status-warning)]" : "text-[var(--text-status-error)]"
-                  }`}
-                />
-                <p className="text-sm text-[var(--text-secondary)]">
-                  {index === 0 && "Biometric authorization with neural signatures"}
-                  {index === 1 && "Post-quantum encryption and key matrices"}
-                  {index === 2 && "Hybrid cloud and on-prem orchestration"}
-                  {index === 3 && "Role governance for teams, nations, and enterprises"}
-                </p>
-              </motion.div>
-            ))}
+            {highlights.map((item, index) => {
+              const Icon = ICON_MAP[item.icon as keyof typeof ICON_MAP];
+              if (!Icon) return null;
+              return (
+                <motion.div
+                  key={`${item.icon}-${index}`}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ delay: index * 0.05, duration: 0.4 }}
+                  className="relative flex flex-col gap-3 pl-5"
+                >
+                  <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
+                  <Icon
+                    className={`h-6 w-6 ${
+                      index % 2 === 0 ? "text-[var(--text-status-warning)]" : "text-[var(--text-status-error)]"
+                    }`}
+                  />
+                  <p className="text-sm text-[var(--text-secondary)]">{item.description}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
         <motion.div

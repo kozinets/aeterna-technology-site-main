@@ -5,82 +5,12 @@ import { useState } from "react";
 import { Globe2 } from "lucide-react";
 import { LanguageModal } from "./language-modal";
 import { AeternaLogo } from "./aeterna-logo";
+import { getFooterCollection } from "@/lib/cms/site-config";
 
-type FooterColumn = {
-  title: string;
-  links: { label: string; href: string }[];
-};
-
-const footerColumns: FooterColumn[] = [
-  {
-    title: "Corporate",
-    links: [
-      { label: "Overview", href: "/company/overview" },
-      { label: "Leadership", href: "/company/leadership" },
-      { label: "Careers", href: "/company/careers" },
-      { label: "Newsroom", href: "/company/newsroom" },
-      { label: "Global facilities", href: "/company/facilities" }
-    ]
-  },
-  {
-    title: "Operations",
-    links: [
-      { label: "Mission control", href: "/operations/control-center" },
-      { label: "Atlas operations", href: "/operations/atlas" },
-      { label: "Edge deployments", href: "/operations/edge-hubs" },
-      { label: "Biomed network", href: "/operations/biomed" },
-      { label: "Orbital logistics", href: "/operations/orbital" }
-    ]
-  },
-  {
-    title: "Programs",
-    links: [
-      { label: "Neural integrity", href: "/programs/neural-integrity" },
-      { label: "Orbital autonomy", href: "/programs/orbital-autonomy" },
-      { label: "Quantum finance", href: "/programs/quantum-finance" },
-      { label: "Longevity guilds", href: "/programs/longevity-guilds" },
-      { label: "Robotics continuum", href: "/programs/robotics-continuum" }
-    ]
-  },
-  {
-    title: "Trust & compliance",
-    links: [
-      { label: "Security posture", href: "/trust/security-posture" },
-      { label: "Compliance hub", href: "/trust/compliance" },
-      { label: "Transparency", href: "/trust/transparency" },
-      { label: "Incident response", href: "/trust/incident-response" },
-      { label: "Responsible AI", href: "/trust/responsible-ai" }
-    ]
-  },
-  {
-    title: "Developers",
-    links: [
-      { label: "Start building", href: "/developers/start" },
-      { label: "API catalog", href: "/developers/api" },
-      { label: "SDK downloads", href: "/developers/sdks" },
-      { label: "Changelog", href: "/developers/changelog" },
-      { label: "Support center", href: "/developers/support" }
-    ]
-  }
-];
-
-const operationsContacts = [
-  { label: "Mission command", value: "command@aeterna.global" },
-  { label: "Security desk", value: "security@aeterna.global" },
-  { label: "Payments desk", value: "pay@aeterna.global" },
-  { label: "Life sciences", value: "vitality@aeterna.global" },
-  { label: "Orbital ops", value: "orbit@aeterna.global" },
-  { label: "Media", value: "press@aeterna.global" }
-];
-
-const statusBadges = [
-  "#AtlasLive",
-  "#NOVAProxy",
-  "#NeuroOps",
-  "#DePINFlux",
-  "#SentientCloud",
-  "#ContinuityLab"
-];
+const footerCollection = getFooterCollection();
+const footerColumns = footerCollection.columns;
+const operationsContacts = footerCollection.contacts;
+const statusBadges = footerCollection.statusBadges;
 
 export function Footer() {
   const [languageOpen, setLanguageOpen] = useState(false);
