@@ -1,0 +1,186 @@
+{
+  "navigation": [
+    {
+      "id": "ecosystem",
+      "label": "Ecosystem",
+      "type": "section",
+      "children": [
+        { "id": "atlas", "label": "Atlas Cognitive Engine", "href": "/ai/atlas", "badge": "beta" },
+        { "id": "helios", "label": "Helios Model Suite", "href": "/ai/helios" },
+        { "id": "aidev", "label": "AIDev Mesh", "href": "/ai/aidev-mesh" }
+      ]
+    },
+    {
+      "id": "network",
+      "label": "Network & Edge",
+      "type": "section",
+      "children": [
+        { "id": "nova", "label": "NOVA Free Proxy", "href": "/network/nova-proxy", "badge": "new" },
+        { "id": "edge-grid", "label": "Aeterna EdgeGrid", "href": "/network/edge-grid" },
+        { "id": "synapse", "label": "Synapse Mesh", "href": "/network/synapse-mesh" }
+      ]
+    },
+    {
+      "id": "crypto",
+      "label": "Crypto & Trust",
+      "type": "section",
+      "children": [
+        { "id": "aeterna-pay", "label": "Aeterna Pay", "href": "/crypto/aeterna-pay", "badge": "launch" },
+        { "id": "depin", "label": "DePIN Orchestration", "href": "/crypto/depin" },
+        { "id": "vault", "label": "Post-Quantum Vault", "href": "/crypto/vault" }
+      ]
+    },
+    {
+      "id": "company",
+      "label": "Company",
+      "type": "section",
+      "children": [
+        { "id": "manifesto", "label": "Corporate Manifesto", "href": "/company/manifesto" },
+        { "id": "careers", "label": "Careers", "href": "/careers/missions" },
+        { "id": "governance", "label": "Ethics & Governance", "href": "/company/governance" }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "name": "Home",
+      "slug": "/",
+      "status": "published",
+      "description": "Primary corporate landing canvas",
+      "tags": ["landing", "showcase"],
+      "lastUpdated": "2024-06-01T10:00:00.000Z",
+      "modules": [
+        {
+          "id": "hero-mission",
+          "type": "hero",
+          "title": "Orchestrate the future of civilization",
+          "subtitle": "Unify AI, biotech, cryptography, and orbital infrastructure under one corporate mission stack.",
+          "verb": "elevate",
+          "actions": [
+            { "label": "View ecosystem", "href": "#programs" },
+            { "label": "Talk to alliances", "href": "/access/strategic" }
+          ],
+          "media": { "type": "image", "src": "/assets/hero-grid.png", "caption": "Atlas orchestrating continuum" }
+        },
+        {
+          "id": "mission-updates",
+          "type": "feed",
+          "title": "Mission updates",
+          "feedId": "mission-stream",
+          "layout": "grid"
+        },
+        {
+          "id": "product-releases",
+          "type": "list",
+          "title": "Pinned releases",
+          "items": ["nova-release", "continuity-brief", "sentient-update"],
+          "layout": "dual"
+        }
+      ]
+    },
+    {
+      "id": "nova-proxy",
+      "name": "NOVA Free Proxy",
+      "slug": "/network/nova-proxy",
+      "status": "published",
+      "description": "Community and enterprise proxy mesh",
+      "tags": ["network", "security"],
+      "lastUpdated": "2024-06-08T09:15:00.000Z",
+      "modules": [
+        { "id": "nova-overview", "type": "hero", "title": "NOVA Proxy", "subtitle": "Deterministic privacy mesh for every mission tier.", "verb": "shield" },
+        { "id": "nova-economics", "type": "stat-block", "title": "Node economics", "stats": [
+          { "label": "Community relays", "value": "48,120", "tone": "positive" },
+          { "label": "Enterprise tenants", "value": "2,870", "tone": "critical" },
+          { "label": "Avg. payout", "value": "₳1,240 / node" }
+        ] }
+      ]
+    },
+    {
+      "id": "aeterna-pay",
+      "name": "Aeterna Pay",
+      "slug": "/crypto/aeterna-pay",
+      "status": "published",
+      "description": "Programmable crypto settlements",
+      "tags": ["finance", "payments"],
+      "lastUpdated": "2024-06-09T11:30:00.000Z",
+      "modules": [
+        { "id": "pay-hero", "type": "hero", "title": "Aeterna Pay", "subtitle": "Zero-fee wallets with sovereign-grade automation.", "verb": "empower" },
+        { "id": "pay-ledger", "type": "media", "title": "Settlement ledger", "media": { "type": "chart", "src": "aeterna-pay-volume" } }
+      ]
+    }
+  ],
+  "contentLibrary": [
+    {
+      "id": "nova-release",
+      "title": "NOVA Proxy global release",
+      "type": "release",
+      "author": "Network Directorate",
+      "publishedAt": "2024-06-07T12:00:00.000Z",
+      "status": "published",
+      "summary": "Adaptive relay fabric with programmable ingress and node economics.",
+      "thumbnail": "/assets/releases/nova.jpg",
+      "pinned": true,
+      "relatedPages": ["nova-proxy"]
+    },
+    {
+      "id": "continuity-brief",
+      "title": "Continuity Initiative clinical brief",
+      "type": "article",
+      "author": "Vitality Labs",
+      "publishedAt": "2024-06-05T08:00:00.000Z",
+      "status": "published",
+      "summary": "Neural twins extend consciousness continuity across orbital habitats.",
+      "thumbnail": "/assets/insights/continuity.jpg",
+      "relatedPages": ["home"]
+    },
+    {
+      "id": "sentient-update",
+      "title": "Sentient Cloud sovereign rollout",
+      "type": "update",
+      "author": "Sentient Cloud Council",
+      "publishedAt": "2024-06-03T15:30:00.000Z",
+      "status": "review",
+      "summary": "Deterministic compute corridors onboard twelve new sovereign regions.",
+      "thumbnail": "/assets/insights/sentient.jpg",
+      "relatedPages": ["home"]
+    }
+  ],
+  "dataFeeds": [
+    {
+      "id": "mission-stream",
+      "name": "Mission telemetry stream",
+      "description": "Realtime mission updates from Atlas Command",
+      "source": "wss://missions.aeterna.global/live",
+      "refreshInterval": "live",
+      "format": "websocket",
+      "status": "connected",
+      "connectedModules": ["mission-updates"]
+    },
+    {
+      "id": "nova-analytics",
+      "name": "NOVA proxy analytics",
+      "description": "Hourly packet flux, validator uptime, and payout data",
+      "source": "https://api.aeterna.network/nova/metrics",
+      "refreshInterval": "5m",
+      "format": "json",
+      "status": "connected",
+      "connectedModules": ["nova-economics"]
+    },
+    {
+      "id": "pay-settlements",
+      "name": "Aeterna Pay settlements",
+      "description": "Settlement velocity and wallet telemetry",
+      "source": "https://api.aeterna.finance/pay/settlements",
+      "refreshInterval": "1m",
+      "format": "json",
+      "status": "degraded",
+      "connectedModules": ["pay-ledger"]
+    }
+  ],
+  "homepage": {
+    "pinnedReleases": ["nova-release", "continuity-brief"],
+    "featuredModules": ["hero-mission", "mission-updates", "product-releases"],
+    "spotlightPageId": "nova-proxy"
+  }
+}
