@@ -55,10 +55,11 @@ export function MegaMenu({
     <AnimatePresence>
       {open ? (
         <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.26, ease: "easeOut" }}
+          initial={{ opacity: 0, scaleY: 0.9 }}
+          animate={{ opacity: 1, scaleY: 1 }}
+          exit={{ opacity: 0, scaleY: 0.92 }}
+          transition={{ duration: 0.24, ease: "easeOut" }}
+          style={{ transformOrigin: "top center" }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
           <div className="mx-auto w-full max-w-[1440px] px-6 py-10 lg:px-12">

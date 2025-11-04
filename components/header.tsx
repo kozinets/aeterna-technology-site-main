@@ -356,7 +356,7 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   const navItemBase =
-    "relative flex h-full items-center gap-2 px-4 text-sm font-medium leading-none transition-colors duration-150 after:absolute after:bottom-[-6px] after:left-0 after:h-[2px] after:w-full after:rounded-full after:transition-colors after:duration-150";
+    "relative flex h-full items-center gap-2 px-4 pb-3 text-sm font-medium leading-tight transition-colors duration-150 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:rounded-full after:transition-all after:duration-150";
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -440,7 +440,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="hidden h-11 w-11 items-center justify-center rounded-full text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
+            className="hidden h-10 w-10 items-center justify-center text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
             aria-label="Search across Aeterna"
           >
             <Search className="h-5 w-5" />
@@ -478,10 +478,11 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
     <AnimatePresence>
       {open ? (
         <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.26, ease: "easeOut" }}
+          initial={{ opacity: 0, scaleY: 0.9 }}
+          animate={{ opacity: 1, scaleY: 1 }}
+          exit={{ opacity: 0, scaleY: 0.92 }}
+          transition={{ duration: 0.24, ease: "easeOut" }}
+          style={{ transformOrigin: "top center" }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >
           <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-10 md:grid-cols-2 lg:grid-cols-3 lg:px-12">

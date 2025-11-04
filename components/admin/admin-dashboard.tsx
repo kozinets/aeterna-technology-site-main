@@ -1,828 +1,2571 @@
 "use client";
 
-import { ArrowUpRight, Check, ChevronDown, ChevronUp, GripVertical, PlayCircle, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentType, type CSSProperties } from "react";
+import {
+  Archive,
+  ArrowLeftRight,
+  ArrowRight,
+  BarChart3,
+  BookMarked,
+  CheckCircle2,
+  Download,
+  FileDigit,
+  FilePlus,
+  Filter,
+  Flame,
+  FolderPlus,
+  Layers,
+  LineChart,
+  ListPlus,
+  MapPin,
+  MonitorSmartphone,
+  Move,
+  Pencil,
+  Play,
+  Save,
+  Settings,
+  SlidersHorizontal,
+  Upload,
+  Wand2
+} from "lucide-react";
 import * as d3 from "d3";
+import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useDraggable, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
+import { restrictToVerticalAxis, restrictToWindowEdges } from "@dnd-kit/modifiers";
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import baseConfig from "@/data/site-config.json";
 
-type MenuLink = {
+type NavigationNode = {
   id: string;
-  title: string;
-  href: string;
-  summary: string;
+  label: string;
+  href?: string;
   badge?: string;
+  description?: string;
+  children?: NavigationNode[];
+  type?: "section" | "link";
 };
 
-type MenuSection = {
+type ModuleType =
+  | "hero"
+  | "stat-block"
+  | "feature-grid"
+  | "media"
+  | "list"
+  | "feed"
+  | "timeline"
+  | "cta"
+  | "markdown";
+
+type ModuleAction = { label: string; href: string };
+
+type ModuleStat = { label: string; value: string; tone?: "positive" | "critical" };
+
+type ModuleMedia = { type: "image" | "video" | "chart"; src: string; caption?: string };
+
+type PageModule = {
   id: string;
-  label: string;
+  type: ModuleType;
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  body?: string;
+  verb?: string;
+  actions?: ModuleAction[];
+  stats?: ModuleStat[];
+  items?: string[];
+  feedId?: string;
+  layout?: "grid" | "dual" | "list" | "split";
+  media?: ModuleMedia;
+  pinned?: boolean;
+  columns?: { title: string; body: string }[];
+};
+
+type PageDefinition = {
+  id: string;
+  name: string;
+  slug: string;
   description: string;
-  items: MenuLink[];
+  status: "draft" | "review" | "scheduled" | "published";
+  tags: string[];
+  lastUpdated: string;
+  modules: PageModule[];
 };
 
-type LandingBlock = {
-  id: string;
-  label: string;
-  type: "hero" | "ticker" | "story" | "research" | "cta";
-  status: "live" | "draft" | "scheduled";
-  accent: "positive" | "critical" | "neutral";
-  summary: string;
-};
-
-type ResearchDraft = {
+type ContentItem = {
   id: string;
   title: string;
-  lead: string;
-  readiness: "ideation" | "peer-review" | "ready";
-  figures: number;
-  attachments: number;
+  type: "article" | "release" | "update" | "brief";
+  author: string;
+  publishedAt: string;
+  status: "draft" | "review" | "published";
+  summary: string;
+  thumbnail?: string;
+  pinned?: boolean;
+  relatedPages: string[];
 };
 
 type DataFeed = {
   id: string;
+  name: string;
+  description: string;
+  source: string;
+  refreshInterval: string;
+  format: "json" | "csv" | "xml" | "websocket";
+  status: "connected" | "degraded" | "offline";
+  connectedModules: string[];
+};
+
+type SiteConfig = {
+  navigation: NavigationNode[];
+  pages: PageDefinition[];
+  contentLibrary: ContentItem[];
+  dataFeeds: DataFeed[];
+  homepage: {
+    pinnedReleases: string[];
+    featuredModules: string[];
+    spotlightPageId: string | null;
+  };
+};
+
+type AdminTab =
+  | "overview"
+  | "navigation"
+  | "pages"
+  | "builder"
+  | "library"
+  | "feeds"
+  | "settings";
+
+type ModuleTemplate = {
+  type: ModuleType;
   label: string;
-  endpoint: string;
-  interval: number;
-  secure: boolean;
-  format: "json" | "csv" | "protobuf";
-  status: "live" | "paused" | "error";
-  lastSync: string;
+  description: string;
+  icon: ComponentType<{ className?: string }>;
+  defaults: Partial<PageModule>;
 };
 
-type ReleaseBlueprint = {
-  id: string;
-  product: string;
-  headline: string;
-  owner: string;
-  status: "design" | "review" | "published";
-  metrics: { label: string; value: string }[];
-  lastPublished: string;
-  hasD3: boolean;
-};
+type DragMeta =
+  | { source: "palette"; moduleType: ModuleType }
+  | { source: "canvas"; moduleId: string };
 
-const initialMenu: MenuSection[] = [
+const MODULE_LIBRARY: ModuleTemplate[] = [
   {
-    id: "ecosystem",
-    label: "Ecosystem",
-    description: "Programs spanning AI, networks, crypto, and bioengineering.",
-    items: [
-      {
-        id: "nova-proxy",
-        title: "NOVA Free Proxy",
-        href: "/network/nova-proxy",
-        summary: "Adaptive relay fabric with open and incentivized node pools.",
-        badge: "launch"
-      },
-      {
-        id: "aeterna-pay",
-        title: "Aeterna Pay",
-        href: "/crypto/aeterna-pay",
-        summary: "Zero-fee crypto treasury with enterprise orchestration."
-      },
-      {
-        id: "neuro-weave",
-        title: "NeuroWeave Implants",
-        href: "/bio/neuro-weave",
-        summary: "Adaptive neural interfaces with biometric co-processors."
-      }
-    ]
-  },
-  {
-    id: "research",
-    label: "Research & Labs",
-    description: "Scientific programs, publications, and lab operations.",
-    items: [
-      {
-        id: "continuity",
-        title: "Continuity Initiative",
-        href: "/research/continuity",
-        summary: "Longevity fellows documenting immortality breakthroughs.",
-        badge: "priority"
-      },
-      {
-        id: "orbital-forge",
-        title: "Orbital Forge",
-        href: "/orbital/forge",
-        summary: "Space manufacturing arrays with deterministic QA loops."
-      }
-    ]
-  },
-  {
-    id: "company",
-    label: "Company",
-    description: "Corporate governance, alliances, and mission charters.",
-    items: [
-      {
-        id: "alliances",
-        title: "Strategic Alliances",
-        href: "/company/alliances",
-        summary: "Governments, universities, and enterprises collaborating with Aeterna."
-      }
-    ]
-  }
-];
-
-const initialBlocks: LandingBlock[] = [
-  {
-    id: "hero-core",
-    label: "Hero intelligence",
     type: "hero",
-    status: "live",
-    accent: "positive",
-    summary: "Rotating corporate question, search bar, and live mission thread."
+    label: "Mission hero",
+    description: "Large headline with verb rotation and dual call-to-actions.",
+    icon: Flame,
+    defaults: {
+      title: "Untitled mission canvas",
+      subtitle: "Compose a strategic overview with actions and live metrics.",
+      verb: "advance",
+      actions: [
+        { label: "Primary action", href: "/#" },
+        { label: "Secondary", href: "/#" }
+      ],
+      media: { type: "image", src: "/assets/placeholder/hero.jpg", caption: "Upload media" }
+    }
   },
   {
-    id: "pinned-release",
-    label: "Pinned release",
-    type: "story",
-    status: "live",
-    accent: "positive",
-    summary: "NOVA Proxy launch tile with zero-latency updates."
+    type: "stat-block",
+    label: "Signal stats",
+    description: "Grid of KPIs highlighting operational telemetry.",
+    icon: BarChart3,
+    defaults: {
+      title: "Operational signals",
+      stats: [
+        { label: "Primary metric", value: "0", tone: "positive" },
+        { label: "Secondary metric", value: "0", tone: "critical" },
+        { label: "Tertiary metric", value: "0" }
+      ]
+    }
   },
   {
-    id: "research-digest",
-    label: "Research digest",
-    type: "research",
-    status: "draft",
-    accent: "neutral",
-    summary: "Latest papers, pinned studies, and figure galleries."
+    type: "feature-grid",
+    label: "Feature matrix",
+    description: "Columnar layout for product capabilities and descriptions.",
+    icon: Layers,
+    defaults: {
+      title: "Feature grid",
+      columns: [
+        { title: "Capability", body: "Describe the outcome." },
+        { title: "Automation", body: "Highlight the automation advantage." },
+        { title: "Security", body: "Note compliance and safety controls." }
+      ],
+      layout: "grid"
+    }
   },
   {
-    id: "livestream",
-    label: "Livestream window",
+    type: "media",
+    label: "Media spotlight",
+    description: "Embed rich media, product renders, or charts.",
+    icon: MonitorSmartphone,
+    defaults: {
+      title: "Media spotlight",
+      media: { type: "video", src: "https://assets.aeterna/video.mp4", caption: "Describe the media asset" },
+      description: "Explain the significance of the visual asset."
+    }
+  },
+  {
+    type: "list",
+    label: "Release list",
+    description: "Chronological list of launches, posts, or changelog entries.",
+    icon: ListPlus,
+    defaults: {
+      title: "Release highlights",
+      items: ["content-id-1", "content-id-2"],
+      layout: "list"
+    }
+  },
+  {
+    type: "feed",
+    label: "Live feed",
+    description: "Attach a live data stream to update visitors in real time.",
+    icon: ArrowLeftRight,
+    defaults: {
+      title: "Live feed",
+      feedId: "mission-stream",
+      layout: "grid"
+    }
+  },
+  {
+    type: "timeline",
+    label: "Roadmap timeline",
+    description: "Communicate upcoming launches and milestones.",
+    icon: MapPin,
+    defaults: {
+      title: "Roadmap",
+      items: ["Q3 launch", "Q4 expansion", "Q1 milestone"],
+      layout: "dual"
+    }
+  },
+  {
     type: "cta",
-    status: "scheduled",
-    accent: "critical",
-    summary: "Hero slot for live orbital or laboratory stream embedding."
+    label: "Call to action",
+    description: "High-impact prompt with single conversion objective.",
+    icon: Wand2,
+    defaults: {
+      title: "Ready to deploy?",
+      description: "Invite alliances, partners, or researchers to engage.",
+      actions: [{ label: "Engage", href: "/contact" }]
+    }
+  },
+  {
+    type: "markdown",
+    label: "Rich narrative",
+    description: "Freeform narrative section with inline media support.",
+    icon: BookMarked,
+    defaults: {
+      title: "Narrative",
+      body: "<p>Craft long-form content with headings, callouts, and inline research citations.</p>"
+    }
   }
 ];
 
-const initialDrafts: ResearchDraft[] = [
-  {
-    id: "draft-1",
-    title: "Orbital biosphere regeneration",
-    lead: "Atlas Continuity Group",
-    readiness: "peer-review",
-    figures: 12,
-    attachments: 6
-  },
-  {
-    id: "draft-2",
-    title: "NeuroWeave adaptive immune mirrors",
-    lead: "Vitality Labs",
-    readiness: "ideation",
-    figures: 4,
-    attachments: 2
-  }
-];
+const createConfigClone = (): SiteConfig => JSON.parse(JSON.stringify(baseConfig)) as SiteConfig;
 
-const initialFeeds: DataFeed[] = [
-  {
-    id: "feed-1",
-    label: "NOVA latency telemetry",
-    endpoint: "https://api.aeterna.network/nova/latency",
-    interval: 15,
-    secure: true,
-    format: "json",
-    status: "live",
-    lastSync: "12s ago"
-  },
-  {
-    id: "feed-2",
-    label: "Atlas mission counter",
-    endpoint: "https://api.aeterna.ai/atlas/missions",
-    interval: 30,
-    secure: true,
-    format: "protobuf",
-    status: "paused",
-    lastSync: "5m ago"
-  },
-  {
-    id: "feed-3",
-    label: "Continuity cohort size",
-    endpoint: "https://api.aeterna.bio/continuity/fellows",
-    interval: 60,
-    secure: false,
-    format: "csv",
-    status: "error",
-    lastSync: "18m ago"
-  }
-];
-
-const initialReleases: ReleaseBlueprint[] = [
-  {
-    id: "release-nova",
-    product: "NOVA Free Proxy",
-    headline: "Zero-friction privacy mesh with node revenue sharing",
-    owner: "Network Division",
-    status: "published",
-    metrics: [
-      { label: "Active nodes", value: "6,482" },
-      { label: "Avg latency", value: "2.8ms" },
-      { label: "Payout volume", value: "382k ₳" }
-    ],
-    lastPublished: "2h ago",
-    hasD3: true
-  },
-  {
-    id: "release-pay",
-    product: "Aeterna Pay",
-    headline: "Programmable settlement with biometric wallets",
-    owner: "Crypto Division",
-    status: "review",
-    metrics: [
-      { label: "Wallets", value: "12.4M" },
-      { label: "TPS capacity", value: "340k" },
-      { label: "AML score", value: "99.98%" }
-    ],
-    lastPublished: "12h ago",
-    hasD3: true
-  },
-  {
-    id: "release-neuro",
-    product: "NeuroWeave",
-    headline: "Adaptive implants with sensory reciprocity",
-    owner: "Biomedicine",
-    status: "design",
-    metrics: [
-      { label: "Implant sites", value: "62" },
-      { label: "Latency", value: "1.1ms" },
-      { label: "Trials", value: "98" }
-    ],
-    lastPublished: "--",
-    hasD3: false
-  }
-];
+const STORAGE_KEY = "aeterna-admin-config";
 
 export function AdminDashboard() {
-  const [menuSections, setMenuSections] = useState<MenuSection[]>(initialMenu);
-  const [selectedSectionId, setSelectedSectionId] = useState<string>(initialMenu[0].id);
-  const [landingBlocks, setLandingBlocks] = useState<LandingBlock[]>(initialBlocks);
-  const [researchDrafts, setResearchDrafts] = useState<ResearchDraft[]>(initialDrafts);
-  const [dataFeeds, setDataFeeds] = useState<DataFeed[]>(initialFeeds);
-  const [releaseBlueprints, setReleaseBlueprints] = useState<ReleaseBlueprint[]>(initialReleases);
-  const [livestreamEnabled, setLivestreamEnabled] = useState(true);
-  const [previewHero, setPreviewHero] = useState("What mission can Aeterna elevate your civilization?");
+  const [config, setConfig] = useState<SiteConfig>(() => createConfigClone());
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
+  const [selectedPageId, setSelectedPageId] = useState<string>(() => {
+    const initial = createConfigClone();
+    return initial.pages[0]?.id ?? "";
+  });
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const selectedSection = menuSections.find((section) => section.id === selectedSectionId) ?? menuSections[0];
-  const liveBlocks = useMemo(() => landingBlocks.filter((block) => block.status === "live"), [landingBlocks]);
-  const upcomingBlocks = useMemo(() => landingBlocks.filter((block) => block.status !== "live"), [landingBlocks]);
-  const previewMenuTotal = menuSections.reduce((total, section) => total + section.items.length, 0);
-
-  const addMenuItem = (sectionId: string) => {
-    setMenuSections((prev) =>
-      prev.map((section) => {
-        if (section.id !== sectionId) return section;
-        const newItem: MenuLink = {
-          id: `link-${Date.now()}`,
-          title: "New program placeholder",
-          href: "/program/new",
-          summary: "Draft description for upcoming launch.",
-          badge: "draft"
-        };
-        return { ...section, items: [...section.items, newItem] };
-      })
-    );
-  };
-
-  const removeMenuItem = (sectionId: string, itemId: string) => {
-    setMenuSections((prev) =>
-      prev.map((section) => {
-        if (section.id !== sectionId) return section;
-        return { ...section, items: section.items.filter((item) => item.id !== itemId) };
-      })
-    );
-  };
-
-  const moveMenuItem = (sectionId: string, itemId: string, direction: -1 | 1) => {
-    setMenuSections((prev) =>
-      prev.map((section) => {
-        if (section.id !== sectionId) return section;
-        const index = section.items.findIndex((item) => item.id === itemId);
-        if (index === -1) return section;
-        const targetIndex = index + direction;
-        if (targetIndex < 0 || targetIndex >= section.items.length) return section;
-        const reordered = [...section.items];
-        const [removed] = reordered.splice(index, 1);
-        reordered.splice(targetIndex, 0, removed);
-        return { ...section, items: reordered };
-      })
-    );
-  };
-
-  const toggleBlockStatus = (blockId: string) => {
-    setLandingBlocks((prev) =>
-      prev.map((block) => {
-        if (block.id !== blockId) return block;
-        const nextStatus = block.status === "live" ? "draft" : "live";
-        return { ...block, status: nextStatus };
-      })
-    );
-  };
-
-  const removeBlock = (blockId: string) => {
-    setLandingBlocks((prev) => prev.filter((block) => block.id !== blockId));
-  };
-
-  const addLandingBlock = (type: LandingBlock["type"]) => {
-    setLandingBlocks((prev) => [
-      ...prev,
-      {
-        id: `block-${Date.now()}`,
-        label: `${type} module draft`,
-        type,
-        status: "draft",
-        accent: "neutral",
-        summary: "New customizable layout module awaiting configuration."
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as SiteConfig;
+        setConfig(parsed);
+        const firstPage = parsed.pages[0]?.id ?? "";
+        setSelectedPageId((current) => (parsed.pages.some((page) => page.id === current) ? current : firstPage));
+      } catch (error) {
+        console.error("Failed to parse stored config", error);
       }
-    ]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+  }, [config]);
+
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timer = window.setTimeout(() => setToastMessage(null), 4200);
+    return () => window.clearTimeout(timer);
+  }, [toastMessage]);
+
+  const selectedPage = config.pages.find((page) => page.id === selectedPageId) ?? config.pages[0] ?? null;
+
+  const totalModules = useMemo(
+    () => config.pages.reduce((acc, page) => acc + page.modules.length, 0),
+    [config.pages]
+  );
+
+  const handleConfigChange = (updater: (current: SiteConfig) => SiteConfig) => {
+    setConfig((current) => updater(JSON.parse(JSON.stringify(current)) as SiteConfig));
   };
 
-  const promoteDraft = (draftId: string) => {
-    setResearchDrafts((prev) =>
-      prev.map((draft) => {
-        if (draft.id !== draftId) return draft;
-        const nextStage =
-          draft.readiness === "ideation"
-            ? "peer-review"
-            : draft.readiness === "peer-review"
-              ? "ready"
-              : "ready";
-        return { ...draft, readiness: nextStage };
-      })
-    );
+  const handleNavigationUpdate = (navigation: NavigationNode[]) => {
+    handleConfigChange((current) => ({ ...current, navigation }));
+    setToastMessage("Navigation updated");
   };
 
-  const toggleFeedStatus = (feedId: string) => {
-    setDataFeeds((prev) =>
-      prev.map((feed) => {
-        if (feed.id !== feedId) return feed;
-        const nextStatus = feed.status === "live" ? "paused" : "live";
-        return { ...feed, status: nextStatus, lastSync: "just now" };
-      })
-    );
+  const handlePageUpdate = (pageId: string, update: (page: PageDefinition) => PageDefinition) => {
+    handleConfigChange((current) => ({
+      ...current,
+      pages: current.pages.map((page) => (page.id === pageId ? update(page) : page))
+    }));
   };
 
-  const resyncFeed = (feedId: string) => {
-    setDataFeeds((prev) =>
-      prev.map((feed) => {
-        if (feed.id !== feedId) return feed;
-        return { ...feed, lastSync: "few seconds ago", status: feed.status === "error" ? "paused" : feed.status };
-      })
-    );
+  const handlePageCreation = (page: PageDefinition) => {
+    handleConfigChange((current) => ({ ...current, pages: [...current.pages, page] }));
+    setSelectedPageId(page.id);
+    setSelectedModuleId(page.modules[0]?.id ?? null);
+    setToastMessage(`Created page ${page.name}`);
   };
 
-  const publishRelease = (releaseId: string) => {
-    setReleaseBlueprints((prev) =>
-      prev.map((release) => {
-        if (release.id !== releaseId) return release;
-        return { ...release, status: "published", lastPublished: "just now" };
-      })
-    );
+  const handlePageRemoval = (pageId: string) => {
+    handleConfigChange((current) => ({
+      ...current,
+      pages: current.pages.filter((page) => page.id !== pageId)
+    }));
+    setSelectedPageId((currentPage) => {
+      if (currentPage === pageId) {
+        const fallback = config.pages.find((page) => page.id !== pageId)?.id ?? "";
+        return fallback;
+      }
+      return currentPage;
+    });
+    setToastMessage("Page removed");
   };
 
-  const updateHeroHeadline = (value: string) => {
-    setPreviewHero(value);
+  const handleLibraryUpdate = (items: ContentItem[]) => {
+    handleConfigChange((current) => ({ ...current, contentLibrary: items }));
   };
+
+  const handleFeedUpdate = (feeds: DataFeed[]) => {
+    handleConfigChange((current) => ({ ...current, dataFeeds: feeds }));
+  };
+
+  const handleReset = () => {
+    const fresh = createConfigClone();
+    setConfig(fresh);
+    setSelectedPageId(fresh.pages[0]?.id ?? "");
+    setSelectedModuleId(null);
+    window.localStorage.removeItem(STORAGE_KEY);
+    setToastMessage("Configuration restored to baseline");
+  };
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(config, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `aeterna-config-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    setToastMessage("Configuration exported");
+  };
+
+  const handleImport = async (file: File) => {
+    const text = await file.text();
+    try {
+      const parsed = JSON.parse(text) as SiteConfig;
+      setConfig(parsed);
+      setSelectedPageId(parsed.pages[0]?.id ?? "");
+      setSelectedModuleId(null);
+      setToastMessage("Configuration imported");
+    } catch (error) {
+      console.error("Failed to import configuration", error);
+      setToastMessage("Import failed – invalid file");
+    }
+  };
+
+  const handlePublish = () => {
+    setToastMessage("Publishing pipeline triggered – preview queued");
+  };
+
+  const importInputId = "config-import-input";
 
   return (
-    <section className="space-y-12">
-      <div className="flex flex-col gap-4">
-        <span className="badge">Administration</span>
-        <h1 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-          Control the entire Aeterna digital estate from one dashboard.
-        </h1>
-        <p className="max-w-3xl text-sm text-[var(--text-secondary)]">
-          Compose landing experiences, orchestrate mega navigation, publish research dossiers, and stream live product analytics
-          without leaving this console. Every action synchronizes with the public experience in seconds.
-        </p>
-      </div>
-      <div className="grid gap-10 xl:grid-cols-[420px_minmax(0,1fr)]">
-        <aside className="space-y-10">
-          <div className="space-y-4 border border-[var(--border-default)] p-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-              <span>Navigation planner</span>
-              <span>{previewMenuTotal} entries</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {menuSections.map((section) => (
-                <button
-                  key={section.id}
-                  type="button"
-                  onClick={() => setSelectedSectionId(section.id)}
-                  className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${
-                    section.id === selectedSectionId
-                      ? "bg-[var(--text-status-warning)] text-[var(--text-inverted)]"
-                      : "border border-[var(--border-default)] text-[var(--text-secondary)]"
-                  }`}
-                >
-                  {section.label}
-                </button>
-              ))}
-            </div>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{selectedSection.label}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{selectedSection.description}</p>
-              </div>
-              <ul className="space-y-3">
-                {selectedSection.items.map((item) => (
-                  <li key={item.id} className="rounded border border-[var(--border-light)] p-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">{item.title}</p>
-                        <p className="text-xs text-[var(--text-secondary)]">{item.summary}</p>
-                        <span className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.href}</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => moveMenuItem(selectedSection.id, item.id, -1)}
-                          className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)]"
-                          aria-label="Move up"
-                        >
-                          <ChevronUp className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => moveMenuItem(selectedSection.id, item.id, 1)}
-                          className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)]"
-                          aria-label="Move down"
-                        >
-                          <ChevronDown className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => removeMenuItem(selectedSection.id, item.id)}
-                          className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-status-error)]"
-                          aria-label="Remove"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                    {item.badge ? (
-                      <span className="mt-3 inline-flex items-center gap-1 rounded-full border border-[var(--border-default)] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                        <GripVertical className="h-3 w-3" />
-                        {item.badge}
-                      </span>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                onClick={() => addMenuItem(selectedSection.id)}
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-              >
-                <Plus className="h-4 w-4" />
-                Add navigation entry
-              </button>
-            </div>
-          </div>
-          <div className="space-y-4 border border-[var(--border-default)] p-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-              <span>Landing composer</span>
-              <span>{liveBlocks.length} live</span>
-            </div>
-            <div className="space-y-3">
-              {landingBlocks.map((block) => (
-                <div key={block.id} className="rounded border border-[var(--border-light)] p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-2">
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">{block.label}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">{block.summary}</p>
-                      <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.18em]">
-                        <span className="rounded-full border border-[var(--border-default)] px-3 py-1">{block.type}</span>
-                        <span
-                          className={`rounded-full px-3 py-1 ${
-                            block.status === "live"
-                              ? "bg-[var(--text-status-warning)] text-[var(--text-inverted)]"
-                              : block.status === "scheduled"
-                                ? "border border-[var(--border-default)] text-[var(--text-secondary)]"
-                                : "border border-[var(--border-default)] text-[var(--text-tertiary)]"
-                          }`}
-                        >
-                          {block.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleBlockStatus(block.id)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)]"
-                        aria-label="Toggle status"
-                      >
-                        <Check className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeBlock(block.id)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-status-error)]"
-                        aria-label="Remove block"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {(["hero", "story", "research", "ticker", "cta"] as LandingBlock["type"][]).map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => addLandingBlock(type)}
-                  className="flex items-center justify-center gap-2 rounded border border-[var(--border-default)] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-                >
-                  <Plus className="h-3 w-3" />
-                  Add {type}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-4 border border-[var(--border-default)] p-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-              <span>Research publisher</span>
-              <span>{researchDrafts.length} drafts</span>
-            </div>
-            <div className="space-y-3">
-              {researchDrafts.map((draft) => (
-                <div key={draft.id} className="rounded border border-[var(--border-light)] p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-2">
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">{draft.title}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">{draft.lead}</p>
-                      <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                        <span>Figures: {draft.figures}</span>
-                        <span>Attachments: {draft.attachments}</span>
-                        <span>Status: {draft.readiness}</span>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => promoteDraft(draft.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)]"
-                      aria-label="Promote draft"
-                    >
-                      <UploadCloud className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-4 border border-[var(--border-default)] p-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-              <span>Data orchestration</span>
-              <span>{dataFeeds.length} feeds</span>
-            </div>
-            <ul className="space-y-3">
-              {dataFeeds.map((feed) => (
-                <li key={feed.id} className="rounded border border-[var(--border-light)] p-4">
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">{feed.label}</p>
-                        <p className="text-xs text-[var(--text-secondary)]">{feed.endpoint}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => toggleFeedStatus(feed.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)]"
-                          aria-label="Toggle feed"
-                        >
-                          <RefreshCw className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => resyncFeed(feed.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--icon-secondary)] transition hover:text-[var(--text-status-warning)]"
-                          aria-label="Resync feed"
-                        >
-                          <Save className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                      <span>Interval: {feed.interval}s</span>
-                      <span>Format: {feed.format}</span>
-                      <span>{feed.secure ? "Secure" : "Public"}</span>
-                      <span>Status: {feed.status}</span>
-                      <span>Last sync: {feed.lastSync}</span>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-        <div className="space-y-10">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-            <div className="space-y-6 border border-[var(--border-default)] p-6">
-              <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-                <span>Live landing preview</span>
-                <label className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                  <input
-                    type="checkbox"
-                    className="h-3 w-3"
-                    checked={livestreamEnabled}
-                    onChange={(event) => setLivestreamEnabled(event.target.checked)}
-                  />
-                  Livestream slot
-                </label>
-              </div>
-              <div className="space-y-4">
-                <label className="flex flex-col gap-2 text-xs text-[var(--text-tertiary)]">
-                  Hero prompt
-                  <input
-                    className="rounded border border-[var(--border-default)] bg-[var(--bg-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none"
-                    value={previewHero}
-                    onChange={(event) => updateHeroHeadline(event.target.value)}
-                  />
-                </label>
-                <div className="rounded border border-[var(--border-light)] p-5">
-                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Hero preview</p>
-                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{previewHero}</p>
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    {liveBlocks.slice(0, 4).map((block) => (
-                      <div key={block.id} className="space-y-1 border border-[var(--border-light)] p-3">
-                        <span className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">#{block.type}</span>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">{block.label}</p>
-                        <p className="text-xs text-[var(--text-secondary)]">{block.summary}</p>
-                      </div>
-                    ))}
-                  </div>
-                  {livestreamEnabled ? (
-                    <div className="mt-4 flex items-center justify-between rounded border border-[var(--border-default)] p-3">
-                      <div>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">Livestream slot ready</p>
-                        <p className="text-xs text-[var(--text-secondary)]">Embed orbital broadcast or laboratory feed with auto captioning.</p>
-                      </div>
-                      <PlayCircle className="h-6 w-6 text-[var(--text-status-warning)]" />
-                    </div>
-                  ) : null}
-                </div>
-                {upcomingBlocks.length ? (
-                  <div className="rounded border border-[var(--border-light)] p-5">
-                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Scheduled modules</p>
-                    <ul className="mt-3 space-y-2 text-xs text-[var(--text-secondary)]">
-                      {upcomingBlocks.map((block) => (
-                        <li key={block.id} className="flex items-center justify-between gap-3">
-                          <span>
-                            <strong className="text-[var(--text-primary)]">{block.label}</strong> — {block.summary}
-                          </span>
-                          <span className="rounded-full border border-[var(--border-default)] px-2 py-1 uppercase tracking-[0.18em]">
-                            {block.status}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <div className="space-y-6 border border-[var(--border-default)] p-6">
-              <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-                <span>Navigation analytics</span>
-                <span>via D3.js</span>
-              </div>
-              <NavigationAnalytics sections={menuSections} />
-              <div className="space-y-2 text-xs text-[var(--text-secondary)]">
-                {menuSections.map((section) => (
-                  <div key={section.id} className="flex items-center justify-between">
-                    <span className="font-semibold text-[var(--text-primary)]">{section.label}</span>
-                    <span>{section.items.length} links</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="space-y-6 border border-[var(--border-default)] p-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-              <span>Product release workspace</span>
-              <span>D3 dashboards ready</span>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-3">
-              {releaseBlueprints.map((release) => (
-                <div key={release.id} className="space-y-3 rounded border border-[var(--border-light)] p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">{release.product}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">{release.headline}</p>
-                      <span className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Owner: {release.owner}</span>
-                    </div>
-                    <span
-                      className={`rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.18em] ${
-                        release.status === "published"
-                          ? "bg-[var(--text-status-warning)] text-[var(--text-inverted)]"
-                          : release.status === "review"
-                            ? "border border-[var(--border-default)] text-[var(--text-secondary)]"
-                            : "border border-[var(--border-default)] text-[var(--text-tertiary)]"
-                      }`}
-                    >
-                      {release.status}
-                    </span>
-                  </div>
-                  <ul className="space-y-1 text-xs text-[var(--text-secondary)]">
-                    {release.metrics.map((metric) => (
-                      <li key={metric.label} className="flex items-center justify-between">
-                        <span>{metric.label}</span>
-                        <span className="font-semibold text-[var(--text-primary)]">{metric.value}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                    <span>Last publish: {release.lastPublished}</span>
-                    <span>{release.hasD3 ? "D3 integrated" : "D3 pending"}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => publishRelease(release.id)}
-                    className="flex w-full items-center justify-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-                  >
-                    <ArrowUpRight className="h-4 w-4" />
-                    Publish to site
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-4 border border-[var(--border-default)] p-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-              <span>Release log</span>
-              <Link
-                href={"/insights/releases" as any}
-                className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-status-warning)]"
-              >
-                View history
-                <ArrowUpRight className="h-3 w-3" />
-              </Link>
-            </div>
-            <ul className="space-y-2 text-xs text-[var(--text-secondary)]">
-              {releaseBlueprints.slice(0, 5).map((release) => (
-                <li key={release.id} className="flex items-center justify-between gap-3 border-b border-[var(--border-light)] pb-2 last:border-b-0 last:pb-0">
-                  <span>
-                    <strong className="text-[var(--text-primary)]">{release.product}</strong> — {release.status}
-                  </span>
-                  <span>{release.lastPublished}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+    <section className="space-y-10 text-[var(--text-primary)]">
+      <header className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-2">
+          <span className="badge">Administrative control</span>
+          <h1 className="text-3xl font-semibold lg:text-4xl">Aeterna control center</h1>
+          <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
+            Govern navigation, launch product canvases, orchestrate live data feeds, and compose landing modules through the
+            visual builder. All changes persist locally and can be exported for deployment.
+          </p>
         </div>
-      </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            <ArrowLeftRight className="h-4 w-4" /> Reset
+          </button>
+          <label
+            htmlFor={importInputId}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            <Upload className="h-4 w-4" /> Import
+          </label>
+          <input
+            id={importInputId}
+            type="file"
+            accept="application/json"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              if (file) {
+                void handleImport(file);
+                event.currentTarget.value = "";
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={handleExport}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            <Download className="h-4 w-4" /> Export
+          </button>
+          <button
+            type="button"
+            onClick={handlePublish}
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--interactive-bg-accent-default)] px-4 py-2 text-sm font-semibold text-[var(--text-accent)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+          >
+            <Save className="h-4 w-4" /> Publish preview
+          </button>
+        </div>
+      </header>
+
+      <AdminTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {toastMessage ? (
+        <div className="flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-secondary)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+          <CheckCircle2 className="h-4 w-4 text-[var(--text-status-warning)]" />
+          <span>{toastMessage}</span>
+        </div>
+      ) : null}
+
+      {activeTab === "overview" ? (
+        <OverviewPanel config={config} totalModules={totalModules} />
+      ) : activeTab === "navigation" ? (
+        <NavigationManager navigation={config.navigation} onChange={handleNavigationUpdate} />
+      ) : null}
+      {activeTab === "pages" ? (
+        <PagesManager
+          pages={config.pages}
+          onCreate={handlePageCreation}
+          onRemove={handlePageRemoval}
+          onSelect={setSelectedPageId}
+          selectedId={selectedPageId}
+        />
+      ) : activeTab === "builder" ? (
+        <PageBuilder
+          page={selectedPage}
+          dataFeeds={config.dataFeeds}
+          contentLibrary={config.contentLibrary}
+          onSelectModule={setSelectedModuleId}
+          selectedModuleId={selectedModuleId}
+          onPageUpdate={(updater) => selectedPage && handlePageUpdate(selectedPage.id, updater)}
+        />
+      ) : activeTab === "library" ? (
+        <ContentLibraryManager items={config.contentLibrary} pages={config.pages} onChange={handleLibraryUpdate} />
+      ) : activeTab === "feeds" ? (
+        <DataFeedManager feeds={config.dataFeeds} modules={config.pages.flatMap((page) => page.modules)} onChange={handleFeedUpdate} />
+      ) : (
+        <SettingsPanel config={config} onConfigChange={handleConfigChange} />
+      )}
     </section>
   );
 }
 
-type NavigationAnalyticsProps = {
-  sections: MenuSection[];
-};
-
-function NavigationAnalytics({ sections }: NavigationAnalyticsProps) {
-  const dataset = useMemo(
-    () =>
-      sections.map((section) => ({
-        label: section.label,
-        value: section.items.length === 0 ? 1 : section.items.length
-      })),
-    [sections]
-  );
-
-  const total = dataset.reduce((sum, item) => sum + item.value, 0);
-  const palette = ["#4ADE80", "#FF9E6C", "#F3F3F3", "#66B5FF"].slice(0, dataset.length);
-
-  const pie = useMemo(() => {
-    const generator = d3.pie<{ label: string; value: number }>().sort(null).value((item) => item.value);
-    return generator(dataset);
-  }, [dataset]);
-
-  const arcGenerator = d3.arc<d3.PieArcDatum<{ label: string; value: number }>>().innerRadius(60).outerRadius(120).cornerRadius(6);
+function AdminTabBar({ activeTab, onTabChange }: { activeTab: AdminTab; onTabChange: (tab: AdminTab) => void }) {
+  const tabs: { id: AdminTab; label: string; icon: ComponentType<{ className?: string }> }[] = [
+    { id: "overview", label: "Overview", icon: LineChart },
+    { id: "navigation", label: "Navigation", icon: Layers },
+    { id: "pages", label: "Pages", icon: FileDigit },
+    { id: "builder", label: "Visual builder", icon: Wand2 },
+    { id: "library", label: "Content", icon: Archive },
+    { id: "feeds", label: "Data feeds", icon: SlidersHorizontal },
+    { id: "settings", label: "Settings", icon: Settings }
+  ];
 
   return (
-    <svg viewBox="0 0 280 280" className="mx-auto h-64 w-full">
-      <g transform="translate(140,140)">
-        {pie.map((segment, index) => (
-          <path
-            key={segment.data.label}
-            d={arcGenerator(segment) ?? undefined}
-            fill={palette[index % palette.length]}
-            fillOpacity={0.9}
-            stroke="#212121"
-            strokeWidth={2}
-          />
-        ))}
-        <text textAnchor="middle" fill="#FFFFFF" fontSize={22} fontWeight={600}>
-          {total}
-        </text>
-        <text textAnchor="middle" dy={24} fill="#AFAFAF" fontSize={11} letterSpacing={3}>
-          LINKS
-        </text>
-      </g>
-    </svg>
+    <nav className="flex flex-wrap gap-2">
+      {tabs.map((tab) => {
+        const isActive = tab.id === activeTab;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => onTabChange(tab.id)}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
+              isActive
+                ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                : "border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        );
+      })}
+    </nav>
   );
+}
+
+function OverviewPanel({ config, totalModules }: { config: SiteConfig; totalModules: number }) {
+  const publishedPages = config.pages.filter((page) => page.status === "published");
+  const draftPages = config.pages.length - publishedPages.length;
+  const connectedFeeds = config.dataFeeds.filter((feed) => feed.status === "connected");
+  const pinnedContent = config.contentLibrary.filter((item) => item.pinned);
+
+  return (
+    <div className="grid gap-10 lg:grid-cols-[360px_1fr]">
+      <div className="space-y-5">
+        <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+          <h2 className="text-lg font-semibold">Operational pulse</h2>
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            Snapshot of the digital estate — pages, content, data pipelines, and publication cadence.
+          </p>
+          <dl className="mt-6 space-y-4 text-sm">
+            <div className="flex items-center justify-between">
+              <dt className="text-[var(--text-tertiary)]">Published canvases</dt>
+              <dd className="text-[var(--text-status-warning)]">{publishedPages.length}</dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-[var(--text-tertiary)]">Draft & review</dt>
+              <dd className="text-[var(--text-status-error)]">{draftPages}</dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-[var(--text-tertiary)]">Total modules in rotation</dt>
+              <dd className="text-[var(--text-primary)]">{totalModules}</dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-[var(--text-tertiary)]">Live data feeds</dt>
+              <dd className="text-[var(--text-status-warning)]">{connectedFeeds.length}</dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-[var(--text-tertiary)]">Pinned releases</dt>
+              <dd className="text-[var(--text-primary)]">{pinnedContent.length}</dd>
+            </div>
+          </dl>
+        </div>
+        <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+          <h2 className="text-lg font-semibold">Quick actions</h2>
+          <div className="mt-4 grid gap-3 text-sm text-[var(--text-secondary)]">
+            <ActionLink icon={FilePlus} label="Create landing page" detail="Launch a new product or mission narrative." />
+            <ActionLink icon={FolderPlus} label="Add navigation branch" detail="Extend ecosystem or research menus." />
+            <ActionLink icon={Play} label="Schedule livestream" detail="Embed upcoming broadcast modules on the home canvas." />
+            <ActionLink icon={Pencil} label="Draft research brief" detail="Compose peer-reviewed publications with inline media." />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-6">
+        <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Publishing cadence</h2>
+              <p className="text-sm text-[var(--text-secondary)]">Rolling 30-day release velocity across all divisions.</p>
+            </div>
+            <div className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+              Real time
+            </div>
+          </div>
+          <PublishingCadenceChart items={config.contentLibrary} />
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          {config.dataFeeds.map((feed) => (
+            <div key={feed.id} className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold">{feed.name}</p>
+                  <p className="text-xs text-[var(--text-tertiary)]">{feed.source}</p>
+                </div>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs uppercase tracking-[0.18em] ${
+                    feed.status === "connected"
+                      ? "text-[var(--text-status-warning)]"
+                      : feed.status === "degraded"
+                        ? "text-[var(--text-status-error)]"
+                        : "text-[var(--text-tertiary)]"
+                  }`}
+                >
+                  {feed.status}
+                </span>
+              </div>
+              <p className="mt-3 text-xs text-[var(--text-secondary)]">{feed.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionLink({ icon: Icon, label, detail }: { icon: ComponentType<{ className?: string }>; label: string; detail: string }) {
+  return (
+    <button
+      type="button"
+      className="group flex items-center justify-between gap-4 rounded-2xl border border-[var(--border-default)] px-4 py-3 text-left transition hover:border-[var(--text-status-warning)]"
+    >
+      <div className="flex items-center gap-3">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-warning)]">
+          <Icon className="h-4 w-4" />
+        </span>
+        <div>
+          <p className="font-semibold text-[var(--text-primary)]">{label}</p>
+          <p className="text-xs text-[var(--text-secondary)]">{detail}</p>
+        </div>
+      </div>
+      <ArrowRight className="h-4 w-4 text-[var(--icon-tertiary)] transition group-hover:translate-x-1 group-hover:text-[var(--text-status-warning)]" />
+    </button>
+  );
+}
+
+function PublishingCadenceChart({ items }: { items: ContentItem[] }) {
+  const svgId = "publishing-cadence-chart";
+
+  useEffect(() => {
+    const svg = d3.select(`#${svgId}`);
+    const container = svg.node()?.parentElement;
+    if (!svg.node() || !container) return;
+
+    const now = new Date();
+    const days = Array.from({ length: 30 }, (_, index) => {
+      const date = new Date(now);
+      date.setDate(date.getDate() - (29 - index));
+      const iso = date.toISOString().slice(0, 10);
+      const count = items.filter((item) => item.publishedAt.slice(0, 10) === iso).length;
+      return { date, count };
+    });
+
+    const render = () => {
+      const width = container.clientWidth;
+      const height = 220;
+      const margin = { top: 20, right: 24, bottom: 28, left: 40 };
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      svg.selectAll("*").remove();
+      svg.attr("viewBox", `0 0 ${width} ${height}`);
+
+      const x = d3.scaleTime().domain([days[0].date, days[days.length - 1].date]).range([0, innerWidth]);
+      const y = d3.scaleLinear().domain([0, d3.max(days, (d) => d.count)! + 1]).range([innerHeight, 0]);
+
+      const area = d3
+        .area<typeof days[number]>()
+        .x((d) => x(d.date))
+        .y0(innerHeight)
+        .y1((d) => y(d.count))
+        .curve(d3.curveCatmullRom.alpha(0.5));
+
+      const line = d3
+        .line<typeof days[number]>()
+        .x((d) => x(d.date))
+        .y((d) => y(d.count))
+        .curve(d3.curveCatmullRom.alpha(0.5));
+
+      const group = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      group
+        .append("path")
+        .datum(days)
+        .attr("fill", "#1f3a2f")
+        .attr("opacity", 0.8)
+        .attr("d", area);
+
+      group
+        .append("path")
+        .datum(days)
+        .attr("fill", "none")
+        .attr("stroke", "#4ADE80")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+      group
+        .selectAll("circle")
+        .data(days)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => x(d.date))
+        .attr("cy", (d) => y(d.count))
+        .attr("r", 3)
+        .attr("fill", "#4ADE80");
+
+      const xAxis = d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%b %d"));
+      const yAxis = d3.axisLeft(y).ticks(4).tickFormat((value) => `${value}`);
+
+      group
+        .append("g")
+        .attr("transform", `translate(0,${innerHeight})`)
+        .call(xAxis as any)
+        .selectAll("text")
+        .attr("fill", "#afafaf")
+        .attr("font-size", "10px");
+
+      group
+        .append("g")
+        .call(yAxis as any)
+        .selectAll("text")
+        .attr("fill", "#afafaf")
+        .attr("font-size", "10px");
+
+      group
+        .selectAll(".grid-line")
+        .data(y.ticks(4))
+        .enter()
+        .append("line")
+        .attr("class", "grid-line")
+        .attr("x1", 0)
+        .attr("x2", innerWidth)
+        .attr("y1", (value) => y(value))
+        .attr("y2", (value) => y(value))
+        .attr("stroke", "#ffffff0d");
+    };
+
+    render();
+    const resizeObserver = new ResizeObserver(render);
+    resizeObserver.observe(container);
+    return () => resizeObserver.disconnect();
+  }, [items, svgId]);
+
+  return <svg id={svgId} className="mt-6 h-[220px] w-full" />;
+}
+
+function NavigationManager({ navigation, onChange }: { navigation: NavigationNode[]; onChange: (nav: NavigationNode[]) => void }) {
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(navigation[0]?.id ?? null);
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedSectionId && navigation.length > 0) {
+      setSelectedSectionId(navigation[0].id);
+    }
+  }, [navigation, selectedSectionId]);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const handleSectionDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = navigation.findIndex((section) => section.id === active.id);
+    const newIndex = navigation.findIndex((section) => section.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(navigation, oldIndex, newIndex);
+    onChange(reordered);
+  };
+
+  const selectedSection = navigation.find((section) => section.id === selectedSectionId) ?? null;
+  const selectedChild = selectedSection?.children?.find((child) => child.id === selectedChildId) ?? null;
+
+  const updateSection = (sectionId: string, update: (section: NavigationNode) => NavigationNode) => {
+    onChange(
+      navigation.map((section) => (section.id === sectionId ? update({ ...section }) : section))
+    );
+  };
+
+  const updateChild = (childId: string, update: (child: NavigationNode) => NavigationNode) => {
+    if (!selectedSection) return;
+    onChange(
+      navigation.map((section) => {
+        if (section.id !== selectedSection.id) return section;
+        return {
+          ...section,
+          children: section.children?.map((child) => (child.id === childId ? update({ ...child }) : child))
+        };
+      })
+    );
+  };
+
+  const addSection = () => {
+    const newSection: NavigationNode = {
+      id: generateId("section"),
+      label: "New section",
+      type: "section",
+      children: []
+    };
+    onChange([...navigation, newSection]);
+    setSelectedSectionId(newSection.id);
+    setSelectedChildId(null);
+  };
+
+  const removeSection = (sectionId: string) => {
+    const filtered = navigation.filter((section) => section.id !== sectionId);
+    onChange(filtered);
+    if (selectedSectionId === sectionId) {
+      setSelectedSectionId(filtered[0]?.id ?? null);
+      setSelectedChildId(null);
+    }
+  };
+
+  const addChild = () => {
+    if (!selectedSection) return;
+    const newChild: NavigationNode = {
+      id: generateId("link"),
+      label: "New link",
+      href: "/",
+      type: "link"
+    };
+    updateSection(selectedSection.id, (section) => ({
+      ...section,
+      children: [...(section.children ?? []), newChild]
+    }));
+    setSelectedChildId(newChild.id);
+  };
+
+  const removeChild = (childId: string) => {
+    if (!selectedSection) return;
+    updateSection(selectedSection.id, (section) => ({
+      ...section,
+      children: (section.children ?? []).filter((child) => child.id !== childId)
+    }));
+    if (selectedChildId === childId) {
+      setSelectedChildId(null);
+    }
+  };
+
+  return (
+    <div className="grid gap-10 lg:grid-cols-[320px_1fr]">
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Navigation tree</h2>
+          <button
+            type="button"
+            onClick={addSection}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            <PlusIcon className="h-3 w-3" /> Add section
+          </button>
+        </div>
+        <DndContext sensors={sensors} onDragEnd={handleSectionDragEnd} modifiers={[restrictToVerticalAxis]}>
+          <SortableContext items={navigation.map((section) => section.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-3">
+              {navigation.map((section) => (
+                <SortableSectionCard
+                  key={section.id}
+                  section={section}
+                  isActive={section.id === selectedSectionId}
+                  onSelect={() => {
+                    setSelectedSectionId(section.id);
+                    setSelectedChildId(null);
+                  }}
+                  onRemove={() => removeSection(section.id)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      </div>
+      <div className="space-y-6">
+        {selectedSection ? (
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+              <h3 className="text-lg font-semibold">Section properties</h3>
+              <div className="mt-4 grid gap-4 text-sm">
+                <label className="grid gap-2">
+                  <span className="text-[var(--text-tertiary)]">Label</span>
+                  <input
+                    className="input"
+                    value={selectedSection.label}
+                    onChange={(event) =>
+                      updateSection(selectedSection.id, (section) => ({ ...section, label: event.target.value }))
+                    }
+                  />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-[var(--text-tertiary)]">Description</span>
+                  <textarea
+                    className="input min-h-[80px]"
+                    value={selectedSection.description ?? ""}
+                    onChange={(event) =>
+                      updateSection(selectedSection.id, (section) => ({ ...section, description: event.target.value }))
+                    }
+                  />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-[var(--text-tertiary)]">Badge (optional)</span>
+                  <input
+                    className="input"
+                    value={selectedSection.badge ?? ""}
+                    onChange={(event) =>
+                      updateSection(selectedSection.id, (section) => ({ ...section, badge: event.target.value || undefined }))
+                    }
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Links in section</h3>
+                <button
+                  type="button"
+                  onClick={addChild}
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                >
+                  <PlusIcon className="h-3 w-3" /> Add link
+                </button>
+              </div>
+              <div className="mt-4 space-y-3">
+                {(selectedSection.children ?? []).length === 0 ? (
+                  <p className="text-sm text-[var(--text-tertiary)]">No links yet. Add destinations for this section.</p>
+                ) : (
+                  <ChildList
+                    sectionId={selectedSection.id}
+                    children={selectedSection.children ?? []}
+                    selectedChildId={selectedChildId}
+                    onSelectChild={setSelectedChildId}
+                    onReorder={(children) =>
+                      updateSection(selectedSection.id, (section) => ({
+                        ...section,
+                        children
+                      }))
+                    }
+                    onRemoveChild={removeChild}
+                  />
+                )}
+              </div>
+              {selectedChild ? (
+                <div className="mt-6 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-tertiary)] p-5">
+                  <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Link details</h4>
+                  <div className="mt-4 grid gap-4 text-sm">
+                    <label className="grid gap-2">
+                      <span className="text-[var(--text-tertiary)]">Label</span>
+                      <input
+                        className="input"
+                        value={selectedChild.label}
+                        onChange={(event) =>
+                          updateChild(selectedChild.id, (child) => ({ ...child, label: event.target.value }))
+                        }
+                      />
+                    </label>
+                    <label className="grid gap-2">
+                      <span className="text-[var(--text-tertiary)]">Destination</span>
+                      <input
+                        className="input"
+                        value={selectedChild.href ?? ""}
+                        onChange={(event) =>
+                          updateChild(selectedChild.id, (child) => ({ ...child, href: event.target.value }))
+                        }
+                      />
+                    </label>
+                    <label className="grid gap-2">
+                      <span className="text-[var(--text-tertiary)]">Badge</span>
+                      <input
+                        className="input"
+                        value={selectedChild.badge ?? ""}
+                        onChange={(event) =>
+                          updateChild(selectedChild.id, (child) => ({ ...child, badge: event.target.value || undefined }))
+                        }
+                      />
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeChild(selectedChild.id)}
+                    className="mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[var(--text-status-error)]"
+                  >
+                    Remove link
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--text-tertiary)]">Select a section to edit navigation details.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SortableSectionCard({
+  section,
+  isActive,
+  onSelect,
+  onRemove
+}: {
+  section: NavigationNode;
+  isActive: boolean;
+  onSelect: () => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: section.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center justify-between rounded-2xl border px-4 py-3 ${
+        isActive
+          ? "border-[var(--text-status-warning)] bg-[var(--bg-secondary)]"
+          : "border-[var(--border-default)] bg-[var(--bg-secondary)]"
+      }`}
+    >
+      <button type="button" className="flex flex-1 flex-col text-left" onClick={onSelect}>
+        <span className="text-sm font-semibold text-[var(--text-primary)]">{section.label}</span>
+        <span className="text-xs text-[var(--text-tertiary)]">{section.description ?? "No description"}</span>
+      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          aria-label="Drag section"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-tertiary)]"
+          {...attributes}
+          {...listeners}
+        >
+          <Move className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-error)]"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ChildList({
+  sectionId,
+  children,
+  selectedChildId,
+  onSelectChild,
+  onReorder,
+  onRemoveChild
+}: {
+  sectionId: string;
+  children: NavigationNode[];
+  selectedChildId: string | null;
+  onSelectChild: (id: string | null) => void;
+  onReorder: (children: NavigationNode[]) => void;
+  onRemoveChild: (id: string) => void;
+}) {
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = children.findIndex((child) => child.id === active.id);
+    const newIndex = children.findIndex((child) => child.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(children, oldIndex, newIndex);
+    onReorder(reordered);
+  };
+
+  return (
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+      <SortableContext items={children.map((child) => child.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-3">
+          {children.map((child) => {
+            const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: child.id });
+            const style = {
+              transform: CSS.Transform.toString(transform),
+              transition
+            };
+            const isActive = child.id === selectedChildId;
+            return (
+              <div
+                key={child.id}
+                ref={setNodeRef}
+                style={style}
+                className={`flex items-center justify-between rounded-2xl border px-4 py-3 ${
+                  isActive
+                    ? "border-[var(--text-status-warning)] bg-[var(--bg-tertiary)]"
+                    : "border-[var(--border-default)] bg-[var(--bg-secondary)]"
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => onSelectChild(isActive ? null : child.id)}
+                  className="flex flex-1 flex-col text-left"
+                >
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">{child.label}</span>
+                  <span className="text-xs text-[var(--text-tertiary)]">{child.href ?? "No destination"}</span>
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-tertiary)]"
+                    {...attributes}
+                    {...listeners}
+                  >
+                    <Move className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRemoveChild(child.id)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-error)]"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </SortableContext>
+    </DndContext>
+  );
+}
+function PagesManager({
+  pages,
+  onCreate,
+  onRemove,
+  onSelect,
+  selectedId
+}: {
+  pages: PageDefinition[];
+  onCreate: (page: PageDefinition) => void;
+  onRemove: (pageId: string) => void;
+  onSelect: (pageId: string) => void;
+  selectedId: string;
+}) {
+  const [filter, setFilter] = useState<string>("");
+  const [draftName, setDraftName] = useState<string>("");
+  const [draftSlug, setDraftSlug] = useState<string>("");
+
+  const filteredPages = pages.filter((page) => page.name.toLowerCase().includes(filter.toLowerCase()));
+
+  const createPage = () => {
+    if (!draftName.trim()) return;
+    const id = generateId("page");
+    const slug = draftSlug.trim() || `/${draftName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+    const page: PageDefinition = {
+      id,
+      name: draftName,
+      slug,
+      description: "New landing canvas",
+      status: "draft",
+      tags: [],
+      lastUpdated: new Date().toISOString(),
+      modules: [
+        {
+          id: generateId("module"),
+          type: "hero",
+          title: `${draftName} mission hero`,
+          subtitle: "Describe the mission impact.",
+          actions: [{ label: "Explore", href: "#" }]
+        }
+      ]
+    };
+    onCreate(page);
+    setDraftName("");
+    setDraftSlug("");
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-2">
+          <h2 className="text-lg font-semibold">Page inventory</h2>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Manage all published and in-flight canvases. Use filters to locate specific mission pages.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3 text-sm">
+          <label className="flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-[var(--text-secondary)]">
+            <Filter className="h-4 w-4" />
+            <input
+              className="bg-transparent outline-none"
+              placeholder="Filter pages"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+            />
+          </label>
+        </div>
+      </div>
+      <div className="grid gap-4 text-sm lg:grid-cols-[320px_1fr]">
+        <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-5">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Create page</h3>
+          <div className="mt-4 space-y-4">
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Title</span>
+              <input className="input" value={draftName} onChange={(event) => setDraftName(event.target.value)} />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Slug</span>
+              <input className="input" value={draftSlug} onChange={(event) => setDraftSlug(event.target.value)} placeholder="/new-product" />
+            </label>
+            <button
+              type="button"
+              onClick={createPage}
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--interactive-bg-accent-default)] px-4 py-2 text-sm font-semibold text-[var(--text-accent)] transition hover:bg-[var(--interactive-bg-accent-hover)]"
+            >
+              <FilePlus className="h-4 w-4" /> Create page
+            </button>
+          </div>
+        </div>
+        <div className="grid gap-3">
+          {filteredPages.map((page) => {
+            const isSelected = page.id === selectedId;
+            return (
+              <div
+                key={page.id}
+                className={`rounded-3xl border px-5 py-4 transition ${
+                  isSelected
+                    ? "border-[var(--text-status-warning)] bg-[var(--bg-secondary)]"
+                    : "border-[var(--border-default)] bg-[var(--bg-secondary)] hover:border-[var(--text-status-warning)]"
+                }`}
+              >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <button type="button" onClick={() => onSelect(page.id)} className="text-left">
+                      <p className="text-base font-semibold text-[var(--text-primary)]">{page.name}</p>
+                      <p className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{page.slug}</p>
+                    </button>
+                    <p className="mt-2 text-xs text-[var(--text-secondary)]">{page.description}</p>
+                  </div>
+                  <div className="flex flex-col items-start gap-2 text-xs text-[var(--text-tertiary)] lg:items-end">
+                    <span className="rounded-full border border-[var(--border-default)] px-3 py-1 uppercase tracking-[0.2em]">
+                      {page.status}
+                    </span>
+                    <span>Last updated {new Date(page.lastUpdated).toLocaleDateString()}</span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onSelect(page.id)}
+                        className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)]"
+                      >
+                        Edit modules
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onRemove(page.id)}
+                        className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-status-error)]"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+interface BuilderProps {
+  page: PageDefinition | null;
+  dataFeeds: DataFeed[];
+  contentLibrary: ContentItem[];
+  selectedModuleId: string | null;
+  onSelectModule: (moduleId: string | null) => void;
+  onPageUpdate: (updater: (page: PageDefinition) => PageDefinition) => void;
+}
+
+function PageBuilder({ page, dataFeeds, contentLibrary, selectedModuleId, onSelectModule, onPageUpdate }: BuilderProps) {
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  const [activeDrag, setActiveDrag] = useState<DragMeta | null>(null);
+
+  if (!page) {
+    return <p className="text-sm text-[var(--text-tertiary)]">Select a page to begin visual composition.</p>;
+  }
+
+  const modules = page.modules;
+
+  const addModule = (moduleType: ModuleType, targetId?: string) => {
+    const template = MODULE_LIBRARY.find((entry) => entry.type === moduleType);
+    if (!template) return;
+    const newModule: PageModule = {
+      id: generateId("module"),
+      type: template.type,
+      title: template.defaults.title ?? template.label,
+      subtitle: template.defaults.subtitle,
+      description: template.defaults.description,
+      body: template.defaults.body,
+      verb: template.defaults.verb,
+      actions: template.defaults.actions ? JSON.parse(JSON.stringify(template.defaults.actions)) : undefined,
+      stats: template.defaults.stats ? JSON.parse(JSON.stringify(template.defaults.stats)) : undefined,
+      items: template.defaults.items ? [...template.defaults.items] : undefined,
+      feedId: template.defaults.feedId,
+      layout: template.defaults.layout,
+      media: template.defaults.media ? { ...template.defaults.media } : undefined,
+      pinned: template.defaults.pinned,
+      columns: template.defaults.columns ? JSON.parse(JSON.stringify(template.defaults.columns)) : undefined
+    };
+
+    onPageUpdate((current) => {
+      const nextModules = [...current.modules];
+      if (!targetId) {
+        nextModules.push(newModule);
+      } else {
+        const targetIndex = nextModules.findIndex((module) => module.id === targetId);
+        if (targetIndex === -1) {
+          nextModules.push(newModule);
+        } else {
+          nextModules.splice(targetIndex, 0, newModule);
+        }
+      }
+      return { ...current, modules: nextModules, lastUpdated: new Date().toISOString() };
+    });
+    onSelectModule(newModule.id);
+  };
+
+  const updateModule = (moduleId: string, update: (module: PageModule) => PageModule) => {
+    onPageUpdate((current) => ({
+      ...current,
+      modules: current.modules.map((module) => (module.id === moduleId ? update({ ...module }) : module)),
+      lastUpdated: new Date().toISOString()
+    }));
+  };
+
+  const removeModule = (moduleId: string) => {
+    onPageUpdate((current) => ({
+      ...current,
+      modules: current.modules.filter((module) => module.id !== moduleId),
+      lastUpdated: new Date().toISOString()
+    }));
+    if (selectedModuleId === moduleId) {
+      onSelectModule(null);
+    }
+  };
+
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    setActiveDrag(null);
+    if (!over) return;
+    const activeMeta = active.data.current as DragMeta | undefined;
+    if (!activeMeta) return;
+
+    if (activeMeta.source === "palette") {
+      const targetId = typeof over.id === "string" && over.id !== "canvas" ? (over.id as string) : undefined;
+      addModule(activeMeta.moduleType, targetId);
+      return;
+    }
+
+    if (activeMeta.source === "canvas") {
+      const oldIndex = modules.findIndex((module) => module.id === activeMeta.moduleId);
+      if (oldIndex === -1) return;
+      if (over.id === "canvas-end") {
+        if (oldIndex === modules.length - 1) return;
+        const reordered = arrayMove(modules, oldIndex, modules.length - 1);
+        onPageUpdate((current) => ({
+          ...current,
+          modules: reordered,
+          lastUpdated: new Date().toISOString()
+        }));
+        return;
+      }
+      const newIndex = modules.findIndex((module) => module.id === over.id);
+      if (newIndex === -1 || newIndex === oldIndex) return;
+      const reordered = arrayMove(modules, oldIndex, newIndex);
+      onPageUpdate((current) => ({
+        ...current,
+        modules: reordered,
+        lastUpdated: new Date().toISOString()
+      }));
+    }
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      onDragStart={({ active }) => {
+        setActiveDrag(active.data.current as DragMeta);
+      }}
+      onDragCancel={() => setActiveDrag(null)}
+      onDragEnd={handleDragEnd}
+      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+    >
+      <div className="grid gap-6 lg:grid-cols-[260px_1fr_320px]">
+        <ModulePalette onSelect={addModule} />
+        <div className="space-y-3">
+          <SortableContext items={modules.map((module) => module.id)} strategy={verticalListSortingStrategy}>
+            <CanvasDroppable>
+              {modules.length === 0 ? (
+                <div className="flex h-48 items-center justify-center rounded-3xl border border-dashed border-[var(--border-default)] text-sm text-[var(--text-tertiary)]">
+                  Drag modules from the library or click a template to begin composing this page.
+                </div>
+              ) : (
+                modules.map((module) => (
+                  <SortableModuleCard
+                    key={module.id}
+                    module={module}
+                    isActive={module.id === selectedModuleId}
+                    onSelect={() => onSelectModule(module.id)}
+                    onRemove={() => removeModule(module.id)}
+                  />
+                ))
+              )}
+              <div id="canvas-end" className="h-2" />
+            </CanvasDroppable>
+          </SortableContext>
+        </div>
+        <ModuleInspector
+          module={modules.find((module) => module.id === selectedModuleId) ?? null}
+          dataFeeds={dataFeeds}
+          contentLibrary={contentLibrary}
+          onUpdate={(updater) => {
+            if (!selectedModuleId) return;
+            updateModule(selectedModuleId, updater);
+          }}
+        />
+      </div>
+      <DragOverlay>
+        {activeDrag
+          ? activeDrag.source === "palette"
+            ? (
+              <ModuleLibraryCard template={MODULE_LIBRARY.find((entry) => entry.type === activeDrag.moduleType)!} dragPreview />
+            )
+            : (
+              <ModulePreview module={modules.find((module) => module.id === activeDrag.moduleId)!} dragging />
+            )
+          : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
+function ModulePalette({ onSelect }: { onSelect: (type: ModuleType, targetId?: string) => void }) {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-5">
+        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Module library</h3>
+        <p className="mt-2 text-xs text-[var(--text-secondary)]">Drag into the canvas or click to append to the end.</p>
+      </div>
+      <div className="space-y-3">
+        {MODULE_LIBRARY.map((template) => (
+          <ModuleLibraryCard key={template.type} template={template} onSelect={() => onSelect(template.type)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ModuleLibraryCard({
+  template,
+  onSelect,
+  dragPreview = false
+}: {
+  template: ModuleTemplate;
+  onSelect?: () => void;
+  dragPreview?: boolean;
+}) {
+  if (dragPreview) {
+    return (
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-4">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-warning)]">
+            <template.icon className="h-5 w-5" />
+          </span>
+          <div className="flex-1 space-y-1">
+            <p className="font-semibold text-[var(--text-primary)]">{template.label}</p>
+            <p className="text-xs text-[var(--text-secondary)]">{template.description}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const { attributes, listeners, setNodeRef, transform, transition } = useDraggable({
+    id: `palette-${template.type}`,
+    data: { source: "palette", moduleType: template.type } satisfies DragMeta
+  });
+
+  const style: CSSProperties = {
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transition: transition ?? undefined
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-4 transition ${
+        onSelect ? "hover:border-[var(--text-status-warning)]" : ""
+      }`}
+      onClick={onSelect}
+    >
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-warning)]">
+          <template.icon className="h-5 w-5" />
+        </span>
+        <div className="flex-1 space-y-1">
+          <p className="font-semibold text-[var(--text-primary)]">{template.label}</p>
+          <p className="text-xs text-[var(--text-secondary)]">{template.description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CanvasDroppable({ children }: { children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: "canvas" });
+  return (
+    <div
+      ref={setNodeRef}
+      id="canvas"
+      className={`space-y-3 rounded-3xl ${
+        isOver
+          ? "ring-1 ring-[var(--text-status-warning)] ring-offset-2 ring-offset-[var(--bg-secondary)]"
+          : ""
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SortableModuleCard({
+  module,
+  isActive,
+  onSelect,
+  onRemove
+}: {
+  module: PageModule;
+  isActive: boolean;
+  onSelect: () => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: module.id,
+    data: { source: "canvas", moduleId: module.id } satisfies DragMeta
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`rounded-3xl border px-5 py-5 transition ${
+        isActive
+          ? "border-[var(--text-status-warning)] bg-[var(--bg-secondary)]"
+          : "border-[var(--border-default)] bg-[var(--bg-secondary)] hover:border-[var(--text-status-warning)]"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <button type="button" onClick={onSelect} className="flex-1 text-left">
+          <ModulePreview module={module} />
+        </button>
+        <div className="flex flex-col items-end gap-2">
+          <button
+            type="button"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-tertiary)]"
+            {...attributes}
+            {...listeners}
+          >
+            <Move className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] text-[var(--text-status-error)]"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModulePreview({ module, dragging = false }: { module: PageModule; dragging?: boolean }) {
+  return (
+    <div className={`space-y-3 ${dragging ? "pointer-events-none" : ""}`}>
+      <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+        <span className="rounded-full border border-[var(--border-default)] px-2 py-1">{module.type}</span>
+        {module.layout ? <span>layout: {module.layout}</span> : null}
+      </div>
+      {module.title ? <h4 className="text-lg font-semibold text-[var(--text-primary)]">{module.title}</h4> : null}
+      {module.subtitle ? <p className="text-sm text-[var(--text-secondary)]">{module.subtitle}</p> : null}
+      {module.description ? <p className="text-xs text-[var(--text-secondary)]">{module.description}</p> : null}
+      {module.stats ? (
+        <div className="grid gap-2 md:grid-cols-3">
+          {module.stats.map((stat) => (
+            <div key={stat.label} className="rounded-2xl border border-[var(--border-default)] px-3 py-2 text-xs">
+              <p className="text-[var(--text-tertiary)]">{stat.label}</p>
+              <p
+                className={`text-sm font-semibold ${
+                  stat.tone === "positive"
+                    ? "text-[var(--text-status-warning)]"
+                    : stat.tone === "critical"
+                      ? "text-[var(--text-status-error)]"
+                      : "text-[var(--text-primary)]"
+                }`}
+              >
+                {stat.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {module.actions ? (
+        <div className="flex flex-wrap gap-2 text-xs">
+          {module.actions.map((action) => (
+            <span key={action.label} className="rounded-full border border-[var(--border-default)] px-3 py-1 text-[var(--text-secondary)]">
+              {action.label}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      {module.media ? (
+        <div className="rounded-2xl border border-[var(--border-default)] p-3 text-xs text-[var(--text-secondary)]">
+          Media: {module.media.type} – {module.media.src}
+        </div>
+      ) : null}
+      {module.items ? (
+        <ul className="list-disc space-y-1 pl-5 text-xs text-[var(--text-secondary)]">
+          {module.items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : null}
+      {module.columns ? (
+        <div className="grid gap-3 md:grid-cols-2">
+          {module.columns.map((column) => (
+            <div key={column.title} className="rounded-2xl border border-[var(--border-default)] p-3 text-xs text-[var(--text-secondary)]">
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{column.title}</p>
+              <p className="mt-1">{column.body}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+interface ModuleInspectorProps {
+  module: PageModule | null;
+  dataFeeds: DataFeed[];
+  contentLibrary: ContentItem[];
+  onUpdate: (updater: (module: PageModule) => PageModule) => void;
+}
+
+function ModuleInspector({ module, dataFeeds, contentLibrary, onUpdate }: ModuleInspectorProps) {
+  const [activeTab, setActiveTab] = useState<"properties" | "content" | "data">("properties");
+
+  useEffect(() => {
+    setActiveTab("properties");
+  }, [module?.id]);
+
+  if (!module) {
+    return (
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6 text-sm text-[var(--text-tertiary)]">
+        Select a module to edit its properties, narrative, and data bindings.
+      </div>
+    );
+  }
+
+  const update = (partial: Partial<PageModule>) => {
+    onUpdate((current) => ({ ...current, ...partial }));
+  };
+
+  const updateAction = (index: number, field: keyof ModuleAction, value: string) => {
+    const actions = [...(module.actions ?? [])];
+    actions[index] = { ...actions[index], [field]: value };
+    update({ actions });
+  };
+
+  const updateStat = (index: number, field: keyof ModuleStat, value: string) => {
+    const stats = [...(module.stats ?? [])];
+    const next = { ...stats[index] };
+    if (field === "tone") {
+      if (!value) {
+        delete next.tone;
+      } else {
+        next.tone = value as ModuleStat["tone"];
+      }
+    } else if (field === "label") {
+      next.label = value;
+    } else if (field === "value") {
+      next.value = value;
+    }
+    stats[index] = next;
+    update({ stats });
+  };
+
+  const updateColumn = (index: number, field: "title" | "body", value: string) => {
+    const columns = [...(module.columns ?? [])];
+    columns[index] = { ...columns[index], [field]: value };
+    update({ columns });
+  };
+
+  const libraryItems = contentLibrary.map((item) => ({ id: item.id, label: item.title }));
+
+  return (
+    <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">Module inspector</h3>
+          <p className="text-xs text-[var(--text-tertiary)]">Editing: {module.title ?? module.type}</p>
+        </div>
+        <div className="flex gap-2 text-xs">
+          {(["properties", "content", "data"] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={`rounded-full px-3 py-1 uppercase tracking-[0.18em] ${
+                activeTab === tab
+                  ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                  : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-4 space-y-4 text-sm">
+        {activeTab === "properties" ? (
+          <div className="space-y-4">
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Title</span>
+              <input className="input" value={module.title ?? ""} onChange={(event) => update({ title: event.target.value })} />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Subtitle</span>
+              <input
+                className="input"
+                value={module.subtitle ?? ""}
+                onChange={(event) => update({ subtitle: event.target.value })}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Layout</span>
+              <select
+                className="input"
+                value={module.layout ?? ""}
+                onChange={(event) => update({ layout: (event.target.value as PageModule["layout"]) || undefined })}
+              >
+                <option value="">Auto</option>
+                <option value="grid">Grid</option>
+                <option value="dual">Dual</option>
+                <option value="list">List</option>
+                <option value="split">Split</option>
+              </select>
+            </label>
+            {module.type === "hero" ? (
+              <label className="grid gap-2">
+                <span className="text-[var(--text-tertiary)]">Verb highlight</span>
+                <input className="input" value={module.verb ?? ""} onChange={(event) => update({ verb: event.target.value })} />
+              </label>
+            ) : null}
+            <div className="flex items-center justify-between rounded-2xl border border-[var(--border-default)] px-4 py-2 text-xs">
+              <span className="text-[var(--text-secondary)]">Pinned on homepage</span>
+              <button
+                type="button"
+                onClick={() => update({ pinned: !module.pinned })}
+                className={`rounded-full px-3 py-1 uppercase tracking-[0.2em] ${
+                  module.pinned
+                    ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                    : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+                }`}
+              >
+                {module.pinned ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Actions</span>
+                <button
+                  type="button"
+                  onClick={() => update({ actions: [...(module.actions ?? []), { label: "Call to action", href: "#" }] })}
+                  className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)]"
+                >
+                  Add action
+                </button>
+              </div>
+              {(module.actions ?? []).length === 0 ? (
+                <p className="text-xs text-[var(--text-tertiary)]">No actions configured.</p>
+              ) : (
+                (module.actions ?? []).map((action, index) => (
+                  <div key={index} className="grid gap-2 rounded-2xl border border-[var(--border-default)] p-3">
+                    <label className="grid gap-1 text-xs">
+                      <span className="text-[var(--text-tertiary)]">Label</span>
+                      <input
+                        className="input"
+                        value={action.label}
+                        onChange={(event) => updateAction(index, "label", event.target.value)}
+                      />
+                    </label>
+                    <label className="grid gap-1 text-xs">
+                      <span className="text-[var(--text-tertiary)]">Href</span>
+                      <input
+                        className="input"
+                        value={action.href}
+                        onChange={(event) => updateAction(index, "href", event.target.value)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => update({ actions: (module.actions ?? []).filter((_, idx) => idx !== index) })}
+                      className="justify-self-end rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-status-error)]"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Stats</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    update({
+                      stats: [...(module.stats ?? []), { label: "Metric", value: "0", tone: "positive" }]
+                    })
+                  }
+                  className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)]"
+                >
+                  Add stat
+                </button>
+              </div>
+              {(module.stats ?? []).length === 0 ? (
+                <p className="text-xs text-[var(--text-tertiary)]">No metrics attached.</p>
+              ) : (
+                (module.stats ?? []).map((stat, index) => (
+                  <div key={index} className="grid gap-2 rounded-2xl border border-[var(--border-default)] p-3">
+                    <label className="grid gap-1 text-xs">
+                      <span className="text-[var(--text-tertiary)]">Label</span>
+                      <input className="input" value={stat.label} onChange={(event) => updateStat(index, "label", event.target.value)} />
+                    </label>
+                    <label className="grid gap-1 text-xs">
+                      <span className="text-[var(--text-tertiary)]">Value</span>
+                      <input className="input" value={stat.value} onChange={(event) => updateStat(index, "value", event.target.value)} />
+                    </label>
+                    <label className="grid gap-1 text-xs">
+                      <span className="text-[var(--text-tertiary)]">Tone</span>
+                      <select
+                        className="input"
+                        value={stat.tone ?? "neutral"}
+                        onChange={(event) =>
+                          updateStat(index, "tone", event.target.value === "neutral" ? "" : (event.target.value as ModuleStat["tone"]))
+                        }
+                      >
+                        <option value="neutral">Neutral</option>
+                        <option value="positive">Positive</option>
+                        <option value="critical">Critical</option>
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => update({ stats: (module.stats ?? []).filter((_, idx) => idx !== index) })}
+                      className="justify-self-end rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-status-error)]"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            {module.type === "feature-grid" ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Columns</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      update({ columns: [...(module.columns ?? []), { title: "New column", body: "Describe the feature." }] })
+                    }
+                    className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)]"
+                  >
+                    Add column
+                  </button>
+                </div>
+                {(module.columns ?? []).map((column, index) => (
+                  <div key={index} className="grid gap-2 rounded-2xl border border-[var(--border-default)] p-3">
+                    <label className="grid gap-1 text-xs">
+                      <span className="text-[var(--text-tertiary)]">Title</span>
+                      <input className="input" value={column.title} onChange={(event) => updateColumn(index, "title", event.target.value)} />
+                    </label>
+                    <label className="grid gap-1 text-xs">
+                      <span className="text-[var(--text-tertiary)]">Body</span>
+                      <textarea className="input" value={column.body} onChange={(event) => updateColumn(index, "body", event.target.value)} />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => update({ columns: (module.columns ?? []).filter((_, idx) => idx !== index) })}
+                      className="justify-self-end rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-status-error)]"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : activeTab === "content" ? (
+          <div className="space-y-4">
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Description</span>
+              <textarea
+                className="input min-h-[120px]"
+                value={module.description ?? ""}
+                onChange={(event) => update({ description: event.target.value })}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Rich narrative</span>
+              <RichTextEditor value={module.body ?? ""} onChange={(value) => update({ body: value })} />
+            </label>
+            {module.media ? (
+              <div className="grid gap-3 rounded-2xl border border-[var(--border-default)] p-3 text-xs">
+                <label className="grid gap-1">
+                  <span className="text-[var(--text-tertiary)]">Media type</span>
+                  <select
+                    className="input"
+                    value={module.media.type}
+                    onChange={(event) => update({ media: { ...module.media!, type: event.target.value as ModuleMedia["type"] } })}
+                  >
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                    <option value="chart">Chart</option>
+                  </select>
+                </label>
+                <label className="grid gap-1">
+                  <span className="text-[var(--text-tertiary)]">Source</span>
+                  <input
+                    className="input"
+                    value={module.media.src}
+                    onChange={(event) => update({ media: { ...module.media!, src: event.target.value } })}
+                  />
+                </label>
+                <label className="grid gap-1">
+                  <span className="text-[var(--text-tertiary)]">Caption</span>
+                  <input
+                    className="input"
+                    value={module.media.caption ?? ""}
+                    onChange={(event) => update({ media: { ...module.media!, caption: event.target.value } })}
+                  />
+                </label>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => update({ media: { type: "image", src: "/assets/placeholder/media.jpg" } })}
+                className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)]"
+              >
+                Attach media
+              </button>
+            )}
+            {module.type === "list" ? (
+              <div className="space-y-3">
+                <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Linked content</span>
+                <div className="flex gap-2">
+                  <select
+                    className="input"
+                    onChange={(event) => {
+                      if (!event.target.value) return;
+                      update({ items: [...(module.items ?? []), event.target.value] });
+                      event.target.value = "";
+                    }}
+                  >
+                    <option value="">Add from library</option>
+                    {libraryItems.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => update({ items: [...(module.items ?? []), `custom-${generateId("item")}`] })}
+                    className="rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)]"
+                  >
+                    Add custom
+                  </button>
+                </div>
+                <ul className="space-y-2 text-xs">
+                  {(module.items ?? []).map((itemId, index) => {
+                    const item = libraryItems.find((entry) => entry.id === itemId);
+                    return (
+                      <li key={`${itemId}-${index}`} className="flex items-center justify-between rounded-2xl border border-[var(--border-default)] px-3 py-2">
+                        <span className="text-[var(--text-secondary)]">{item ? item.label : itemId}</span>
+                        <button
+                          type="button"
+                          onClick={() => update({ items: (module.items ?? []).filter((_, idx) => idx !== index) })}
+                          className="rounded-full border border-[var(--border-default)] px-3 py-1 text-[var(--text-status-error)]"
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Data feed</span>
+              <select
+                className="input"
+                value={module.feedId ?? ""}
+                onChange={(event) => update({ feedId: event.target.value || undefined })}
+              >
+                <option value="">No feed</option>
+                {dataFeeds.map((feed) => (
+                  <option key={feed.id} value={feed.id}>
+                    {feed.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {module.feedId ? (
+              <p className="text-xs text-[var(--text-secondary)]">
+                Connected to {module.feedId}. Refresh cadence {dataFeeds.find((feed) => feed.id === module.feedId)?.refreshInterval}.
+              </p>
+            ) : (
+              <p className="text-xs text-[var(--text-tertiary)]">Attach a data feed to stream live telemetry into this module.</p>
+            )}
+            <div className="rounded-2xl border border-[var(--border-default)] p-4 text-xs text-[var(--text-secondary)]">
+              <p className="font-semibold text-[var(--text-primary)]">Library references</p>
+              <ul className="mt-2 space-y-1">
+                {contentLibrary.slice(0, 5).map((item) => (
+                  <li key={item.id} className="flex justify-between">
+                    <span>{item.title}</span>
+                    <span className="text-[var(--text-tertiary)]">{item.status}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+function RichTextEditor({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const [html, setHtml] = useState<string>(value);
+
+  useEffect(() => {
+    setHtml(value);
+  }, [value]);
+
+  return (
+    <div className="space-y-2">
+      <div
+        className="min-h-[140px] rounded-2xl border border-[var(--border-default)] bg-[var(--bg-tertiary)] p-4 text-sm text-[var(--text-secondary)] focus:outline-none"
+        contentEditable
+        suppressContentEditableWarning
+        onInput={(event) => {
+          const next = (event.currentTarget as HTMLDivElement).innerHTML;
+          setHtml(next);
+          onChange(next);
+        }}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+      <div className="rounded-2xl border border-[var(--border-default)] p-3 text-xs text-[var(--text-tertiary)]">
+        Preview
+        <div className="mt-2 space-y-2 text-[var(--text-secondary)]" dangerouslySetInnerHTML={{ __html: html }} />
+      </div>
+    </div>
+  );
+}
+
+function ContentLibraryManager({ items, pages, onChange }: { items: ContentItem[]; pages: PageDefinition[]; onChange: (items: ContentItem[]) => void }) {
+  const [selectedId, setSelectedId] = useState<string | null>(items[0]?.id ?? null);
+
+  useEffect(() => {
+    if (!selectedId && items.length > 0) {
+      setSelectedId(items[0].id);
+    }
+  }, [items, selectedId]);
+
+  const selectedItem = items.find((item) => item.id === selectedId) ?? null;
+
+  const updateItem = (itemId: string, update: (item: ContentItem) => ContentItem) => {
+    onChange(items.map((item) => (item.id === itemId ? update({ ...item }) : item)));
+  };
+
+  const createItem = () => {
+    const id = generateId("content");
+    const item: ContentItem = {
+      id,
+      title: "New article",
+      type: "article",
+      author: "Editorial",
+      publishedAt: new Date().toISOString(),
+      status: "draft",
+      summary: "Add a short summary",
+      thumbnail: "/assets/placeholder/article.jpg",
+      pinned: false,
+      relatedPages: []
+    };
+    onChange([...items, item]);
+    setSelectedId(id);
+  };
+
+  const removeItem = (itemId: string) => {
+    onChange(items.filter((item) => item.id !== itemId));
+    if (selectedId === itemId) {
+      setSelectedId(items.filter((item) => item.id !== itemId)[0]?.id ?? null);
+    }
+  };
+
+  return (
+    <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Content library</h2>
+          <button
+            type="button"
+            onClick={createItem}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            <PlusIcon /> New
+          </button>
+        </div>
+        <div className="space-y-3">
+          {items.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSelectedId(item.id)}
+              className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
+                selectedId === item.id
+                  ? "border-[var(--text-status-warning)] bg-[var(--bg-secondary)]"
+                  : "border-[var(--border-default)] bg-[var(--bg-secondary)] hover:border-[var(--text-status-warning)]"
+              }`}
+            >
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{item.title}</p>
+              <p className="text-xs text-[var(--text-tertiary)]">{item.type} · {item.status}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        {selectedItem ? (
+          <div className="space-y-4 text-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">{selectedItem.title}</h3>
+                <p className="text-xs text-[var(--text-tertiary)]">{selectedItem.id}</p>
+              </div>
+              <div className="flex gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => updateItem(selectedItem.id, (item) => ({ ...item, pinned: !item.pinned }))}
+                  className={`rounded-full px-3 py-1 uppercase tracking-[0.18em] ${
+                    selectedItem.pinned
+                      ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                      : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+                  }`}
+                >
+                  {selectedItem.pinned ? "Pinned" : "Pin"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeItem(selectedItem.id)}
+                  className="rounded-full border border-[var(--border-default)] px-3 py-1 uppercase tracking-[0.18em] text-[var(--text-status-error)]"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Title</span>
+              <input
+                className="input"
+                value={selectedItem.title}
+                onChange={(event) => updateItem(selectedItem.id, (item) => ({ ...item, title: event.target.value }))}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Author</span>
+              <input
+                className="input"
+                value={selectedItem.author}
+                onChange={(event) => updateItem(selectedItem.id, (item) => ({ ...item, author: event.target.value }))}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Summary</span>
+              <textarea
+                className="input min-h-[120px]"
+                value={selectedItem.summary}
+                onChange={(event) => updateItem(selectedItem.id, (item) => ({ ...item, summary: event.target.value }))}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Thumbnail</span>
+              <input
+                className="input"
+                value={selectedItem.thumbnail ?? ""}
+                onChange={(event) => updateItem(selectedItem.id, (item) => ({ ...item, thumbnail: event.target.value }))}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Status</span>
+              <select
+                className="input"
+                value={selectedItem.status}
+                onChange={(event) => updateItem(selectedItem.id, (item) => ({ ...item, status: event.target.value as ContentItem["status"] }))}
+              >
+                <option value="draft">Draft</option>
+                <option value="review">Review</option>
+                <option value="published">Published</option>
+              </select>
+            </label>
+            <div className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Related pages</span>
+              <div className="flex flex-wrap gap-2">
+                {pages.map((page) => {
+                  const selected = selectedItem.relatedPages.includes(page.id);
+                  return (
+                    <button
+                      key={page.id}
+                      type="button"
+                      onClick={() =>
+                        updateItem(selectedItem.id, (item) => ({
+                          ...item,
+                          relatedPages: selected
+                            ? item.relatedPages.filter((id) => id !== page.id)
+                            : [...item.relatedPages, page.id]
+                        }))
+                      }
+                      className={`rounded-full px-3 py-1 text-xs uppercase tracking-[0.18em] ${
+                        selected
+                          ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                          : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+                      }`}
+                    >
+                      {page.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--text-tertiary)]">Select a content item to edit metadata and publication state.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DataFeedManager({ feeds, modules, onChange }: { feeds: DataFeed[]; modules: PageModule[]; onChange: (feeds: DataFeed[]) => void }) {
+  const [selectedFeedId, setSelectedFeedId] = useState<string | null>(feeds[0]?.id ?? null);
+
+  useEffect(() => {
+    if (!selectedFeedId && feeds.length > 0) {
+      setSelectedFeedId(feeds[0].id);
+    }
+  }, [feeds, selectedFeedId]);
+
+  const selectedFeed = feeds.find((feed) => feed.id === selectedFeedId) ?? null;
+
+  const updateFeed = (feedId: string, update: (feed: DataFeed) => DataFeed) => {
+    onChange(feeds.map((feed) => (feed.id === feedId ? update({ ...feed }) : feed)));
+  };
+
+  const createFeed = () => {
+    const id = generateId("feed");
+    const feed: DataFeed = {
+      id,
+      name: "New feed",
+      description: "Describe the data source",
+      source: "https://api.aeterna/internal",
+      refreshInterval: "5m",
+      format: "json",
+      status: "offline",
+      connectedModules: []
+    };
+    onChange([...feeds, feed]);
+    setSelectedFeedId(id);
+  };
+
+  const removeFeed = (feedId: string) => {
+    onChange(feeds.filter((feed) => feed.id !== feedId));
+    if (selectedFeedId === feedId) {
+      setSelectedFeedId(feeds.filter((feed) => feed.id !== feedId)[0]?.id ?? null);
+    }
+  };
+
+  return (
+    <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Data feeds</h2>
+          <button
+            type="button"
+            onClick={createFeed}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+          >
+            <PlusIcon /> New
+          </button>
+        </div>
+        <div className="space-y-3">
+          {feeds.map((feed) => (
+            <button
+              key={feed.id}
+              type="button"
+              onClick={() => setSelectedFeedId(feed.id)}
+              className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
+                selectedFeedId === feed.id
+                  ? "border-[var(--text-status-warning)] bg-[var(--bg-secondary)]"
+                  : "border-[var(--border-default)] bg-[var(--bg-secondary)] hover:border-[var(--text-status-warning)]"
+              }`}
+            >
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{feed.name}</p>
+              <p className="text-xs text-[var(--text-tertiary)]">{feed.refreshInterval} · {feed.status}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        {selectedFeed ? (
+          <div className="space-y-4 text-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">{selectedFeed.name}</h3>
+                <p className="text-xs text-[var(--text-tertiary)]">{selectedFeed.source}</p>
+              </div>
+              <div className="flex gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => removeFeed(selectedFeed.id)}
+                  className="rounded-full border border-[var(--border-default)] px-3 py-1 uppercase tracking-[0.18em] text-[var(--text-status-error)]"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Name</span>
+              <input
+                className="input"
+                value={selectedFeed.name}
+                onChange={(event) => updateFeed(selectedFeed.id, (feed) => ({ ...feed, name: event.target.value }))}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Description</span>
+              <textarea
+                className="input min-h-[100px]"
+                value={selectedFeed.description}
+                onChange={(event) => updateFeed(selectedFeed.id, (feed) => ({ ...feed, description: event.target.value }))}
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Source URL</span>
+              <input
+                className="input"
+                value={selectedFeed.source}
+                onChange={(event) => updateFeed(selectedFeed.id, (feed) => ({ ...feed, source: event.target.value }))}
+              />
+            </label>
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-[var(--text-tertiary)]">Refresh interval</span>
+                <input
+                  className="input"
+                  value={selectedFeed.refreshInterval}
+                  onChange={(event) => updateFeed(selectedFeed.id, (feed) => ({ ...feed, refreshInterval: event.target.value }))}
+                />
+              </label>
+              <label className="grid gap-2">
+                <span className="text-[var(--text-tertiary)]">Format</span>
+                <select
+                  className="input"
+                  value={selectedFeed.format}
+                  onChange={(event) => updateFeed(selectedFeed.id, (feed) => ({ ...feed, format: event.target.value as DataFeed["format"] }))}
+                >
+                  <option value="json">JSON</option>
+                  <option value="csv">CSV</option>
+                  <option value="xml">XML</option>
+                  <option value="websocket">WebSocket</option>
+                </select>
+              </label>
+            </div>
+            <label className="grid gap-2">
+              <span className="text-[var(--text-tertiary)]">Status</span>
+              <select
+                className="input"
+                value={selectedFeed.status}
+                onChange={(event) => updateFeed(selectedFeed.id, (feed) => ({ ...feed, status: event.target.value as DataFeed["status"] }))}
+              >
+                <option value="connected">Connected</option>
+                <option value="degraded">Degraded</option>
+                <option value="offline">Offline</option>
+              </select>
+            </label>
+            <div className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Connected modules</span>
+              <div className="flex flex-wrap gap-2">
+                {modules.map((module) => {
+                  const selected = selectedFeed.connectedModules.includes(module.id);
+                  return (
+                    <button
+                      key={module.id}
+                      type="button"
+                      onClick={() =>
+                        updateFeed(selectedFeed.id, (feed) => ({
+                          ...feed,
+                          connectedModules: selected
+                            ? feed.connectedModules.filter((id) => id !== module.id)
+                            : [...feed.connectedModules, module.id]
+                        }))
+                      }
+                      className={`rounded-full px-3 py-1 text-xs uppercase tracking-[0.18em] ${
+                        selected
+                          ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                          : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+                      }`}
+                    >
+                      {module.title ?? module.type}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--text-tertiary)]">Select a feed to manage connectivity and module bindings.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SettingsPanel({ config, onConfigChange }: { config: SiteConfig; onConfigChange: (updater: (config: SiteConfig) => SiteConfig) => void }) {
+  const pinnedContent = config.homepage.pinnedReleases;
+  const featuredModules = config.homepage.featuredModules;
+
+  const togglePinned = (id: string) => {
+    onConfigChange((current) => ({
+      ...current,
+      homepage: {
+        ...current.homepage,
+        pinnedReleases: pinnedContent.includes(id)
+          ? current.homepage.pinnedReleases.filter((release) => release !== id)
+          : [...current.homepage.pinnedReleases, id]
+      }
+    }));
+  };
+
+  const toggleFeatured = (id: string) => {
+    onConfigChange((current) => ({
+      ...current,
+      homepage: {
+        ...current.homepage,
+        featuredModules: featuredModules.includes(id)
+          ? current.homepage.featuredModules.filter((module) => module !== id)
+          : [...current.homepage.featuredModules, id]
+      }
+    }));
+  };
+
+  return (
+    <div className="grid gap-8 lg:grid-cols-2">
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        <h2 className="text-lg font-semibold">Homepage releases</h2>
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">Control which launches stay pinned to the top of the hero canvas.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {config.contentLibrary.map((item) => {
+            const selected = pinnedContent.includes(item.id);
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => togglePinned(item.id)}
+                className={`rounded-full px-3 py-1 text-xs uppercase tracking-[0.18em] ${
+                  selected
+                    ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                    : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+                }`}
+              >
+                {item.title}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        <h2 className="text-lg font-semibold">Featured modules</h2>
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">Choose the modules that compose the hero spotlight.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {config.pages.flatMap((page) => page.modules).map((module) => {
+            const selected = featuredModules.includes(module.id);
+            return (
+              <button
+                key={module.id}
+                type="button"
+                onClick={() => toggleFeatured(module.id)}
+                className={`rounded-full px-3 py-1 text-xs uppercase tracking-[0.18em] ${
+                  selected
+                    ? "bg-[var(--interactive-bg-accent-default)] text-[var(--text-accent)]"
+                    : "border border-[var(--border-default)] text-[var(--text-secondary)]"
+                }`}
+              >
+                {module.title ?? module.type}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        <h2 className="text-lg font-semibold">Spotlight page</h2>
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">Select which product or mission gets the primary hero CTA.</p>
+        <select
+          className="mt-4 input"
+          value={config.homepage.spotlightPageId ?? ""}
+          onChange={(event) =>
+            onConfigChange((current) => ({
+              ...current,
+              homepage: { ...current.homepage, spotlightPageId: event.target.value || null }
+            }))
+          }
+        >
+          <option value="">None</option>
+          {config.pages.map((page) => (
+            <option key={page.id} value={page.id}>
+              {page.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="rounded-3xl border border-[var(--border-default)] bg-[var(--bg-secondary)] p-6">
+        <h2 className="text-lg font-semibold">Deployment notes</h2>
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">
+          Export the JSON after making edits to propagate changes to the static site or connect the admin API endpoint to your
+          deployment pipeline.
+        </p>
+        <ul className="mt-4 space-y-2 text-xs text-[var(--text-tertiary)]">
+          <li>1. Review navigation and module arrangements in the builder.</li>
+          <li>2. Export configuration and commit to the repository configuration folder.</li>
+          <li>3. Trigger CI to regenerate static pages via `next export`.</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function PlusIcon() {
+  return <span className="inline-flex h-4 w-4 items-center justify-center">+</span>;
+}
+
+function generateId(prefix: string) {
+  return `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
 }
