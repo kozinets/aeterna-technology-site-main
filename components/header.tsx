@@ -346,7 +346,8 @@ const TOP_NAV: TopNavItem[] = [
   { id: "access", label: "Access", type: "secondary" },
   { id: "company", label: "Company", type: "secondary" },
   { id: "programs", label: "Programs", type: "anchor", href: "#programs" },
-  { id: "insights", label: "Insights", type: "anchor", href: "#insights" }
+  { id: "insights", label: "Insights", type: "anchor", href: "#insights" },
+  { id: "admin", label: "Admin", type: "anchor", href: "/admin" }
 ];
 
 export function Header() {
@@ -355,7 +356,7 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   const navItemBase =
-    "relative flex h-full items-center gap-2 px-3 text-sm font-medium leading-none transition-colors duration-150 after:absolute after:bottom-[-3px] after:left-0 after:h-[2px] after:w-full after:rounded-full after:transition-colors after:duration-150";
+    "relative flex h-full items-center gap-2 px-4 text-sm font-medium leading-none transition-colors duration-150 after:absolute after:bottom-[-6px] after:left-0 after:h-[2px] after:w-full after:rounded-full after:transition-colors after:duration-150";
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -386,10 +387,10 @@ export function Header() {
           className="flex items-center"
           aria-label="Aeterna Technology — home"
         >
-          <AeternaLogo className="h-7 shrink-0 lg:h-8" />
+          <AeternaLogo className="h-6 shrink-0 lg:h-7" />
         </Link>
         <div className="hidden flex-1 items-center lg:flex">
-          <nav className="flex h-full flex-1 items-center gap-1 text-sm font-medium">
+          <nav className="flex h-full flex-1 items-stretch gap-1 text-sm font-medium">
             {TOP_NAV.map((item) => {
               if (item.type === "anchor") {
                 return (
@@ -439,10 +440,10 @@ export function Header() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="hidden items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
+            className="hidden h-11 w-11 items-center justify-center rounded-full text-[var(--icon-secondary)] transition hover:text-[var(--text-primary)] lg:flex"
+            aria-label="Search across Aeterna"
           >
-            <Search className="h-4 w-4 text-[var(--icon-secondary)]" />
-            Search
+            <Search className="h-5 w-5" />
           </button>
           <button
             type="button"
@@ -477,9 +478,9 @@ function SecondaryMenu({ open, groups }: { open: boolean; groups: SecondaryPanel
     <AnimatePresence>
       {open ? (
         <motion.div
-          initial={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
-          animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
-          exit={{ opacity: 0, clipPath: "inset(0% 0% 100% 0%)" }}
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.26, ease: "easeOut" }}
           className="absolute left-0 right-0 top-full z-40 mt-[-1px] border-y border-[var(--border-default)] bg-[var(--bg-primary)]"
         >

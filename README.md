@@ -32,4 +32,10 @@ Install packages using the standard command:
 npm install
 ```
 
+If Tailwind or PostCSS tooling fails to install in restricted environments, run the explicit developer dependency command:
+
+```bash
+npm install -D autoprefixer postcss tailwindcss
+```
+
 If the environment lacks access to `registry.npmjs.org`, configure a private registry mirror or offline cache before installing.
