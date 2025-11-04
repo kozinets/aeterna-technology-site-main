@@ -3,53 +3,18 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight, Beaker, Binary, RadioTower, Sparkles } from "lucide-react";
 import Link from "next/link";
+import type { InsightsCollection } from "@/lib/cms/types";
 
-const articles = [
-  {
-    tag: "Research",
-    title: "Neurobionic Immortality Protocol",
-    description:
-      "Immersive NeuroWeave implants synchronized with regenerative matrices to preserve consciousness continuity.",
-    readingTime: "12 min",
-    href: "/insights/neurobionic-immortality"
-  },
-  {
-    tag: "AI",
-    title: "Atlas 5.0: Architect Agents",
-    description:
-      "The latest Atlas release trains autonomous teams to plan orbital missions and bioengineered cities.",
-    readingTime: "8 min",
-    href: "/insights/atlas-agents"
-  },
-  {
-    tag: "Crypto",
-    title: "DePIN Orchestration Network",
-    description:
-      "Govern physical networks from drones to energy grids with cryptographic revenue sharing and composite DAOs.",
-    readingTime: "9 min",
-    href: "/insights/depin"
-  }
-];
+const ICON_MAP = {
+  binary: Binary,
+  "radio-tower": RadioTower,
+  beaker: Beaker
+} as const;
 
-const signals = [
-  {
-    icon: Binary,
-    title: "Neuro-Sat Grid",
-    description: "Orbital relays delivering instantaneous data for implants and drones without ground latency."
-  },
-  {
-    icon: RadioTower,
-    title: "Synthesis Fields",
-    description: "Urban sites with robotic bioreactors and autonomous logistics corridors."
-  },
-  {
-    icon: Beaker,
-    title: "Immortality Trials",
-    description: "Long-horizon studies in cellular reprogramming and digital memory fidelity."
-  }
-];
+export function Insights({ collection }: { collection: InsightsCollection }) {
+  const articles = collection.articles;
+  const signals = collection.signals;
 
-export function Insights() {
   return (
     <section id="insights" className="mt-28">
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
@@ -117,7 +82,10 @@ export function Insights() {
               <li key={signal.title} className="relative pl-4">
                 <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-light)]" aria-hidden="true" />
                 <div className="flex items-center gap-3">
-                  <signal.icon className="h-5 w-5 text-[var(--icon-secondary)]" />
+                  {(() => {
+                    const Icon = ICON_MAP[signal.icon as keyof typeof ICON_MAP];
+                    return Icon ? <Icon className="h-5 w-5 text-[var(--icon-secondary)]" /> : null;
+                  })()}
                   <span
                     className={`text-sm font-semibold ${
                       index === 0

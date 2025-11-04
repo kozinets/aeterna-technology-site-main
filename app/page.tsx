@@ -4,83 +4,57 @@ import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
 import { Insights } from "@/components/insights";
 import { Programs } from "@/components/programs";
-import { Building2, Cpu, FlaskConical, Orbit, Radar, Sparkles, Workflow } from "lucide-react";
-import Link from "next/link";
 import { RealtimePulse } from "@/components/realtime-pulse";
+import {
+  getAccessPortalCollection,
+  getHeroCollection,
+  getHomeCollection,
+  getInsightsCollection,
+  getProgramsCollection,
+  getPulseCollection
+} from "@/lib/cms/site-config";
+import {
+  Building2,
+  Cpu,
+  FlaskConical,
+  Orbit,
+  Radar,
+  Sparkles,
+  Workflow
+} from "lucide-react";
+import Link from "next/link";
 
-const ecosystemNodes = [
-  {
-    title: "Aeterna Genesis",
-    description: "Incubator for breakthrough ventures in organ bioprinting, material synthesis, and nanorobotics.",
-    detail: "18 divisions synchronized with Sentient Cloud and Vitality Labs",
-    streams: ["Biofoundry", "Quantum materials", "Longevity"]
-  },
-  {
-    title: "Continuum Campus",
-    description: "A living university with neural lecture halls, quantum compute, and autonomous laboratories.",
-    detail: "32,000 researchers and students operating across immersive environments",
-    streams: ["Neural curriculum", "Shared datasets", "Joint missions"]
-  },
-  {
-    title: "Orbital Forge",
-    description: "Space manufacturing platform for implants, satellites, and autonomous stations.",
-    detail: "LEO/MEO orbits connected through quantum channels and robotic foundries",
-    streams: ["Zero-G assembly", "Station autonomy", "Launch cadence"]
-  },
-  {
-    title: "Aeterna Network Fabric",
-    description: "Global proxy, DePIN, and quantum communications lattice for data, robots, and implants.",
-    detail: "Powered by NOVA Proxy, Synapse Mesh, and Quantum Zero Trust governance",
-    streams: ["Proxy mesh", "Edge orchestration", "Telemetry"]
-  }
-];
+const CAMPUS_ICON_MAP = {
+  cpu: Cpu,
+  sparkles: Sparkles,
+  radar: Radar
+} as const;
 
-const campusStats = [
-  { icon: Cpu, label: "Sentient Cloud", value: "Exascale compute", tone: "positive" as const },
-  { icon: Sparkles, label: "Neural Lattice", value: "Self-learning agents", tone: "positive" as const },
-  { icon: Radar, label: "Aeterna Link", value: "Instant exchange", tone: "critical" as const }
-];
-
-const alliances = [
-  {
-    icon: Building2,
-    title: "Governments",
-    text: "Sovereign clouds, digital twins, and longevity initiatives for national leaders.",
-    tone: "critical" as const
-  },
-  {
-    icon: Workflow,
-    title: "Enterprises",
-    text: "Autonomous production, cybernetic factories, and cognitive operations.",
-    tone: "positive" as const
-  },
-  {
-    icon: FlaskConical,
-    title: "Universities",
-    text: "Joint research programs, data exchanges, and accelerated discoveries.",
-    tone: "positive" as const
-  },
-  {
-    icon: Orbit,
-    title: "Orbital missions",
-    text: "Satellites, stations, and drones governed by Atlas Command and Sentient Cloud.",
-    tone: "critical" as const
-  }
-];
-
-const timeline = [
-  { year: "2024", description: "Quantum Zero Trust deployed across 12 nations", tone: "critical" as const },
-  { year: "2025", description: "Orbital Forge launches with Sentient Cloud v5", tone: "positive" as const },
-  { year: "2026", description: "NeuroWeave immortality programs reach global scale", tone: "positive" as const },
-  { year: "2027", description: "Autonomous cities orchestrated by Atlas", tone: "positive" as const }
-];
+const ALLIANCE_ICON_MAP = {
+  "building-2": Building2,
+  workflow: Workflow,
+  "flask-conical": FlaskConical,
+  orbit: Orbit
+} as const;
 
 export default function Page() {
+  const heroContent = getHeroCollection();
+  const homeCollection = getHomeCollection();
+  const programsCollection = getProgramsCollection();
+  const insightsCollection = getInsightsCollection();
+  const pulseCollection = getPulseCollection();
+  const accessPortalCollection = getAccessPortalCollection();
+
+  const ecosystemNodes = homeCollection.ecosystemNodes;
+  const campusStats = homeCollection.campusStats;
+  const alliances = homeCollection.alliances;
+  const timeline = homeCollection.timeline;
+
   return (
     <main>
       <Header />
       <div className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-12 sm:px-8 lg:px-12">
-        <Hero />
+        <Hero content={heroContent} />
         <section className="mt-24">
           <div className="grid gap-14 lg:grid-cols-[280px_1fr]">
             <div className="space-y-8">
@@ -94,34 +68,39 @@ export default function Page() {
                 </p>
               </div>
               <div className="space-y-4">
-                {campusStats.map((item) => (
-                  <div key={item.label} className="relative flex items-center gap-3 pl-4">
-                    <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                    <item.icon
-                      className={`h-6 w-6 ${
-                        item.tone === "positive"
-                          ? "text-[var(--text-status-warning)]"
-                          : item.tone === "critical"
-                            ? "text-[var(--text-status-error)]"
-                            : "text-[var(--icon-secondary)]"
-                      }`}
-                    />
-                    <div>
-                      <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</span>
-                      <p
-                        className={`text-sm font-semibold ${
-                          item.tone === "positive"
-                            ? "text-[var(--text-status-warning)]"
-                            : item.tone === "critical"
-                              ? "text-[var(--text-status-error)]"
-                              : "text-[var(--text-primary)]"
-                        }`}
-                      >
-                        {item.value}
-                      </p>
+                {campusStats.map((item) => {
+                  const Icon = CAMPUS_ICON_MAP[item.icon as keyof typeof CAMPUS_ICON_MAP];
+                  return (
+                    <div key={item.label} className="relative flex items-center gap-3 pl-4">
+                      <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
+                      {Icon ? (
+                        <Icon
+                          className={`h-6 w-6 ${
+                            item.tone === "positive"
+                              ? "text-[var(--text-status-warning)]"
+                              : item.tone === "critical"
+                                ? "text-[var(--text-status-error)]"
+                                : "text-[var(--icon-secondary)]"
+                          }`}
+                        />
+                      ) : null}
+                      <div>
+                        <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</span>
+                        <p
+                          className={`text-sm font-semibold ${
+                            item.tone === "positive"
+                              ? "text-[var(--text-status-warning)]"
+                              : item.tone === "critical"
+                                ? "text-[var(--text-status-error)]"
+                                : "text-[var(--text-primary)]"
+                          }`}
+                        >
+                          {item.value}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div className="grid gap-10 md:grid-cols-2">
@@ -147,7 +126,7 @@ export default function Page() {
             </div>
           </div>
         </section>
-        <Programs />
+        <Programs collection={programsCollection} />
         <section className="mt-28">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr]">
             <div className="space-y-6">
@@ -159,30 +138,35 @@ export default function Page() {
                 Governments, enterprises, and universities integrate with our infrastructure to launch joint missions and co-own progress.
               </p>
               <div className="grid gap-5">
-                {alliances.map((unit) => (
-                  <div key={unit.title} className="relative flex gap-4 pl-5">
-                    <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                    <unit.icon
-                      className={`mt-1 h-6 w-6 ${
-                        unit.tone === "positive"
-                          ? "text-[var(--text-status-warning)]"
-                          : "text-[var(--text-status-error)]"
-                      }`}
-                    />
-                    <div>
-                      <h3
-                        className={`text-sm font-semibold uppercase tracking-[0.18em] ${
-                          unit.tone === "positive"
-                            ? "text-[var(--text-status-warning)]"
-                            : "text-[var(--text-status-error)]"
-                        }`}
-                      >
-                        {unit.title}
-                      </h3>
-                      <p className="mt-2 text-sm text-[var(--text-secondary)]">{unit.text}</p>
+                {alliances.map((unit) => {
+                  const Icon = ALLIANCE_ICON_MAP[unit.icon as keyof typeof ALLIANCE_ICON_MAP];
+                  return (
+                    <div key={unit.title} className="relative flex gap-4 pl-5">
+                      <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
+                      {Icon ? (
+                        <Icon
+                          className={`mt-1 h-6 w-6 ${
+                            unit.tone === "positive"
+                              ? "text-[var(--text-status-warning)]"
+                              : "text-[var(--text-status-error)]"
+                          }`}
+                        />
+                      ) : null}
+                      <div>
+                        <h3
+                          className={`text-sm font-semibold uppercase tracking-[0.18em] ${
+                            unit.tone === "positive"
+                              ? "text-[var(--text-status-warning)]"
+                              : "text-[var(--text-status-error)]"
+                          }`}
+                        >
+                          {unit.title}
+                        </h3>
+                        <p className="mt-2 text-sm text-[var(--text-secondary)]">{unit.text}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div className="space-y-6">
@@ -219,9 +203,9 @@ export default function Page() {
             </div>
           </div>
         </section>
-        <RealtimePulse />
-        <Insights />
-        <AccessPortal />
+        <RealtimePulse collection={pulseCollection} />
+        <Insights collection={insightsCollection} />
+        <AccessPortal collection={accessPortalCollection} />
       </div>
       <Footer />
     </main>

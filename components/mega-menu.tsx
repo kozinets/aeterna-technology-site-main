@@ -4,24 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronRight, Dot } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-
-type MegaMenuItem = {
-  title: string;
-  summary: string;
-  href: string;
-  badge?: string;
-  focus: string;
-  preview: string;
-  metrics: string[];
-};
-
-type MegaMenuSection = {
-  id: string;
-  title: string;
-  description: string;
-  meta: string;
-  items: MegaMenuItem[];
-};
+import type { MegaMenuItem, MegaMenuSection } from "@/lib/cms/types";
 
 export function MegaMenu({
   open,

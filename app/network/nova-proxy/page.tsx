@@ -2,123 +2,79 @@ import { AccessPortal } from "@/components/access-portal";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { NovaProxyAnalytics } from "@/components/charts/nova-proxy-analytics";
+import { getAccessPortalCollection, getPageContent } from "@/lib/cms/site-config";
+import type { NovaProxyContent } from "@/lib/cms/types";
 import { CheckCircle2, Download, Globe, Layers, Shield, Zap } from "lucide-react";
 import Link from "next/link";
 
-const freeMeshHighlights = [
-  {
-    tag: "#PulseScan",
-    title: "Continuous discovery",
-    detail:
-      "Billions of public proxies are scanned, scored, and updated every hour with live geolocation and reputation telemetry."
-  },
-  {
-    tag: "#Integrity",
-    title: "Quality assurance",
-    detail:
-      "Every endpoint passes multi-layer latency, encryption, and availability checks before entering the NOVA catalogue."
-  },
-  {
-    tag: "#OpenSDK",
-    title: "SDKs for any stack",
-    detail:
-      "Drop-in clients for browsers, servers, and mobile securely rotate identities with deterministic routing policies."
-  }
-];
-
-const nodeEconomy = [
-  {
-    title: "Enroll as a node",
-    description:
-      "Install the NOVA daemon on desktop, server, or edge devices and register hardware posture, bandwidth, and jurisdiction."
-  },
-  {
-    title: "Relay encrypted traffic",
-    description:
-      "Subscribers are matched to the healthiest node for their region. Requests inherit your IP while remaining policy compliant."
-  },
-  {
-    title: "Share monthly revenue",
-    description:
-      "At the end of each billing cycle you receive 80% of subscription revenue generated across your node sessions."
-  }
-];
-
-const telemetryBursts = [
-  { label: "Validated endpoints", value: "4.1M", tone: "positive" as const },
-  { label: "Average latency", value: "2.8 ms", tone: "positive" as const },
-  { label: "Regions online", value: "184", tone: "positive" as const },
-  { label: "Node uptime", value: "99.999%", tone: "positive" as const },
-  { label: "Compromised relays", value: "0 detected", tone: "critical" as const }
-];
-
-const developerKits = [
-  {
-    title: "Open source agents",
-    description: "Self-host the NOVA CLI, SDKs, and router blueprints to embed proxy orchestration in your own stack.",
-    href: "/docs/nova/agents"
-  },
-  {
-    title: "Enterprise governance",
-    description: "Configure audit feeds, request policies, and compliance mirrors for regulated workloads.",
-    href: "/docs/nova/governance"
-  },
-  {
-    title: "Node marketplace",
-    description: "Discover payout structures, jurisdiction requirements, and deployment playbooks for contributors.",
-    href: "/docs/nova/marketplace"
-  }
-];
+const HERO_ICON_MAP = {
+  shield: Shield,
+  globe: Globe,
+  zap: Zap
+} as const;
 
 export default function NovaProxyPage() {
+  const pageContent = getPageContent("network/nova-proxy") as NovaProxyContent | undefined;
+  const accessPortalCollection = getAccessPortalCollection();
+
+  if (!pageContent) {
+    return (
+      <>
+        <Header />
+        <main className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-12 sm:px-8 lg:px-12">
+          <p className="text-sm text-[var(--text-secondary)]">Unable to load NOVA proxy content.</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  const { hero, highlights, nodeEconomy, telemetryBursts, developerKits, badges } = pageContent;
+
   return (
     <>
       <Header />
       <main className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-12 sm:px-8 lg:px-12">
         <section className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)]">
           <div className="space-y-6">
-            <span className="text-xs uppercase tracking-[0.24em] text-[var(--text-tertiary)]">Network & Edge</span>
+            <span className="text-xs uppercase tracking-[0.24em] text-[var(--text-tertiary)]">{hero.category}</span>
             <h1 className="text-4xl font-semibold text-[var(--text-primary)] md:text-5xl">
-              <span style={{ color: "#4ADE80" }}>NOVA Free Proxy</span> — sovereign privacy at planetary scale.
+              <span style={{ color: hero.accentColor }}>{hero.title.split(" — ")[0]}</span>
+              {hero.title.includes(" — ") ? ` — ${hero.title.split(" — ")[1]}` : null}
             </h1>
-            <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
-              NOVA converges free community relays and paid contributor nodes into one programmable mesh. Every request is signed,
-              anonymized, and steered through the healthiest route with zero-knowledge accounting.
-            </p>
+            <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">{hero.summary}</p>
             <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--text-secondary)]">
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[var(--text-status-warning)]" />
-                <span>Post-quantum handshakes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-[var(--text-status-warning)]" />
-                <span>184 live regions</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-[var(--text-status-error)]" />
-                <span>Adaptive rate control</span>
-              </div>
+              {hero.features.map((feature) => {
+                const Icon = HERO_ICON_MAP[feature.icon as keyof typeof HERO_ICON_MAP];
+                return (
+                  <div key={feature.text} className="flex items-center gap-2">
+                    {Icon ? <Icon className="h-5 w-5 text-[var(--text-status-warning)]" /> : null}
+                    <span>{feature.text}</span>
+                  </div>
+                );
+              })}
             </div>
             <div className="flex flex-wrap gap-4">
-              <Link
-                href={"/downloads/nova" as any}
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-              >
-                Download clients
-                <Download className="h-4 w-4" />
-              </Link>
-              <Link
-                href={"/docs/nova" as any}
-                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-              >
-                Explore documentation
-              </Link>
+              {hero.actions.map((action) => (
+                <Link
+                  key={action.href}
+                  href={action.href as any}
+                  className={
+                    action.variant === "primary"
+                      ? "inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                      : "inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                  }
+                >
+                  {action.label}
+                  {action.variant === "primary" ? <Download className="h-4 w-4" /> : null}
+                </Link>
+              ))}
             </div>
           </div>
           <div className="space-y-4">
             <p className="text-sm uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Why the free mesh matters</p>
             <ul className="space-y-5">
-              {freeMeshHighlights.map((item) => (
+              {highlights.map((item) => (
                 <li key={item.tag} className="relative flex flex-col gap-2 pl-5">
                   <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
                   <span className="text-[11px] uppercase tracking-[0.24em] text-[var(--text-tertiary)]">{item.tag}</span>
@@ -133,12 +89,10 @@ export default function NovaProxyPage() {
         <section className="mt-20 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="space-y-6">
             <h2 className="text-3xl font-semibold text-[var(--text-primary)]">
-              Become a <span style={{ color: "#4ADE80" }}>NOVA Node</span> and earn with every encrypted route.
+              Become a <span style={{ color: hero.accentColor }}>NOVA Node</span> and earn with every encrypted route.
             </h2>
             <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-              Contributors host the paid tier. When enterprise subscribers connect through your node, 80% of the subscription
-              value is transferred to your wallet. Aeterna automatically retains 20% to operate the verification, routing, and
-              compliance fabric.
+              Contributors host the paid tier. When enterprise subscribers connect through your node, 80% of the subscription value is transferred to your wallet. Aeterna automatically retains 20% to operate the verification, routing, and compliance fabric.
             </p>
             <ol className="space-y-6">
               {nodeEconomy.map((item, index) => (
@@ -154,9 +108,11 @@ export default function NovaProxyPage() {
               ))}
             </ol>
             <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.24em] text-[var(--text-tertiary)]">
-              <span className="rounded-full border border-[var(--border-default)] px-3 py-1 text-[var(--text-status-warning)]">Zero downtime SLAs</span>
-              <span className="rounded-full border border-[var(--border-default)] px-3 py-1 text-[var(--text-status-error)]">Automated payouts</span>
-              <span className="rounded-full border border-[var(--border-default)] px-3 py-1 text-[var(--text-secondary)]">Multi-device binaries</span>
+              {badges.map((badge) => (
+                <span key={badge} className="rounded-full border border-[var(--border-default)] px-3 py-1 text-[var(--text-status-warning)]">
+                  {badge}
+                </span>
+              ))}
             </div>
           </div>
           <div className="space-y-6">
@@ -198,43 +154,36 @@ export default function NovaProxyPage() {
           </div>
         </section>
 
-        <section className="mt-20 space-y-8">
-          <div className="space-y-3">
-            <h2 className="text-3xl font-semibold text-[var(--text-primary)]">Build on top of the NOVA fabric.</h2>
-            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-              Use our open tooling or integrate enterprise governance to weave NOVA directly into your data pipelines, testing
-              harnesses, and mission infrastructure.
+        <section className="mt-20 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <div className="space-y-4">
+            <h3 className="text-2xl font-semibold text-[var(--text-primary)]">Developer readiness</h3>
+            <p className="text-sm text-[var(--text-secondary)]">
+              Everything you need to integrate NOVA into sovereign infrastructure: agent SDKs, compliance tooling, and marketplace tooling for contributors.
             </p>
+            <ul className="space-y-4">
+              {developerKits.map((kit) => (
+                <li key={kit.title} className="border-b border-[var(--border-light)] pb-4 last:border-b-0 last:pb-0">
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">{kit.title}</h4>
+                  <p className="mt-2 text-sm text-[var(--text-secondary)]">{kit.description}</p>
+                  <Link
+                    href={kit.href as any}
+                    className="mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                  >
+                    Explore kit
+                    <Download className="h-4 w-4" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {developerKits.map((kit) => (
-              <div key={kit.title} className="relative flex flex-col gap-3 pl-5">
-                <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{kit.title}</p>
-                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{kit.description}</p>
-                <Link
-                  href={kit.href as any}
-                  className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-                >
-                  View brief
-                </Link>
-              </div>
-            ))}
+          <div className="space-y-6">
+            <NovaProxyAnalytics />
           </div>
         </section>
 
-        <section className="mt-20 space-y-8">
-          <div className="space-y-3">
-            <h2 className="text-3xl font-semibold text-[var(--text-primary)]">Mesh telemetry visualized.</h2>
-            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-              Real-time packet density, revenue allocation, and resilience envelopes drive how NOVA balances community traffic
-              with sovereign-grade workloads. These charts update continuously inside the live console.
-            </p>
-          </div>
-          <NovaProxyAnalytics />
+        <section className="mt-20">
+          <AccessPortal collection={accessPortalCollection} />
         </section>
-
-        <AccessPortal />
       </main>
       <Footer />
     </>

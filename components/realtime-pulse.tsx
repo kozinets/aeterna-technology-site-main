@@ -3,53 +3,35 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Activity, GaugeCircle, Satellite, Timer } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import type { PulseCollection } from "@/lib/cms/types";
 
-const transmissions = [
-  {
-    title: "Atlas Council",
-    detail: "Thread 1892 approved orbital bio-dome deployment with autonomous compliance gates.",
-    meta: "Approval latency 2.4s",
-    tone: "positive" as const
-  },
-  {
-    title: "Sentient Cloud",
-    detail: "Quantum relay synchronized across 14 sovereign regions with zero packet loss.",
-    meta: "Telemetry lock 99.998%",
-    tone: "positive" as const
-  },
-  {
-    title: "Containment Protocol",
-    detail: "Neural risk model triggered amber advisory for synthetic pathogen experiment.",
-    meta: "Response unit en route",
-    tone: "critical" as const
-  }
-];
+const ICON_MAP = {
+  "gauge-circle": GaugeCircle,
+  satellite: Satellite,
+  timer: Timer,
+  activity: Activity
+} as const;
 
-const sensorGrid = [
-  { label: "BioForge", value: "+12% synthesis", icon: GaugeCircle },
-  { label: "Proxy Mesh", value: "642 active nodes", icon: Satellite },
-  { label: "NeuroOps", value: "Latency 1.1ms", icon: Timer },
-  { label: "Mission Ops", value: "38 live directives", icon: Activity }
-];
-
-const streamEvents = [
-  { label: "Robotics", text: "Orbital Forge prints carbon lattice prosthetics", tone: "positive" as const },
-  { label: "Longevity", text: "Vitality Labs extends trial cohort to 5 continents", tone: "positive" as const },
-  { label: "Security", text: "Quantum Zero Trust patch 7 deployed globally", tone: "critical" as const },
-  { label: "Network", text: "NOVA Proxy adds 24 new regional entrances", tone: "positive" as const }
-];
-
-export function RealtimePulse() {
+export function RealtimePulse({ collection }: { collection: PulseCollection }) {
+  const transmissions = collection.transmissions;
+  const sensorGrid = collection.sensorGrid;
+  const streamEvents = collection.streamEvents;
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (transmissions.length < 2) {
+      return;
+    }
     const timer = setInterval(() => {
       setIndex((current) => (current + 1) % transmissions.length);
     }, 4200);
     return () => clearInterval(timer);
-  }, []);
+  }, [transmissions]);
 
-  const activeTransmission = useMemo(() => transmissions[index], [index]);
+  const activeTransmission = useMemo(
+    () => (transmissions.length ? transmissions[index % transmissions.length] : null),
+    [index, transmissions]
+  );
 
   return (
     <section className="mt-28">
@@ -71,26 +53,28 @@ export function RealtimePulse() {
               <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
               <span className="text-xs uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Priority transmission</span>
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTransmission.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                  className="mt-2 space-y-3"
-                >
-                  <p
-                    className={`text-lg font-semibold ${
-                      activeTransmission.tone === "critical"
-                        ? "text-[var(--text-status-error)]"
-                        : "text-[var(--text-status-warning)]"
-                    }`}
+                {activeTransmission ? (
+                  <motion.div
+                    key={activeTransmission.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className="mt-2 space-y-3"
                   >
-                    {activeTransmission.title}
-                  </p>
-                  <p className="text-sm text-[var(--text-secondary)]">{activeTransmission.detail}</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{activeTransmission.meta}</p>
-                </motion.div>
+                    <p
+                      className={`text-lg font-semibold ${
+                        activeTransmission.tone === "critical"
+                          ? "text-[var(--text-status-error)]"
+                          : "text-[var(--text-status-warning)]"
+                      }`}
+                    >
+                      {activeTransmission.title}
+                    </p>
+                    <p className="text-sm text-[var(--text-secondary)]">{activeTransmission.detail}</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{activeTransmission.meta}</p>
+                  </motion.div>
+                ) : null}
               </AnimatePresence>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
@@ -104,7 +88,10 @@ export function RealtimePulse() {
                   className="relative flex items-center gap-4 pl-5"
                 >
                   <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                  <item.icon className="h-5 w-5 text-[var(--icon-secondary)]" />
+                  {(() => {
+                    const Icon = ICON_MAP[item.icon as keyof typeof ICON_MAP];
+                    return Icon ? <Icon className="h-5 w-5 text-[var(--icon-secondary)]" /> : null;
+                  })()}
                   <div>
                     <p className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</p>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">{item.value}</p>
