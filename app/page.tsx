@@ -1,213 +1,309 @@
-import { Header } from "@/components/header";
-import { AccessPortal } from "@/components/access-portal";
-import { Footer } from "@/components/footer";
-import { Hero } from "@/components/hero";
-import { Insights } from "@/components/insights";
-import { Programs } from "@/components/programs";
-import { RealtimePulse } from "@/components/realtime-pulse";
-import {
-  getAccessPortalCollection,
-  getHeroCollection,
-  getHomeCollection,
-  getInsightsCollection,
-  getProgramsCollection,
-  getPulseCollection
-} from "@/lib/cms/site-config";
-import {
-  Building2,
-  Cpu,
-  FlaskConical,
-  Orbit,
-  Radar,
-  Sparkles,
-  Workflow
-} from "lucide-react";
 import Link from "next/link";
+import { Header } from "@/components/header";
+import { ArrowUpRight, CalendarCheck, Rocket, ShieldCheck, SignalHigh } from "lucide-react";
+import { StoryScroller } from "@/components/story-scroller";
 
-const CAMPUS_ICON_MAP = {
-  cpu: Cpu,
-  sparkles: Sparkles,
-  radar: Radar
-} as const;
+const flagshipProduct = {
+  title: "Helios Continuum",
+  tagline: "Orbital-scale intelligence infrastructure launching 2025",
+  description:
+    "A fusion of photonic cores, quantum routing, and adaptive governance contracts. Designed to empower civilizations with a single nervous system that spans ground, orbit, and deep-sea colonies.",
+  cta: "Enter mission dossier",
+};
 
-const ALLIANCE_ICON_MAP = {
-  "building-2": Building2,
-  workflow: Workflow,
-  "flask-conical": FlaskConical,
-  orbit: Orbit
-} as const;
+const upcomingProduct = {
+  title: "Atlas Relay",
+  description:
+    "Distributed command mesh that translates human intent into orchestrated robotics. Perfect for planetary terraforming teams and climate intervention coalitions.",
+};
+
+const heritageProducts = [
+  {
+    title: "Pulse Vault",
+    description: "Biometric memory chains safeguarding sovereign data realms.",
+  },
+  {
+    title: "Chronicle Loom",
+    description: "Narrative AI preserving generational knowledge without distortion.",
+  },
+  {
+    title: "Echelon Nodes",
+    description: "Edge accelerators that retrofit legacy industries with realtime cognition.",
+  },
+];
+
+const latestNews = [
+  {
+    title: "Aeterna joins Europa Accord",
+    date: "June 12, 2024",
+    description: "Co-authoring the charter for interplanetary ethics and autonomy safeguards.",
+  },
+  {
+    title: "Helios Continuum clears orbital review",
+    date: "June 05, 2024",
+    description: "Independent regulators confirm trajectory stability across geosynchronous bands.",
+  },
+  {
+    title: "Atlas Relay partners with Pacific Climate Coalition",
+    date: "May 28, 2024",
+    description: "Deploying adaptive mesh to stabilize oceanic temperature gradients.",
+  },
+  {
+    title: "Quantum campus opens in Dakar",
+    date: "May 16, 2024",
+    description: "A new continental hub for photonic material research and sovereign compute.",
+  },
+  {
+    title: "Neural corridors reach 30 light-min latency",
+    date: "May 03, 2024",
+    description: "Interplanetary communications now operate below strategic response thresholds.",
+  },
+  {
+    title: "Continuum academies release governance syllabus",
+    date: "April 22, 2024",
+    description: "Nations fast-track mission stewards through certified command simulations.",
+  },
+];
+
+const stories = [
+  {
+    title: "Terraforming the Midnight Belt",
+    description:
+      "How three frontier settlements used Helios predictive matrices to stabilize comet mining arcs and cultivate breathable corridors in six months.",
+    linkLabel: "Read the transformation log",
+  },
+  {
+    title: "Guardians of the Circadian Reef",
+    description:
+      "An oceanic alliance employs Atlas Relay to synchronize biome drones across twelve sovereign territories without a single data breach.",
+    linkLabel: "Dive into the reef protocol",
+  },
+  {
+    title: "Chronicle Loom saves a lost language",
+    description:
+      "Elders of the Qira community encoded ceremonial knowledge into regenerative memory chains, reviving rituals dormant for a century.",
+    linkLabel: "Explore cultural recovery",
+  },
+  {
+    title: "Pulse Vault and the lunar clinics",
+    description:
+      "Medical guilds on Selene built trust across rival councils using tamper-evident diagnostics with near-zero latency audits.",
+    linkLabel: "See the lunar blueprint",
+  },
+];
+
+const researchHighlights = [
+  {
+    title: "Adaptive Ethics Mesh",
+    description: "Self-healing policy layer that reconciles jurisdictional paradoxes within 42 ms.",
+    badge: "Whitepaper",
+  },
+  {
+    title: "Exo-Cortex Biointerface",
+    description: "Hybrid neural mesh translating marine mammal language into strategic telemetry.",
+    badge: "Field trial",
+  },
+];
+
+const businessSolutions = [
+  {
+    title: "Sovereign industries",
+    description: "Deploy modular cognition cells across energy, health, and transit networks with continuous compliance telemetry.",
+  },
+  {
+    title: "Enterprise intelligence fabric",
+    description: "Unify global operations into one command lattice that learns, predicts, and adapts alongside your executives.",
+  },
+  {
+    title: "Strategic risk observatory",
+    description: "Horizon scanning dashboards for boardrooms balancing exploration and regulation across multiple planets.",
+  },
+];
 
 export default function Page() {
-  const heroContent = getHeroCollection();
-  const homeCollection = getHomeCollection();
-  const programsCollection = getProgramsCollection();
-  const insightsCollection = getInsightsCollection();
-  const pulseCollection = getPulseCollection();
-  const accessPortalCollection = getAccessPortalCollection();
-
-  const ecosystemNodes = homeCollection.ecosystemNodes;
-  const campusStats = homeCollection.campusStats;
-  const alliances = homeCollection.alliances;
-  const timeline = homeCollection.timeline;
-
   return (
-    <main>
+    <main className="min-h-screen bg-neutral-950 text-neutral-100">
       <Header />
-      <div className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-12 sm:px-8 lg:px-12">
-        <Hero content={heroContent} />
-        <section className="mt-24">
-          <div className="grid gap-14 lg:grid-cols-[280px_1fr]">
-            <div className="space-y-8">
-              <div className="space-y-3">
-                <span className="badge">Integrated ecosystems</span>
-                <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-                  The Aeterna ecosystem is a <span className="text-[var(--text-status-warning)]">living corporate organism</span>.
-                </h2>
-                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                  Subterranean labs, orbital foundries, quantum networks, and longevity programs operate under one mission console.
-                </p>
-              </div>
-              <div className="space-y-4">
-                {campusStats.map((item) => {
-                  const Icon = CAMPUS_ICON_MAP[item.icon as keyof typeof CAMPUS_ICON_MAP];
-                  return (
-                    <div key={item.label} className="relative flex items-center gap-3 pl-4">
-                      <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                      {Icon ? (
-                        <Icon
-                          className={`h-6 w-6 ${
-                            item.tone === "positive"
-                              ? "text-[var(--text-status-warning)]"
-                              : item.tone === "critical"
-                                ? "text-[var(--text-status-error)]"
-                                : "text-[var(--icon-secondary)]"
-                          }`}
-                        />
-                      ) : null}
-                      <div>
-                        <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{item.label}</span>
-                        <p
-                          className={`text-sm font-semibold ${
-                            item.tone === "positive"
-                              ? "text-[var(--text-status-warning)]"
-                              : item.tone === "critical"
-                                ? "text-[var(--text-status-error)]"
-                                : "text-[var(--text-primary)]"
-                          }`}
-                        >
-                          {item.value}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-12 px-4 pb-16 pt-12 lg:flex-row lg:px-12">
+        <section className="lg:w-[40%] lg:pr-12">
+          <div className="space-y-12 lg:sticky lg:top-20 lg:h-[calc(100vh-80px)] lg:space-y-16">
+            <div className="space-y-6">
+              <p className="text-xs uppercase tracking-[0.28em] text-lime-300/80">Mission command</p>
+              <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">
+                What mission can Aeterna empower your civilization?
+              </h1>
+              <p className="max-w-xl text-base leading-relaxed text-neutral-300">
+                We craft connective tissue for societies reaching beyond planetary limits. From orbital habitats to subterranean
+                sanctuaries, Aeterna aligns intelligence, governance, and trust so your people thrive anywhere.
+              </p>
             </div>
-            <div className="grid gap-10 md:grid-cols-2">
-              {ecosystemNodes.map((node) => (
-                <div
-                  key={node.title}
-                  className="relative flex flex-col gap-4 pb-6 after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-[var(--border-light)] after:content-[''] last:after:hidden"
-                >
-                  <div>
-                    <h3 className="text-xl font-semibold text-[var(--text-primary)]">{node.title}</h3>
-                    <p className="mt-2 text-sm text-[var(--text-secondary)]">{node.description}</p>
-                  </div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">{node.detail}</p>
-                  <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
-                    {node.streams.map((stream) => (
-                      <span key={stream} className="rounded-full border border-[var(--border-default)] px-3 py-1">
-                        #{stream.replace(/\s+/g, "")}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-4 rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent p-8">
+              <p className="text-sm uppercase tracking-[0.2em] text-neutral-400">Operational beacons</p>
+              <ul className="space-y-3 text-sm text-neutral-200">
+                <li className="flex items-start gap-3">
+                  <Rocket className="mt-0.5 h-5 w-5 text-emerald-300" />
+                  Launch autonomous expeditions with strategic oversight across every theater.
+                </li>
+                <li className="flex items-start gap-3">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 text-sky-300" />
+                  Maintain unbroken security perimeters with transparent, interoperable governance.
+                </li>
+                <li className="flex items-start gap-3">
+                  <SignalHigh className="mt-0.5 h-5 w-5 text-amber-200" />
+                  Orchestrate fleets of sensors, drones, and envoys through a unified signal lattice.
+                </li>
+                <li className="flex items-start gap-3">
+                  <CalendarCheck className="mt-0.5 h-5 w-5 text-rose-300" />
+                  Forecast decades of impact with scenario engines tuned for your civilization's ethos.
+                </li>
+              </ul>
+            </div>
+            <div className="hidden rounded-3xl border border-white/10 bg-neutral-900/60 p-6 text-sm text-neutral-300 lg:block">
+              <p className="font-semibold text-white">Signal status</p>
+              <p className="mt-2 leading-relaxed">
+                Mission control nodes: <span className="text-emerald-300">142 active</span>. Orbital corridors: <span className="text-sky-300">Stable</span>.
+                Terrestrial sanctuaries: <span className="text-amber-200">Expanding</span>.
+              </p>
             </div>
           </div>
         </section>
-        <Programs collection={programsCollection} />
-        <section className="mt-28">
-          <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr]">
-            <div className="space-y-6">
-              <span className="badge">Alliance network</span>
-              <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">
-                Strategic partners extend Aeterna's reach.
-              </h2>
-              <p className="text-base text-[var(--text-secondary)]">
-                Governments, enterprises, and universities integrate with our infrastructure to launch joint missions and co-own progress.
-              </p>
-              <div className="grid gap-5">
-                {alliances.map((unit) => {
-                  const Icon = ALLIANCE_ICON_MAP[unit.icon as keyof typeof ALLIANCE_ICON_MAP];
-                  return (
-                    <div key={unit.title} className="relative flex gap-4 pl-5">
-                      <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                      {Icon ? (
-                        <Icon
-                          className={`mt-1 h-6 w-6 ${
-                            unit.tone === "positive"
-                              ? "text-[var(--text-status-warning)]"
-                              : "text-[var(--text-status-error)]"
-                          }`}
-                        />
-                      ) : null}
-                      <div>
-                        <h3
-                          className={`text-sm font-semibold uppercase tracking-[0.18em] ${
-                            unit.tone === "positive"
-                              ? "text-[var(--text-status-warning)]"
-                              : "text-[var(--text-status-error)]"
-                          }`}
-                        >
-                          {unit.title}
-                        </h3>
-                        <p className="mt-2 text-sm text-[var(--text-secondary)]">{unit.text}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="space-y-6">
-              <span className="badge">Continuum timeline</span>
-              <h2 className="text-3xl font-semibold text-[var(--text-primary)] md:text-4xl">Expansion roadmap.</h2>
-              <div className="space-y-6">
-                {timeline.map((milestone) => (
-                  <div key={milestone.year} className="relative pl-6">
-                    <span className="absolute left-0 top-0 h-full w-px bg-[var(--border-default)]" aria-hidden="true" />
-                    <p className="text-sm text-[var(--text-secondary)]">
-                      <span
-                        className={`font-semibold ${
-                          milestone.tone === "positive"
-                            ? "text-[var(--text-status-warning)]"
-                            : "text-[var(--text-status-error)]"
-                        }`}
-                      >
-                        {milestone.year}
-                      </span>{" "}
-                      — {milestone.description}
-                    </p>
+        <section className="lg:w-[60%]">
+          <div className="space-y-12 rounded-[2rem] bg-black/60 p-4 shadow-[0_0_80px_-40px_rgba(0,0,0,0.9)] lg:max-h-[calc(100vh-80px)] lg:overflow-y-auto lg:pr-2">
+            <div className="space-y-6 rounded-3xl border border-white/10 bg-[#251d3a] p-6 sm:p-8">
+              <div className="grid gap-6 md:grid-cols-3 md:auto-rows-[minmax(160px,1fr)]">
+                <article className="flex flex-col justify-between rounded-2xl bg-[#3c2f5c]/90 p-6 shadow-inner md:col-span-2">
+                  <div className="space-y-4">
+                    <p className="text-xs uppercase tracking-[0.28em] text-violet-200/80">New frontier</p>
+                    <h2 className="text-2xl font-semibold text-white">{flagshipProduct.title}</h2>
+                    <p className="text-sm text-violet-100/90">{flagshipProduct.tagline}</p>
+                    <p className="text-sm leading-relaxed text-violet-100/80">{flagshipProduct.description}</p>
                   </div>
+                  <Link
+                    href="#mission-dossier"
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-violet-100 transition hover:text-white"
+                  >
+                    {flagshipProduct.cta}
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </article>
+                <article className="flex flex-col justify-between rounded-2xl bg-[#2f2640]/90 p-6 text-violet-100">
+                  <div className="space-y-3">
+                    <p className="text-xs uppercase tracking-[0.24em] text-violet-200/70">Coming next</p>
+                    <h3 className="text-xl font-semibold text-white">{upcomingProduct.title}</h3>
+                    <p className="text-sm leading-relaxed text-violet-100/80">{upcomingProduct.description}</p>
+                  </div>
+                  <span className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-violet-200/70">
+                    Status: In verification
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden />
+                  </span>
+                </article>
+                {heritageProducts.map((product) => (
+                  <article
+                    key={product.title}
+                    className="rounded-2xl bg-[#2a2345]/80 p-6 text-violet-100 shadow-inner"
+                  >
+                    <h4 className="text-lg font-semibold text-white">{product.title}</h4>
+                    <p className="mt-2 text-sm leading-relaxed text-violet-100/80">{product.description}</p>
+                  </article>
                 ))}
               </div>
-              <p className="border-l border-[var(--border-light)] pl-6 text-sm text-[var(--text-tertiary)]">
-                Every roadmap entry is governed by Atlas Mission Control with compliance checks, partner review boards, and biometric authorization through <span className="text-[var(--text-status-warning)]">Aeterna Pass</span>.
-              </p>
-              <Link
-                href={"/missions" as any}
-                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
-              >
-                Review mission governance
-              </Link>
             </div>
+
+            <div className="space-y-6 rounded-3xl border border-white/10 bg-[#111b2c] p-6 sm:p-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-white">Latest news</h2>
+                <Link href="#all-news" className="text-sm text-sky-200 transition hover:text-white">
+                  View all
+                </Link>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                {latestNews.map((item) => (
+                  <article key={item.title} className="rounded-2xl bg-[#0d1626] p-5 text-slate-100">
+                    <p className="text-xs uppercase tracking-[0.24em] text-sky-300/80">{item.date}</p>
+                    <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-slate-200/80">{item.description}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-6 rounded-3xl border border-white/10 bg-[#102022] p-6 sm:p-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-white">Stories</h2>
+                <span className="text-xs uppercase tracking-[0.28em] text-emerald-200/70">Drag to explore</span>
+              </div>
+              <StoryScroller stories={stories} />
+            </div>
+
+            <div className="space-y-6 rounded-3xl border border-white/10 bg-[#241f2f] p-6 sm:p-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-white">Latest research</h2>
+                <Link href="#research" className="text-sm text-rose-200 transition hover:text-white">
+                  Research archive
+                </Link>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                {researchHighlights.map((item) => (
+                  <article key={item.title} className="flex flex-col justify-between rounded-2xl bg-[#2f263d] p-6 text-rose-100">
+                    <div className="space-y-3">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-rose-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-rose-200">
+                        {item.badge}
+                      </span>
+                      <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                      <p className="text-sm leading-relaxed text-rose-100/80">{item.description}</p>
+                    </div>
+                    <Link
+                      href="#research"
+                      className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-rose-100 transition hover:text-white"
+                    >
+                      Continue reading
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-6 rounded-3xl border border-white/10 bg-[#1e2721] p-6 sm:p-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-white">Aeterna for business</h2>
+                <Link href="#business" className="text-sm text-emerald-200 transition hover:text-white">
+                  Talk to strategists
+                </Link>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                {businessSolutions.map((item) => (
+                  <article key={item.title} className="rounded-2xl bg-[#17201a] p-6 text-emerald-100">
+                    <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-emerald-100/80">{item.description}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <footer className="rounded-3xl border border-white/10 bg-[#0b1018] p-8 text-sm text-neutral-400">
+              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <p className="text-xs uppercase tracking-[0.28em] text-neutral-500">Essential links</p>
+                <div className="flex flex-wrap gap-4 text-sm text-neutral-300">
+                  <Link href={"/privacy" as any} className="transition hover:text-white">
+                    Privacy
+                  </Link>
+                  <Link href={"/terms" as any} className="transition hover:text-white">
+                    Terms
+                  </Link>
+                  <Link href={"/network" as any} className="transition hover:text-white">
+                    Global network
+                  </Link>
+                  <Link href={"/contact" as any} className="transition hover:text-white">
+                    Contact mission control
+                  </Link>
+                </div>
+              </div>
+              <p className="mt-6 text-xs text-neutral-500">© {new Date().getFullYear()} Aeterna Technology. Engineered for enduring civilizations.</p>
+            </footer>
           </div>
         </section>
-        <RealtimePulse collection={pulseCollection} />
-        <Insights collection={insightsCollection} />
-        <AccessPortal collection={accessPortalCollection} />
       </div>
-      <Footer />
     </main>
   );
 }
