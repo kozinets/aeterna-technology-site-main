@@ -5,13 +5,14 @@ import Link from "next/link";
 
 type Story = {
   title: string;
-  description: string;
-  linkLabel: string;
+  category: string;
+  date: string;
+  linkLabel?: string;
 };
 
 export function StoryScroller({ stories }: { stories: Story[] }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const dragState = useRef({ startY: 0, scrollTop: 0, pointerId: 0 });
+  const dragState = useRef({ startX: 0, scrollLeft: 0, pointerId: 0 });
   const [dragging, setDragging] = useState(false);
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -19,8 +20,8 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
     if (!container) return;
 
     dragState.current = {
-      startY: event.clientY,
-      scrollTop: container.scrollTop,
+      startX: event.clientX,
+      scrollLeft: container.scrollLeft,
       pointerId: event.pointerId,
     };
 
@@ -33,8 +34,8 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
     const container = containerRef.current;
     if (!container) return;
 
-    const delta = event.clientY - dragState.current.startY;
-    container.scrollTop = dragState.current.scrollTop - delta;
+    const delta = event.clientX - dragState.current.startX;
+    container.scrollLeft = dragState.current.scrollLeft - delta;
   };
 
   const endDrag = (event: PointerEvent<HTMLDivElement>) => {
@@ -48,7 +49,7 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
   return (
     <div
       ref={containerRef}
-      className={`${dragging ? "cursor-grabbing" : "cursor-grab"} max-h-[28rem] space-y-4 overflow-y-auto pr-2 scrollbar-hide`}
+      className={`${dragging ? "cursor-grabbing" : "cursor-grab"} overflow-x-auto pb-2 pt-1 scrollbar-hide`}
       style={{ touchAction: "none" }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -56,21 +57,25 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
       onPointerLeave={(event) => dragging && endDrag(event)}
       onPointerCancel={endDrag}
     >
-      {stories.map((story) => (
-        <article
-          key={story.title}
-          className="rounded-2xl border border-emerald-300/10 bg-[#0f2623] p-5 text-emerald-100 shadow-inner"
-        >
-          <h3 className="text-lg font-semibold text-white">{story.title}</h3>
-          <p className="mt-3 text-sm leading-relaxed text-emerald-100/80">{story.description}</p>
-          <Link
-            href="#stories"
-            className="mt-4 inline-flex items-center text-sm font-semibold text-emerald-200 transition hover:text-white"
+      <div className="flex gap-4 sm:gap-6">
+        {stories.map((story) => (
+          <article
+            key={story.title}
+            className="min-w-[220px] rounded-[24px] bg-[#1e1b4b] p-5 text-indigo-100 shadow-[0_0_40px_-24px_rgba(76,29,149,0.8)] sm:min-w-[260px]"
           >
-            {story.linkLabel}
-          </Link>
-        </article>
-      ))}
+            <span className="text-[11px] uppercase tracking-[0.2em] text-indigo-200/70">{story.category}</span>
+            <h3 className="mt-3 text-lg font-semibold text-white">{story.title}</h3>
+            <div className="mt-6 flex items-center justify-between text-xs text-indigo-200/70">
+              <span>{story.date}</span>
+              {story.linkLabel ? (
+                <Link href="#stories" className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
+                  {story.linkLabel}
+                </Link>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
