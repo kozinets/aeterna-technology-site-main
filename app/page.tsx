@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { ChevronDown, Globe2, MapPin } from "lucide-react";
@@ -282,33 +282,6 @@ const footerNavigation = [
   }
 ];
 
-const presenceDirectory = [
-  {
-    title: "Command architecture",
-    details: [
-      "Helios Mission Hall · Tycho City",
-      "Atlas Relay Hub · Reykjavík",
-      "Continuum Nexus · Singapore"
-    ]
-  },
-  {
-    title: "Strategic alliances",
-    details: [
-      "Diplomatic Forum · Geneva",
-      "Interstellar Trade Desk · São Paulo",
-      "Civic Outreach Wing · Washington, D.C."
-    ]
-  },
-  {
-    title: "Logistics corridors",
-    details: [
-      "Orbital Launch Corridor · Canaveral",
-      "Deep Space Relay · Lagrange L5",
-      "Continuity Hangars · Auckland"
-    ]
-  }
-];
-
 const policyLinks = [
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
@@ -419,7 +392,7 @@ export default function Page() {
   );
 
   const filteredResearch = useMemo(
-    () => filterHighlights(researchHighlights, activeSector).slice(0, 3),
+    () => filterHighlights(researchHighlights, activeSector).slice(0, 2),
     [activeSector]
   );
 
@@ -438,7 +411,7 @@ export default function Page() {
           </div>
         </aside>
         <section className="relative flex-1 bg-black text-white lg:basis-[65%] lg:overflow-y-auto">
-          <div className="mx-auto flex min-h-full w-full max-w-[960px] flex-col gap-10 px-6 pb-16 pt-10 sm:px-10 lg:pb-20 lg:pt-12">
+          <div className="mx-auto flex min-h-full w-full max-w-[960px] flex-col gap-8 px-6 pb-16 pt-10 sm:px-10 lg:pb-20 lg:pt-12">
             <nav className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.24em] text-white/50">
               {focusAreas.map((area) => {
                 const active = area.id === activeSector;
@@ -454,14 +427,14 @@ export default function Page() {
                 );
               })}
             </nav>
-            <div className="space-y-12">
-              <section className="space-y-6" aria-labelledby="launch-slate">
+            <div className="space-y-10">
+              <section className="space-y-5" aria-labelledby="launch-slate">
                 <h2 id="launch-slate" className="sr-only">
                   Launch slate
                 </h2>
                 <div className="grid gap-6 lg:auto-rows-[minmax(0,1fr)] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                   <article
-                    className={`relative isolate flex min-h-[240px] flex-col overflow-hidden rounded-[28px] p-6 lg:aspect-square ${
+                    className={`relative isolate flex min-h-[240px] flex-col overflow-hidden rounded-[28px] p-6 lg:min-h-[320px] ${
                       toneStyles[flagshipCard.tone].background
                     } ${toneStyles[flagshipCard.tone].text} ${toneStyles[flagshipCard.tone].shadow}`}
                   >
@@ -479,7 +452,7 @@ export default function Page() {
                     {companionCards.map((item) => (
                       <article
                         key={item.id}
-                        className={`relative isolate flex min-h-[180px] flex-col justify-between overflow-hidden rounded-[28px] p-6 lg:aspect-square ${
+                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 ${
                           toneStyles[item.tone].background
                         } ${toneStyles[item.tone].text} ${toneStyles[item.tone].shadow}`}
                       >
@@ -574,7 +547,7 @@ export default function Page() {
                     {filteredResearch.map((item) => (
                       <article
                         key={item.title}
-                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 lg:aspect-square ${
+                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 lg:min-h-[240px] ${
                           toneStyles[item.tone ?? "violet"].background
                         } ${toneStyles[item.tone ?? "violet"].text} ${toneStyles[item.tone ?? "violet"].shadow}`}
                       >
@@ -654,58 +627,37 @@ function FooterPanel() {
   const currentYear = new Date().getFullYear();
   const [languageChoice, setLanguageChoice] = useState(languageOptions[0]);
   const [regionChoice, setRegionChoice] = useState(regionOptions[0]);
-  const [openMenu, setOpenMenu] = useState<"language" | "region" | null>(null);
-  const languageMenuRef = useRef<HTMLDivElement | null>(null);
-  const regionMenuRef = useRef<HTMLDivElement | null>(null);
+  const [activeDialog, setActiveDialog] = useState<"language" | "region" | null>(null);
 
   useEffect(() => {
-    const handlePointer = (event: PointerEvent) => {
-      const target = event.target as Node | null;
-      if (!target) {
-        setOpenMenu(null);
-        return;
-      }
+    if (!activeDialog) {
+      return;
+    }
 
-      if (
-        languageMenuRef.current?.contains(target) ||
-        regionMenuRef.current?.contains(target)
-      ) {
-        return;
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActiveDialog(null);
       }
-
-      setOpenMenu(null);
     };
 
-    document.addEventListener("pointerdown", handlePointer);
-    return () => document.removeEventListener("pointerdown", handlePointer);
-  }, []);
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [activeDialog]);
 
-  const toggleMenu = (menu: "language" | "region") => {
-    setOpenMenu((current) => (current === menu ? null : menu));
+  const activeOptions = activeDialog === "language" ? languageOptions : regionOptions;
+  const activeChoice = activeDialog === "language" ? languageChoice : regionChoice;
+
+  const handleSelect = (value: string) => {
+    if (activeDialog === "language") {
+      setLanguageChoice(value);
+    }
+
+    if (activeDialog === "region") {
+      setRegionChoice(value);
+    }
+
+    setActiveDialog(null);
   };
-
-  const renderMenu = (options: string[], active: string, onSelect: (value: string) => void) => (
-    <ul className="max-h-64 overflow-y-auto py-1 text-sm text-white/80">
-      {options.map((option) => (
-        <li key={option}>
-          <button
-            type="button"
-            onClick={() => {
-              onSelect(option);
-              setOpenMenu(null);
-            }}
-            className={`flex w-full items-center justify-between gap-4 px-4 py-2 text-left transition ${
-              option === active
-                ? "bg-white/10 text-white"
-                : "hover:bg-white/5 hover:text-white"
-            }`}
-          >
-            <span>{option}</span>
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
 
   return (
     <footer className="border-t border-white/10 pt-12 text-sm text-white/70">
@@ -726,74 +678,33 @@ function FooterPanel() {
         ))}
       </div>
 
-      <div className="mt-12 grid gap-8 lg:grid-cols-3">
-        {presenceDirectory.map((cluster) => (
-          <div key={cluster.title} className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/50">{cluster.title}</p>
-            <ul className="space-y-2 text-sm text-white/70">
-              {cluster.details.map((detail) => (
-                <li key={detail}>{detail}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
       <div className="mt-12 space-y-6 text-sm text-white/70">
         <div className="flex flex-wrap gap-6">
-          <div
-            ref={languageMenuRef}
-            className="relative flex min-w-[220px] flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50"
-          >
+          <div className="flex min-w-[220px] flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
             <span className="flex items-center gap-2 text-white/60">
               <Globe2 className="h-4 w-4" /> Language
             </span>
             <button
               type="button"
-              onClick={() => toggleMenu("language")}
-              className={`flex w-full items-center justify-between rounded-full border px-4 py-2 text-sm transition ${
-                openMenu === "language"
-                  ? "border-white/40 bg-white/10 text-white"
-                  : "border-white/15 bg-white/10 text-white/80 hover:border-white/30 hover:text-white"
-              }`}
+              onClick={() => setActiveDialog("language")}
+              className="flex w-full items-center justify-between rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/80 transition hover:border-white/30 hover:text-white"
             >
               <span className="truncate text-left">{languageChoice}</span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${openMenu === "language" ? "rotate-180" : ""}`}
-              />
+              <ChevronDown className="h-4 w-4" />
             </button>
-            {openMenu === "language" ? (
-              <div className="absolute left-0 right-0 top-full z-20 mt-3 overflow-hidden rounded-3xl border border-white/10 bg-black/90 shadow-[0_32px_80px_rgba(0,0,0,0.45)] backdrop-blur">
-                {renderMenu(languageOptions, languageChoice, (value) => setLanguageChoice(value))}
-              </div>
-            ) : null}
           </div>
-          <div
-            ref={regionMenuRef}
-            className="relative flex min-w-[220px] flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50"
-          >
+          <div className="flex min-w-[220px] flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
             <span className="flex items-center gap-2 text-white/60">
               <MapPin className="h-4 w-4" /> Region
             </span>
             <button
               type="button"
-              onClick={() => toggleMenu("region")}
-              className={`flex w-full items-center justify-between rounded-full border px-4 py-2 text-sm transition ${
-                openMenu === "region"
-                  ? "border-white/40 bg-white/10 text-white"
-                  : "border-white/15 bg-white/10 text-white/80 hover:border-white/30 hover:text-white"
-              }`}
+              onClick={() => setActiveDialog("region")}
+              className="flex w-full items-center justify-between rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/80 transition hover:border-white/30 hover:text-white"
             >
               <span className="truncate text-left">{regionChoice}</span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${openMenu === "region" ? "rotate-180" : ""}`}
-              />
+              <ChevronDown className="h-4 w-4" />
             </button>
-            {openMenu === "region" ? (
-              <div className="absolute left-0 right-0 top-full z-20 mt-3 overflow-hidden rounded-3xl border border-white/10 bg-black/90 shadow-[0_32px_80px_rgba(0,0,0,0.45)] backdrop-blur">
-                {renderMenu(regionOptions, regionChoice, (value) => setRegionChoice(value))}
-              </div>
-            ) : null}
           </div>
         </div>
         <p className="text-xs text-white/50">
@@ -811,6 +722,61 @@ function FooterPanel() {
           ))}
         </div>
       </div>
+
+      {activeDialog ? (
+        <div
+          className="fixed inset-0 z-30 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
+          onClick={() => setActiveDialog(null)}
+          role="presentation"
+        >
+          <div
+            className="w-full max-w-md overflow-hidden rounded-3xl border border-white/12 bg-[#0b0b0f] p-6 text-sm text-white/80 shadow-[0_32px_96px_rgba(0,0,0,0.55)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-white/40">
+                  {activeDialog === "language" ? "Language" : "Region"}
+                </p>
+                <h3 className="mt-2 text-lg font-semibold text-white">
+                  {activeDialog === "language" ? "Select your language" : "Select your region"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveDialog(null)}
+                className="rounded-full border border-white/15 px-3 py-1 text-xs uppercase tracking-[0.18em] text-white/60 transition hover:border-white/30 hover:text-white"
+              >
+                Close
+              </button>
+            </div>
+            <div className="mt-4 space-y-1 text-xs text-white/50">
+              <span>Current selection</span>
+              <span className="block text-sm font-medium text-white">{activeChoice}</span>
+            </div>
+            <ul className="mt-5 max-h-60 space-y-1 overflow-y-auto pr-1">
+              {activeOptions.map((option) => (
+                <li key={option}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelect(option)}
+                    className={`flex w-full items-center justify-between rounded-2xl px-4 py-2 text-left transition ${
+                      option === activeChoice
+                        ? "bg-white/15 text-white"
+                        : "hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    <span className="truncate">{option}</span>
+                    {option === activeChoice ? (
+                      <span className="text-[10px] uppercase tracking-[0.24em] text-white/70">Active</span>
+                    ) : null}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ) : null}
     </footer>
   );
 }
