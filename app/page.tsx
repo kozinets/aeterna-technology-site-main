@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { ChevronDown, Globe2, MapPin } from "lucide-react";
@@ -284,27 +284,27 @@ const footerNavigation = [
 
 const presenceDirectory = [
   {
-    title: "Sovereign operations",
+    title: "Command architecture",
     details: [
-      "Continuum Nexus · Singapore",
+      "Helios Mission Hall · Tycho City",
       "Atlas Relay Hub · Reykjavík",
-      "Sovereign Ops Spine · Dakar"
+      "Continuum Nexus · Singapore"
     ]
   },
   {
-    title: "Client alliances",
+    title: "Strategic alliances",
     details: [
-      "Strategic Missions · Washington, D.C.",
-      "Alliances Forum · Geneva",
-      "Interstellar Trade Desk · São Paulo"
+      "Diplomatic Forum · Geneva",
+      "Interstellar Trade Desk · São Paulo",
+      "Civic Outreach Wing · Washington, D.C."
     ]
   },
   {
-    title: "Continuum logistics",
+    title: "Logistics corridors",
     details: [
-      "Helios Continuum Campus · Tycho City",
       "Orbital Launch Corridor · Canaveral",
-      "Deep Space Relay · Lagrange L5"
+      "Deep Space Relay · Lagrange L5",
+      "Continuity Hangars · Auckland"
     ]
   }
 ];
@@ -438,7 +438,7 @@ export default function Page() {
           </div>
         </aside>
         <section className="relative flex-1 bg-black text-white lg:basis-[65%] lg:overflow-y-auto">
-          <div className="mx-auto flex min-h-full w-full max-w-[960px] flex-col gap-14 px-6 pb-16 pt-10 sm:px-10 lg:pb-20 lg:pt-14">
+          <div className="mx-auto flex min-h-full w-full max-w-[960px] flex-col gap-10 px-6 pb-16 pt-10 sm:px-10 lg:pb-20 lg:pt-12">
             <nav className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.24em] text-white/50">
               {focusAreas.map((area) => {
                 const active = area.id === activeSector;
@@ -454,31 +454,39 @@ export default function Page() {
                 );
               })}
             </nav>
-
-            <div className="space-y-16">
-              <section className="space-y-8" aria-labelledby="launch-slate">
+            <div className="space-y-12">
+              <section className="space-y-6" aria-labelledby="launch-slate">
                 <h2 id="launch-slate" className="sr-only">
                   Launch slate
                 </h2>
-                <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:auto-rows-[minmax(0,1fr)]">
+                <div className="grid gap-6 lg:auto-rows-[minmax(0,1fr)] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                   <article
-                    className={`flex min-h-[240px] flex-col rounded-[28px] p-6 ${
+                    className={`relative isolate flex min-h-[240px] flex-col overflow-hidden rounded-[28px] p-6 lg:aspect-square ${
                       toneStyles[flagshipCard.tone].background
                     } ${toneStyles[flagshipCard.tone].text} ${toneStyles[flagshipCard.tone].shadow}`}
                   >
-                    <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{flagshipCard.category}</span>
-                    <h3 className="mt-auto text-2xl font-semibold text-white">{flagshipCard.title}</h3>
-                    <span className="mt-4 text-xs uppercase tracking-[0.2em] opacity-80">{flagshipCard.date}</span>
+                    <span
+                      className="pointer-events-none absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+                      aria-hidden="true"
+                    />
+                    <div className="relative">
+                      <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{flagshipCard.category}</span>
+                    </div>
+                    <h3 className="relative mt-auto text-2xl font-semibold text-white">{flagshipCard.title}</h3>
+                    <span className="relative mt-4 text-xs uppercase tracking-[0.2em] opacity-80">{flagshipCard.date}</span>
                   </article>
                   <div className="grid gap-6">
                     {companionCards.map((item) => (
                       <article
                         key={item.id}
-                        className={`relative isolate flex min-h-[180px] flex-col justify-between overflow-hidden rounded-[28px] p-6 ${
+                        className={`relative isolate flex min-h-[180px] flex-col justify-between overflow-hidden rounded-[28px] p-6 lg:aspect-square ${
                           toneStyles[item.tone].background
                         } ${toneStyles[item.tone].text} ${toneStyles[item.tone].shadow}`}
                       >
-                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <span
+                          className="pointer-events-none absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+                          aria-hidden="true"
+                        />
                         <div className="relative">
                           <span className="block text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
                         </div>
@@ -511,9 +519,12 @@ export default function Page() {
                     {filteredNews.map((item) => (
                       <article
                         key={item.title}
-                        className="relative isolate flex min-h-[180px] flex-col justify-between overflow-hidden rounded-[24px] bg-[#1f2937] p-6 text-slate-100"
+                        className="relative isolate flex min-h-[180px] flex-col justify-between overflow-hidden rounded-[24px] bg-[#1f2937] p-6 text-slate-100 lg:aspect-square"
                       >
-                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <span
+                          className="pointer-events-none absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+                          aria-hidden="true"
+                        />
                         <div className="relative">
                           <span className="block text-[11px] uppercase tracking-[0.2em] text-slate-200/80">{item.category}</span>
                         </div>
@@ -563,11 +574,14 @@ export default function Page() {
                     {filteredResearch.map((item) => (
                       <article
                         key={item.title}
-                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 ${
+                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 lg:aspect-square ${
                           toneStyles[item.tone ?? "violet"].background
                         } ${toneStyles[item.tone ?? "violet"].text} ${toneStyles[item.tone ?? "violet"].shadow}`}
                       >
-                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <span
+                          className="pointer-events-none absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+                          aria-hidden="true"
+                        />
                         <div className="relative">
                           <span className="block text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
                         </div>
@@ -602,11 +616,14 @@ export default function Page() {
                     {filteredPrograms.map((item) => (
                       <article
                         key={item.title}
-                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 ${
+                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 lg:aspect-square ${
                           toneStyles[item.tone ?? "blue"].background
                         } ${toneStyles[item.tone ?? "blue"].text} ${toneStyles[item.tone ?? "blue"].shadow}`}
                       >
-                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <span
+                          className="pointer-events-none absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+                          aria-hidden="true"
+                        />
                         <div className="relative">
                           <span className="block text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
                         </div>
@@ -635,6 +652,60 @@ export default function Page() {
 
 function FooterPanel() {
   const currentYear = new Date().getFullYear();
+  const [languageChoice, setLanguageChoice] = useState(languageOptions[0]);
+  const [regionChoice, setRegionChoice] = useState(regionOptions[0]);
+  const [openMenu, setOpenMenu] = useState<"language" | "region" | null>(null);
+  const languageMenuRef = useRef<HTMLDivElement | null>(null);
+  const regionMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handlePointer = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (!target) {
+        setOpenMenu(null);
+        return;
+      }
+
+      if (
+        languageMenuRef.current?.contains(target) ||
+        regionMenuRef.current?.contains(target)
+      ) {
+        return;
+      }
+
+      setOpenMenu(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointer);
+    return () => document.removeEventListener("pointerdown", handlePointer);
+  }, []);
+
+  const toggleMenu = (menu: "language" | "region") => {
+    setOpenMenu((current) => (current === menu ? null : menu));
+  };
+
+  const renderMenu = (options: string[], active: string, onSelect: (value: string) => void) => (
+    <ul className="max-h-64 overflow-y-auto py-1 text-sm text-white/80">
+      {options.map((option) => (
+        <li key={option}>
+          <button
+            type="button"
+            onClick={() => {
+              onSelect(option);
+              setOpenMenu(null);
+            }}
+            className={`flex w-full items-center justify-between gap-4 px-4 py-2 text-left transition ${
+              option === active
+                ? "bg-white/10 text-white"
+                : "hover:bg-white/5 hover:text-white"
+            }`}
+          >
+            <span>{option}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <footer className="border-t border-white/10 pt-12 text-sm text-white/70">
@@ -670,48 +741,60 @@ function FooterPanel() {
 
       <div className="mt-12 space-y-6 text-sm text-white/70">
         <div className="flex flex-wrap gap-6">
-          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
+          <div
+            ref={languageMenuRef}
+            className="relative flex min-w-[220px] flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50"
+          >
             <span className="flex items-center gap-2 text-white/60">
               <Globe2 className="h-4 w-4" /> Language
             </span>
-            <div className="relative">
-              <select
-                className="w-full min-w-[240px] appearance-none rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur focus:border-white/40 focus:outline-none"
-                defaultValue={languageOptions[0]}
-                aria-label="Select language"
-              >
-                {languageOptions.map((option) => (
-                  <option key={option} value={option} className="bg-black text-white">
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/60">
-                <ChevronDown className="h-4 w-4" />
-              </span>
-            </div>
-          </label>
-          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
+            <button
+              type="button"
+              onClick={() => toggleMenu("language")}
+              className={`flex w-full items-center justify-between rounded-full border px-4 py-2 text-sm transition ${
+                openMenu === "language"
+                  ? "border-white/40 bg-white/10 text-white"
+                  : "border-white/15 bg-white/10 text-white/80 hover:border-white/30 hover:text-white"
+              }`}
+            >
+              <span className="truncate text-left">{languageChoice}</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${openMenu === "language" ? "rotate-180" : ""}`}
+              />
+            </button>
+            {openMenu === "language" ? (
+              <div className="absolute left-0 right-0 top-full z-20 mt-3 overflow-hidden rounded-3xl border border-white/10 bg-black/90 shadow-[0_32px_80px_rgba(0,0,0,0.45)] backdrop-blur">
+                {renderMenu(languageOptions, languageChoice, (value) => setLanguageChoice(value))}
+              </div>
+            ) : null}
+          </div>
+          <div
+            ref={regionMenuRef}
+            className="relative flex min-w-[220px] flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50"
+          >
             <span className="flex items-center gap-2 text-white/60">
               <MapPin className="h-4 w-4" /> Region
             </span>
-            <div className="relative">
-              <select
-                className="w-full min-w-[240px] appearance-none rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur focus:border-white/40 focus:outline-none"
-                defaultValue={regionOptions[0]}
-                aria-label="Select region"
-              >
-                {regionOptions.map((option) => (
-                  <option key={option} value={option} className="bg-black text-white">
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/60">
-                <ChevronDown className="h-4 w-4" />
-              </span>
-            </div>
-          </label>
+            <button
+              type="button"
+              onClick={() => toggleMenu("region")}
+              className={`flex w-full items-center justify-between rounded-full border px-4 py-2 text-sm transition ${
+                openMenu === "region"
+                  ? "border-white/40 bg-white/10 text-white"
+                  : "border-white/15 bg-white/10 text-white/80 hover:border-white/30 hover:text-white"
+              }`}
+            >
+              <span className="truncate text-left">{regionChoice}</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${openMenu === "region" ? "rotate-180" : ""}`}
+              />
+            </button>
+            {openMenu === "region" ? (
+              <div className="absolute left-0 right-0 top-full z-20 mt-3 overflow-hidden rounded-3xl border border-white/10 bg-black/90 shadow-[0_32px_80px_rgba(0,0,0,0.45)] backdrop-blur">
+                {renderMenu(regionOptions, regionChoice, (value) => setRegionChoice(value))}
+              </div>
+            ) : null}
+          </div>
         </div>
         <p className="text-xs text-white/50">
           Aeterna localizes compliance, currency, and mission governance across every active territory and orbital platform.

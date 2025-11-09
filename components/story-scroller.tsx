@@ -84,11 +84,15 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
         {stories.map((story) => (
           <article
             key={story.title}
-            className="min-w-[220px] rounded-[24px] bg-[#1e1b4b] p-5 text-indigo-100 shadow-[0_0_40px_-24px_rgba(76,29,149,0.8)] sm:min-w-[260px]"
+            className="relative isolate flex min-w-[220px] flex-col justify-between overflow-hidden rounded-[24px] bg-[#1e1b4b] p-5 text-indigo-100 shadow-[0_0_40px_-24px_rgba(76,29,149,0.8)] sm:min-w-[260px] lg:aspect-square"
           >
-            <span className="text-[11px] uppercase tracking-[0.2em] text-indigo-200/70">{story.category}</span>
-            <h3 className="mt-3 text-lg font-semibold text-white">{story.title}</h3>
-            <div className="mt-6 flex items-center justify-between text-xs text-indigo-200/70">
+            <span
+              className="pointer-events-none absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+              aria-hidden="true"
+            />
+            <span className="relative text-[11px] uppercase tracking-[0.2em] text-indigo-200/70">{story.category}</span>
+            <h3 className="relative mt-3 text-lg font-semibold text-white">{story.title}</h3>
+            <div className="relative mt-6 flex items-center justify-between text-xs text-indigo-200/70">
               <span>{story.date}</span>
               {story.linkLabel ? (
                 <Link href="#stories" className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
