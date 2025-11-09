@@ -17,7 +17,7 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
 
   if (!stories.length) {
     return (
-      <p className="rounded-3xl bg-white/5 px-5 py-8 text-center text-sm text-indigo-100/70">
+      <p className="px-5 py-6 text-center text-sm text-indigo-100/70">
         Stories for this focus area are coming online shortly.
       </p>
     );

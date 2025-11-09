@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
+import { Globe2, MapPin } from "lucide-react";
 import { Header } from "@/components/header";
 import { MissionColumn } from "@/components/mission-column";
 import { StoryScroller } from "@/components/story-scroller";
@@ -13,7 +14,7 @@ type Tone = "violet" | "teal" | "emerald" | "amber" | "blue" | "purple";
 
 type LaunchCard = {
   id: string;
-  layout: "flagship" | "upcoming" | "heritage";
+  tier: "primary" | "companion";
   category: string;
   title: string;
   date: string;
@@ -57,93 +58,30 @@ const searchExamples = [
 const launchCards: LaunchCard[] = [
   {
     id: "flagship-helios",
-    layout: "flagship",
+    tier: "primary",
     category: "Flagship launch",
     title: "Helios Continuum checks in",
     date: "June 24, 2024",
     tone: "violet",
-    sectors: ["all", "ai", "network", "orbital", "governance"]
-  },
-  {
-    id: "flagship-vault",
-    layout: "flagship",
-    category: "Flagship launch",
-    title: "Pulse Vault sentinel refresh",
-    date: "June 12, 2024",
-    tone: "emerald",
-    sectors: ["all", "biotech", "ai"]
-  },
-  {
-    id: "flagship-finance",
-    layout: "flagship",
-    category: "Flagship launch",
-    title: "Continuum clearinghouse upgrade",
-    date: "June 5, 2024",
-    tone: "teal",
-    sectors: ["all", "crypto", "network"]
+    sectors: ["all", "ai", "network", "orbital", "governance", "biotech", "crypto"]
   },
   {
     id: "upcoming-atlas",
-    layout: "upcoming",
+    tier: "companion",
     category: "Next deployment",
     title: "Atlas Relay mesh rehearsal",
     date: "July 2, 2024",
     tone: "teal",
-    sectors: ["all", "network", "orbital", "governance"]
-  },
-  {
-    id: "upcoming-aegis",
-    layout: "upcoming",
-    category: "Next deployment",
-    title: "Aegis bio-shield field trials",
-    date: "July 9, 2024",
-    tone: "emerald",
-    sectors: ["all", "biotech", "ai"]
-  },
-  {
-    id: "upcoming-ledger",
-    layout: "upcoming",
-    category: "Next deployment",
-    title: "Ledger lattice compliance sync",
-    date: "July 14, 2024",
-    tone: "amber",
-    sectors: ["all", "crypto", "governance"]
+    sectors: ["all", "network", "orbital", "governance", "ai"]
   },
   {
     id: "heritage-chronicle",
-    layout: "heritage",
+    tier: "companion",
     category: "Heritage system",
     title: "Chronicle Loom archive sync",
     date: "May 9, 2024",
     tone: "amber",
-    sectors: ["all", "ai", "governance"]
-  },
-  {
-    id: "heritage-echelon",
-    layout: "heritage",
-    category: "Heritage system",
-    title: "Echelon Nodes uplink audit",
-    date: "April 30, 2024",
-    tone: "blue",
-    sectors: ["all", "network", "orbital"]
-  },
-  {
-    id: "heritage-safeguard",
-    layout: "heritage",
-    category: "Heritage system",
-    title: "Safeguard collective policy refresh",
-    date: "April 18, 2024",
-    tone: "purple",
-    sectors: ["all", "governance", "crypto"]
-  },
-  {
-    id: "heritage-biome",
-    layout: "heritage",
-    category: "Heritage system",
-    title: "Biome stabilizer serum restock",
-    date: "April 2, 2024",
-    tone: "emerald",
-    sectors: ["biotech", "ai", "all"]
+    sectors: ["all", "ai", "governance", "biotech", "crypto"]
   }
 ];
 
@@ -203,35 +141,30 @@ const stories: StoryEntry[] = [
     category: "Terraforming",
     title: "Frontier settlements stabilize the Midnight Belt",
     date: "June 10, 2024",
-    linkLabel: "View log",
     sectors: ["all", "orbital", "governance"]
   },
   {
     category: "Oceanic alliance",
     title: "Circadian Reef drones stay in sync across 12 nations",
     date: "May 29, 2024",
-    linkLabel: "Open brief",
     sectors: ["all", "network", "ai"]
   },
   {
     category: "Cultural recovery",
     title: "Chronicle Loom revives the Qira ceremonial code",
     date: "May 6, 2024",
-    linkLabel: "See archive",
     sectors: ["all", "ai", "governance"]
   },
   {
     category: "Lunar health",
     title: "Pulse Vault safeguards Selene clinics",
     date: "April 27, 2024",
-    linkLabel: "Review report",
     sectors: ["all", "biotech", "orbital"]
   },
   {
     category: "DePIN expansion",
     title: "Mesh operators onboard 4,200 new sovereign nodes",
     date: "April 11, 2024",
-    linkLabel: "Inspect",
     sectors: ["all", "crypto", "network"]
   }
 ];
@@ -264,31 +197,172 @@ const businessPrograms: Highlight[] = [
   {
     category: "Industries",
     title: "Sovereign operations network",
-    date: "Updated weekly",
+    date: "June 2024",
     tone: "blue",
     sectors: ["all", "network", "governance"]
   },
   {
     category: "Enterprises",
     title: "Executive intelligence fabric",
-    date: "Updated biweekly",
+    date: "May 2024",
     tone: "amber",
     sectors: ["all", "ai", "crypto"]
   },
   {
     category: "Risk",
     title: "Strategic observatory council",
-    date: "Updated monthly",
+    date: "April 2024",
     tone: "teal",
     sectors: ["all", "governance", "orbital"]
   },
   {
     category: "Healthcare",
     title: "Continuum care exchanges",
-    date: "Updated monthly",
+    date: "April 2024",
     tone: "emerald",
     sectors: ["all", "biotech", "ai"]
   }
+];
+
+const footerNavigation = [
+  {
+    title: "Products",
+    links: [
+      { label: "Helios Continuum", href: "/products/helios" },
+      { label: "Atlas Relay", href: "/products/atlas" },
+      { label: "Pulse Vault", href: "/products/pulse" },
+      { label: "Chronicle Loom", href: "/products/chronicle" },
+      { label: "Continuum Ledger", href: "/products/ledger" },
+      { label: "Aegis Shield", href: "/products/aegis" }
+    ]
+  },
+  {
+    title: "Solutions",
+    links: [
+      { label: "Sovereign AI", href: "/solutions/ai" },
+      { label: "Orbital logistics", href: "/solutions/orbital" },
+      { label: "Quantum finance", href: "/solutions/finance" },
+      { label: "Civic intelligence", href: "/solutions/civic" },
+      { label: "Healthcare systems", href: "/solutions/health" },
+      { label: "Industrial autonomy", href: "/solutions/industrial" }
+    ]
+  },
+  {
+    title: "Resources",
+    links: [
+      { label: "Developer docs", href: "/docs" },
+      { label: "Integration hub", href: "/integrations" },
+      { label: "Security advisories", href: "/security" },
+      { label: "Network status", href: "/status" },
+      { label: "Brand toolkit", href: "/brand" },
+      { label: "Press kit", href: "/press" }
+    ]
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About Aeterna", href: "/about" },
+      { label: "Leadership", href: "/leadership" },
+      { label: "Careers", href: "/careers" },
+      { label: "Newsroom", href: "/newsroom" },
+      { label: "Ethics council", href: "/ethics" },
+      { label: "Partners", href: "/partners" }
+    ]
+  },
+  {
+    title: "Network",
+    links: [
+      { label: "Mission directory", href: "/missions" },
+      { label: "Operator network", href: "/operators" },
+      { label: "Research labs", href: "/labs" },
+      { label: "Global alliances", href: "/alliances" },
+      { label: "Customer stories", href: "/stories" },
+      { label: "Community", href: "/community" }
+    ]
+  }
+];
+
+const operationsDirectory = [
+  { label: "Mission control", value: "command@aeterna.technology" },
+  { label: "Enterprise", value: "alliances@aeterna.technology" },
+  { label: "Security", value: "trust@aeterna.technology" },
+  { label: "Public sector", value: "civic@aeterna.technology" },
+  { label: "Press", value: "press@aeterna.technology" },
+  { label: "Careers", value: "talent@aeterna.technology" }
+];
+
+const presenceDirectory = [
+  {
+    title: "Orbital & lunar campuses",
+    details: [
+      "Tycho City · Mare Tranquillitatis",
+      "New Dawn Station · L5 Alliance",
+      "Helios Ring · Geosync"
+    ]
+  },
+  {
+    title: "Terrestrial network hubs",
+    details: [
+      "New Singapore · Quantum Finance Port",
+      "Reykjavík · Arctic Compute Harbor",
+      "São Paulo · Sovereign Mesh Exchange"
+    ]
+  },
+  {
+    title: "Research enclaves",
+    details: [
+      "Dakar · Bioadaptive Systems",
+      "Bengaluru · Cognitive Interfaces",
+      "Vancouver · Autonomous Governance"
+    ]
+  }
+];
+
+const policyLinks = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Status", href: "/status" },
+  { label: "Trust center", href: "/trust" }
+];
+
+const languageOptions = [
+  "English (United States)",
+  "Español (España)",
+  "Deutsch",
+  "Français",
+  "Italiano",
+  "Português (Brasil)",
+  "Polski",
+  "Türkçe",
+  "العربية",
+  "한국어",
+  "日本語",
+  "Русский",
+  "हिन्दी",
+  "Bahasa Indonesia",
+  "简体中文",
+  "繁體中文",
+  "ไทย",
+  "Tiếng Việt",
+  "Svenska",
+  "Norsk Bokmål"
+];
+
+const regionOptions = [
+  "Global",
+  "North America",
+  "South America",
+  "Europe",
+  "Middle East",
+  "Africa",
+  "South Asia",
+  "East Asia",
+  "Southeast Asia",
+  "Oceania",
+  "Central Asia",
+  "Arctic",
+  "Lunar settlements",
+  "Orbital platforms"
 ];
 
 const toneStyles: Record<
@@ -331,23 +405,16 @@ export default function Page() {
   const [activeSector, setActiveSector] = useState<Sector>("all");
 
   const flagshipCard = useMemo(() => {
-    const candidates = launchCards.filter((card) => card.layout === "flagship");
+    const candidates = launchCards.filter((card) => card.tier === "primary");
     return (
       candidates.find((card) => matchesSector(card.sectors, activeSector)) ?? candidates[0]
     );
   }, [activeSector]);
 
-  const upcomingCard = useMemo(() => {
-    const candidates = launchCards.filter((card) => card.layout === "upcoming");
-    return (
-      candidates.find((card) => matchesSector(card.sectors, activeSector)) ?? candidates[0]
-    );
-  }, [activeSector]);
-
-  const heritageCards = useMemo(() => {
-    const candidates = launchCards.filter((card) => card.layout === "heritage");
+  const companionCards = useMemo(() => {
+    const candidates = launchCards.filter((card) => card.tier === "companion");
     const filtered = candidates.filter((card) => matchesSector(card.sectors, activeSector));
-    return (filtered.length ? filtered : candidates).slice(0, 3);
+    return (filtered.length ? filtered : candidates).slice(0, 2);
   }, [activeSector]);
 
   const filteredNews = useMemo(
@@ -371,17 +438,17 @@ export default function Page() {
   );
 
   return (
-    <main className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
+    <main className="bg-[var(--bg-primary)] text-[var(--text-primary)] lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
       <Header />
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-10 px-4 pb-16 pt-10 lg:flex-row lg:items-start">
-        <aside className="lg:sticky lg:top-24 lg:w-[32%] lg:self-start">
-          <div className="rounded-[32px] border border-[var(--border-default)] bg-[var(--bg-primary)]/80 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.7)]">
+      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
+        <aside className="flex-none px-6 py-10 lg:basis-[40%] lg:px-12 lg:py-14">
+          <div className="mx-auto flex h-full w-full max-w-xl items-center justify-center">
             <MissionColumn searchExamples={searchExamples} />
           </div>
         </aside>
-        <section className="flex-1">
-          <div className="mx-auto flex w-full max-w-[1100px] flex-col gap-10 rounded-[40px] bg-black/95 px-4 py-6 shadow-[0_70px_120px_-80px_rgba(0,0,0,0.9)] sm:px-8 sm:py-10 lg:px-12">
-            <nav className="flex flex-wrap items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-white/60">
+        <section className="relative flex-1 bg-black text-white lg:basis-[60%] lg:overflow-y-auto">
+          <div className="mx-auto flex min-h-full w-full max-w-[960px] flex-col gap-14 px-6 pb-16 pt-10 sm:px-10 lg:pb-20 lg:pt-14">
+            <nav className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.24em] text-white/50">
               {focusAreas.map((area) => {
                 const active = area.id === activeSector;
                 return (
@@ -389,9 +456,7 @@ export default function Page() {
                     key={area.id}
                     type="button"
                     onClick={() => setActiveSector(area.id)}
-                    className={`rounded-full px-3 py-1 transition ${
-                      active ? "bg-white/15 text-white" : "hover:text-white"
-                    }`}
+                    className={`transition hover:text-white ${active ? "text-white" : ""}`}
                   >
                     {area.label}
                   </button>
@@ -399,13 +464,12 @@ export default function Page() {
               })}
             </nav>
 
-            <div className="space-y-10">
-              <div className="rounded-[32px] bg-white/[0.04] p-5 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.7)] sm:p-8">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white sm:text-2xl">Launch slate</h2>
-                    <span className="text-xs uppercase tracking-[0.2em] text-white/60">Status updated weekly</span>
-                  </div>
+            <div className="space-y-16">
+              <section className="space-y-8" aria-labelledby="launch-slate">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <h2 id="launch-slate" className="text-2xl font-semibold">
+                    Launch slate
+                  </h2>
                   <Link
                     href={"/launches" as Route}
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-white/60 transition hover:text-white"
@@ -413,46 +477,38 @@ export default function Page() {
                     View all
                   </Link>
                 </div>
-                <div className="grid gap-4 sm:gap-6 lg:grid-cols-3 lg:auto-rows-[minmax(0,1fr)]">
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:auto-rows-[minmax(0,1fr)]">
                   <article
-                    className={`flex min-h-[220px] flex-col justify-between rounded-[24px] p-6 lg:col-span-2 lg:row-span-2 ${
+                    className={`flex min-h-[240px] flex-col justify-between rounded-[28px] p-6 ${
                       toneStyles[flagshipCard.tone].background
                     } ${toneStyles[flagshipCard.tone].text} ${toneStyles[flagshipCard.tone].shadow}`}
                   >
                     <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{flagshipCard.category}</span>
-                    <h3 className="mt-4 text-2xl font-semibold text-white">{flagshipCard.title}</h3>
-                    <span className="mt-6 text-xs uppercase tracking-[0.2em] opacity-80">{flagshipCard.date}</span>
+                    <h3 className="mt-6 text-2xl font-semibold text-white">{flagshipCard.title}</h3>
+                    <span className="mt-8 text-xs uppercase tracking-[0.2em] opacity-80">{flagshipCard.date}</span>
                   </article>
-                  <article
-                    className={`flex min-h-[220px] flex-col justify-between rounded-[24px] p-6 ${
-                      toneStyles[upcomingCard.tone].background
-                    } ${toneStyles[upcomingCard.tone].text} ${toneStyles[upcomingCard.tone].shadow}`}
-                  >
-                    <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{upcomingCard.category}</span>
-                    <h3 className="mt-4 text-xl font-semibold text-white">{upcomingCard.title}</h3>
-                    <span className="mt-6 text-xs uppercase tracking-[0.2em] opacity-80">{upcomingCard.date}</span>
-                  </article>
-                  {heritageCards.map((item) => (
-                    <article
-                      key={item.id}
-                      className={`flex min-h-[200px] flex-col justify-between rounded-[24px] p-6 ${
-                        toneStyles[item.tone].background
-                      } ${toneStyles[item.tone].text} ${toneStyles[item.tone].shadow}`}
-                    >
-                      <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
-                      <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
-                      <span className="mt-6 text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
-                    </article>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-[32px] bg-white/[0.04] p-5 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.7)] sm:p-8">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white sm:text-2xl">Latest news</h2>
-                    <span className="text-xs uppercase tracking-[0.2em] text-white/60">All channels</span>
+                  <div className="grid gap-6">
+                    {companionCards.map((item) => (
+                      <article
+                        key={item.id}
+                        className={`flex min-h-[180px] flex-col justify-between rounded-[28px] p-6 ${
+                          toneStyles[item.tone].background
+                        } ${toneStyles[item.tone].text} ${toneStyles[item.tone].shadow}`}
+                      >
+                        <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
+                        <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
+                        <span className="mt-6 text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
+                      </article>
+                    ))}
                   </div>
+                </div>
+              </section>
+
+              <section className="space-y-8" aria-labelledby="latest-news">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <h2 id="latest-news" className="text-2xl font-semibold">
+                    Latest news
+                  </h2>
                   <Link
                     href={"/newsroom" as Route}
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-white/60 transition hover:text-white"
@@ -461,11 +517,11 @@ export default function Page() {
                   </Link>
                 </div>
                 {filteredNews.length ? (
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredNews.map((item) => (
                       <article
                         key={item.title}
-                        className="flex min-h-[180px] flex-col justify-between rounded-[24px] bg-[#263238] p-5 text-slate-100 shadow-[0_0_48px_-32px_rgba(38,50,56,0.9)]"
+                        className="flex min-h-[180px] flex-col justify-between rounded-[24px] bg-[#1f2937] p-6 text-slate-100"
                       >
                         <span className="text-[11px] uppercase tracking-[0.2em] text-slate-200/80">{item.category}</span>
                         <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
@@ -474,18 +530,15 @@ export default function Page() {
                     ))}
                   </div>
                 ) : (
-                  <p className="rounded-3xl bg-white/5 px-6 py-10 text-center text-sm text-white/60">
-                    Mission communications for this focus area are being composed.
-                  </p>
+                  <p className="text-sm text-white/60">Mission communications for this focus area are being composed.</p>
                 )}
-              </div>
+              </section>
 
-              <div className="rounded-[32px] bg-white/[0.04] p-5 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.7)] sm:p-8">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white sm:text-2xl">Stories</h2>
-                    <span className="text-xs uppercase tracking-[0.2em] text-white/60">Drag to explore</span>
-                  </div>
+              <section className="space-y-8" aria-labelledby="stories">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <h2 id="stories" className="text-2xl font-semibold">
+                    Stories
+                  </h2>
                   <Link
                     href={"/stories" as Route}
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-white/60 transition hover:text-white"
@@ -493,17 +546,14 @@ export default function Page() {
                     View all
                   </Link>
                 </div>
-                <StoryScroller
-                  stories={filteredStories.map(({ sectors: _sectors, ...story }) => story)}
-                />
-              </div>
+                <StoryScroller stories={filteredStories.map(({ sectors: _sectors, ...story }) => story)} />
+              </section>
 
-              <div className="rounded-[32px] bg-white/[0.04] p-5 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.7)] sm:p-8">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white sm:text-2xl">Latest research</h2>
-                    <span className="text-xs uppercase tracking-[0.2em] text-white/60">Mission labs</span>
-                  </div>
+              <section className="space-y-8" aria-labelledby="research">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <h2 id="research" className="text-2xl font-semibold">
+                    Latest research
+                  </h2>
                   <Link
                     href={"/research" as Route}
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-white/60 transition hover:text-white"
@@ -512,11 +562,11 @@ export default function Page() {
                   </Link>
                 </div>
                 {filteredResearch.length ? (
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-6 sm:grid-cols-2">
                     {filteredResearch.map((item) => (
                       <article
                         key={item.title}
-                        className={`flex min-h-[200px] flex-col justify-between rounded-[24px] p-6 ${
+                        className={`flex min-h-[200px] flex-col justify-between rounded-[28px] p-6 ${
                           toneStyles[item.tone ?? "violet"].background
                         } ${toneStyles[item.tone ?? "violet"].text} ${toneStyles[item.tone ?? "violet"].shadow}`}
                       >
@@ -527,18 +577,15 @@ export default function Page() {
                     ))}
                   </div>
                 ) : (
-                  <p className="rounded-3xl bg-white/5 px-6 py-10 text-center text-sm text-white/60">
-                    No research updates for this focus yet—check back soon.
-                  </p>
+                  <p className="text-sm text-white/60">No research updates for this focus yet—check back soon.</p>
                 )}
-              </div>
+              </section>
 
-              <div className="rounded-[32px] bg-white/[0.04] p-5 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.7)] sm:p-8">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white sm:text-2xl">Aeterna for business</h2>
-                    <span className="text-xs uppercase tracking-[0.2em] text-white/60">Program suites</span>
-                  </div>
+              <section className="space-y-8" aria-labelledby="business">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <h2 id="business" className="text-2xl font-semibold">
+                    Aeterna for business
+                  </h2>
                   <Link
                     href={"/programs" as Route}
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-white/60 transition hover:text-white"
@@ -547,11 +594,11 @@ export default function Page() {
                   </Link>
                 </div>
                 {filteredPrograms.length ? (
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredPrograms.map((item) => (
                       <article
                         key={item.title}
-                        className={`flex min-h-[200px] flex-col justify-between rounded-[24px] p-6 ${
+                        className={`flex min-h-[200px] flex-col justify-between rounded-[28px] p-6 ${
                           toneStyles[item.tone ?? "blue"].background
                         } ${toneStyles[item.tone ?? "blue"].text} ${toneStyles[item.tone ?? "blue"].shadow}`}
                       >
@@ -562,33 +609,115 @@ export default function Page() {
                     ))}
                   </div>
                 ) : (
-                  <p className="rounded-3xl bg-white/5 px-6 py-10 text-center text-sm text-white/60">
-                    Select another focus area to reveal aligned business programs.
-                  </p>
+                  <p className="text-sm text-white/60">Select another focus area to reveal aligned business programs.</p>
                 )}
-              </div>
-            </div>
+              </section>
 
-            <footer className="rounded-[32px] bg-white/[0.04] p-6 text-sm text-white/70 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.7)] sm:p-8">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                <span>© {new Date().getFullYear()} Aeterna Technology</span>
-                <div className="flex flex-wrap gap-4 text-xs uppercase tracking-[0.24em] text-white/60">
-                  <Link href="/privacy" className="transition hover:text-white">
-                    Privacy
-                  </Link>
-                  <Link href="/terms" className="transition hover:text-white">
-                    Terms
-                  </Link>
-                  <Link href="/status" className="transition hover:text-white">
-                    Status
-                  </Link>
-                </div>
-              </div>
-            </footer>
+              <FooterPanel />
+            </div>
           </div>
         </section>
       </div>
     </main>
+  );
+}
+
+function FooterPanel() {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="border-t border-white/10 pt-12 text-sm text-white/70">
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+        {footerNavigation.map((column) => (
+          <div key={column.title} className="space-y-3">
+            <h3 className="text-xs uppercase tracking-[0.2em] text-white/50">{column.title}</h3>
+            <ul className="space-y-2 text-sm text-white/70">
+              {column.links.map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href as Route} className="transition hover:text-white">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-12 grid gap-8 lg:grid-cols-3">
+        {presenceDirectory.map((cluster) => (
+          <div key={cluster.title} className="space-y-3">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/50">{cluster.title}</p>
+            <ul className="space-y-2 text-sm text-white/70">
+              {cluster.details.map((detail) => (
+                <li key={detail}>{detail}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-12 grid gap-10 lg:grid-cols-[3fr_2fr]">
+        <div className="grid gap-6 text-sm text-white/70 sm:grid-cols-2 lg:grid-cols-3">
+          {operationsDirectory.map((entry) => (
+            <div key={entry.label} className="space-y-1">
+              <span className="text-[10px] uppercase tracking-[0.24em] text-white/50">{entry.label}</span>
+              <span className="break-all">{entry.value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-6 text-sm text-white/70">
+          <div className="flex flex-wrap gap-6">
+            <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
+              <span className="flex items-center gap-2 text-white/60">
+                <Globe2 className="h-4 w-4" /> Language
+              </span>
+              <select
+                className="w-full min-w-[220px] rounded-full bg-white/10 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                defaultValue={languageOptions[0]}
+                aria-label="Select language"
+              >
+                {languageOptions.map((option) => (
+                  <option key={option} value={option} className="bg-black text-white">
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
+              <span className="flex items-center gap-2 text-white/60">
+                <MapPin className="h-4 w-4" /> Region
+              </span>
+              <select
+                className="w-full min-w-[220px] rounded-full bg-white/10 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                defaultValue={regionOptions[0]}
+                aria-label="Select region"
+              >
+                {regionOptions.map((option) => (
+                  <option key={option} value={option} className="bg-black text-white">
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <p className="text-xs text-white/50">
+            Aeterna localizes compliance, currency, and mission governance across every active territory and orbital platform.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-8 text-xs uppercase tracking-[0.2em] text-white/50 sm:flex-row sm:items-center sm:justify-between">
+        <span>© {currentYear} Aeterna Technology</span>
+        <div className="flex flex-wrap gap-4">
+          {policyLinks.map((link) => (
+            <Link key={link.label} href={link.href as Route} className="transition hover:text-white">
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </footer>
   );
 }
 
