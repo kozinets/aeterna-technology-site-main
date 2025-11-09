@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type PointerEvent } from "react";
+import { useRef, useState, type PointerEvent, type WheelEvent } from "react";
 import Link from "next/link";
 
 type Story = {
@@ -14,6 +14,14 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const dragState = useRef({ startX: 0, scrollLeft: 0, pointerId: 0 });
   const [dragging, setDragging] = useState(false);
+
+  if (!stories.length) {
+    return (
+      <p className="rounded-3xl bg-white/5 px-5 py-8 text-center text-sm text-indigo-100/70">
+        Stories for this focus area are coming online shortly.
+      </p>
+    );
+  }
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     const container = containerRef.current;
@@ -46,16 +54,31 @@ export function StoryScroller({ stories }: { stories: Story[] }) {
     setDragging(false);
   };
 
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const isVerticalScrollDominant = Math.abs(event.deltaY) > Math.abs(event.deltaX);
+    if (!isVerticalScrollDominant) {
+      return;
+    }
+
+    container.scrollLeft += event.deltaY;
+    event.preventDefault();
+  };
+
   return (
     <div
       ref={containerRef}
+      aria-label="Mission stories"
       className={`${dragging ? "cursor-grabbing" : "cursor-grab"} overflow-x-auto pb-2 pt-1 scrollbar-hide`}
-      style={{ touchAction: "none" }}
+      style={{ touchAction: "pan-y" }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
       onPointerLeave={(event) => dragging && endDrag(event)}
       onPointerCancel={endDrag}
+      onWheel={handleWheel}
     >
       <div className="flex gap-4 sm:gap-6">
         {stories.map((story) => (

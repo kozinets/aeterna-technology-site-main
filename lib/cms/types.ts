@@ -234,11 +234,14 @@ export type AccessPortalCollection = {
 
 export type FooterColumn = { title: string; links: { label: string; href: string }[] };
 export type FooterContact = { label: string; value: string };
+export type FooterPresence = { title: string; details: string[] };
 
 export type FooterCollection = {
   columns: FooterColumn[];
   contacts: FooterContact[];
   statusBadges: string[];
+  globalPresence: FooterPresence[];
+  footnotes: string[];
 };
 
 export type NovaProxyContent = {
