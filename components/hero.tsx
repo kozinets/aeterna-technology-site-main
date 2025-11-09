@@ -241,35 +241,41 @@ export function Hero({ content }: { content: HeroCollection }) {
                 </button>
               </div>
             </div>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeStory.title}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-3"
-              >
-                <span
-                  className={`text-xs font-semibold uppercase tracking-[0.22em] ${
-                    activeStory.tone === "critical"
-                      ? "text-[var(--text-status-error)]"
-                      : "text-[var(--text-status-warning)]"
-                  }`}
+            {activeStory ? (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStory.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-3"
                 >
-                  #{activeStory.tag.toLowerCase()}
-                </span>
-                <h3 className="text-xl font-semibold text-[var(--text-primary)]">{activeStory.title}</h3>
-                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{activeStory.description}</p>
-                <Link
-                  href={activeStory.href as any}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-status-warning)] transition hover:text-[var(--text-primary)]"
-                >
-                  {activeStory.action}
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </motion.div>
-            </AnimatePresence>
+                  <span
+                    className={`text-xs font-semibold uppercase tracking-[0.22em] ${
+                      activeStory.tone === "critical"
+                        ? "text-[var(--text-status-error)]"
+                        : "text-[var(--text-status-warning)]"
+                    }`}
+                  >
+                    #{activeStory.tag.toLowerCase()}
+                  </span>
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)]">{activeStory.title}</h3>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{activeStory.description}</p>
+                  <Link
+                    href={activeStory.href as any}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-status-warning)] transition hover:text-[var(--text-primary)]"
+                  >
+                    {activeStory.action}
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </motion.div>
+              </AnimatePresence>
+            ) : (
+              <div className="space-y-3 text-sm text-[var(--text-tertiary)]">
+                <p>Mission stories will populate once intelligence briefs are published.</p>
+              </div>
+            )}
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {operationsFeed.map((operation) => (
