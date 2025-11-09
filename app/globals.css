@@ -142,7 +142,7 @@
 
 body {
   margin: 0;
-  font-family: var(--font-roboto), "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -177,7 +177,7 @@ main {
 }
 
 .font-display {
-  font-family: var(--font-roboto), "Roboto", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
