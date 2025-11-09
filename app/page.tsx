@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
-import { Globe2, MapPin } from "lucide-react";
+import { ChevronDown, Globe2, MapPin } from "lucide-react";
 import { Header } from "@/components/header";
 import { MissionColumn } from "@/components/mission-column";
 import { StoryScroller } from "@/components/story-scroller";
@@ -282,38 +282,29 @@ const footerNavigation = [
   }
 ];
 
-const operationsDirectory = [
-  { label: "Mission control", value: "command@aeterna.technology" },
-  { label: "Enterprise", value: "alliances@aeterna.technology" },
-  { label: "Security", value: "trust@aeterna.technology" },
-  { label: "Public sector", value: "civic@aeterna.technology" },
-  { label: "Press", value: "press@aeterna.technology" },
-  { label: "Careers", value: "talent@aeterna.technology" }
-];
-
 const presenceDirectory = [
   {
-    title: "Orbital & lunar campuses",
+    title: "Sovereign operations",
     details: [
-      "Tycho City · Mare Tranquillitatis",
-      "New Dawn Station · L5 Alliance",
-      "Helios Ring · Geosync"
+      "Continuum Nexus · Singapore",
+      "Atlas Relay Hub · Reykjavík",
+      "Sovereign Ops Spine · Dakar"
     ]
   },
   {
-    title: "Terrestrial network hubs",
+    title: "Client alliances",
     details: [
-      "New Singapore · Quantum Finance Port",
-      "Reykjavík · Arctic Compute Harbor",
-      "São Paulo · Sovereign Mesh Exchange"
+      "Strategic Missions · Washington, D.C.",
+      "Alliances Forum · Geneva",
+      "Interstellar Trade Desk · São Paulo"
     ]
   },
   {
-    title: "Research enclaves",
+    title: "Continuum logistics",
     details: [
-      "Dakar · Bioadaptive Systems",
-      "Bengaluru · Cognitive Interfaces",
-      "Vancouver · Autonomous Governance"
+      "Helios Continuum Campus · Tycho City",
+      "Orbital Launch Corridor · Canaveral",
+      "Deep Space Relay · Lagrange L5"
     ]
   }
 ];
@@ -441,12 +432,12 @@ export default function Page() {
     <main className="bg-[var(--bg-primary)] text-[var(--text-primary)] lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
       <Header />
       <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
-        <aside className="flex-none px-6 py-10 lg:basis-[40%] lg:px-12 lg:py-14">
+        <aside className="flex-none px-6 py-10 lg:basis-[35%] lg:px-12 lg:py-14">
           <div className="mx-auto flex h-full w-full max-w-xl items-center justify-center">
             <MissionColumn searchExamples={searchExamples} />
           </div>
         </aside>
-        <section className="relative flex-1 bg-black text-white lg:basis-[60%] lg:overflow-y-auto">
+        <section className="relative flex-1 bg-black text-white lg:basis-[65%] lg:overflow-y-auto">
           <div className="mx-auto flex min-h-full w-full max-w-[960px] flex-col gap-14 px-6 pb-16 pt-10 sm:px-10 lg:pb-20 lg:pt-14">
             <nav className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.24em] text-white/50">
               {focusAreas.map((area) => {
@@ -466,38 +457,37 @@ export default function Page() {
 
             <div className="space-y-16">
               <section className="space-y-8" aria-labelledby="launch-slate">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <h2 id="launch-slate" className="text-2xl font-semibold">
-                    Launch slate
-                  </h2>
-                  <Link
-                    href={"/launches" as Route}
-                    className="text-xs font-semibold uppercase tracking-[0.22em] text-white/60 transition hover:text-white"
-                  >
-                    View all
-                  </Link>
-                </div>
+                <h2 id="launch-slate" className="sr-only">
+                  Launch slate
+                </h2>
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:auto-rows-[minmax(0,1fr)]">
                   <article
-                    className={`flex min-h-[240px] flex-col justify-between rounded-[28px] p-6 ${
+                    className={`flex min-h-[240px] flex-col rounded-[28px] p-6 ${
                       toneStyles[flagshipCard.tone].background
                     } ${toneStyles[flagshipCard.tone].text} ${toneStyles[flagshipCard.tone].shadow}`}
                   >
                     <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{flagshipCard.category}</span>
-                    <h3 className="mt-6 text-2xl font-semibold text-white">{flagshipCard.title}</h3>
-                    <span className="mt-8 text-xs uppercase tracking-[0.2em] opacity-80">{flagshipCard.date}</span>
+                    <h3 className="mt-auto text-2xl font-semibold text-white">{flagshipCard.title}</h3>
+                    <span className="mt-4 text-xs uppercase tracking-[0.2em] opacity-80">{flagshipCard.date}</span>
                   </article>
                   <div className="grid gap-6">
                     {companionCards.map((item) => (
                       <article
                         key={item.id}
-                        className={`flex min-h-[180px] flex-col justify-between rounded-[28px] p-6 ${
+                        className={`relative isolate flex min-h-[180px] flex-col justify-between overflow-hidden rounded-[28px] p-6 ${
                           toneStyles[item.tone].background
                         } ${toneStyles[item.tone].text} ${toneStyles[item.tone].shadow}`}
                       >
-                        <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
-                        <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-                        <span className="mt-6 text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
+                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <div className="relative">
+                          <span className="block text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
+                        </div>
+                        <div className="relative mt-4">
+                          <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                        </div>
+                        <div className="relative mt-6">
+                          <span className="block text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
+                        </div>
                       </article>
                     ))}
                   </div>
@@ -521,11 +511,18 @@ export default function Page() {
                     {filteredNews.map((item) => (
                       <article
                         key={item.title}
-                        className="flex min-h-[180px] flex-col justify-between rounded-[24px] bg-[#1f2937] p-6 text-slate-100"
+                        className="relative isolate flex min-h-[180px] flex-col justify-between overflow-hidden rounded-[24px] bg-[#1f2937] p-6 text-slate-100"
                       >
-                        <span className="text-[11px] uppercase tracking-[0.2em] text-slate-200/80">{item.category}</span>
-                        <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
-                        <span className="mt-6 text-xs uppercase tracking-[0.2em] text-slate-200/70">{item.date}</span>
+                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <div className="relative">
+                          <span className="block text-[11px] uppercase tracking-[0.2em] text-slate-200/80">{item.category}</span>
+                        </div>
+                        <div className="relative mt-4">
+                          <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                        </div>
+                        <div className="relative mt-6">
+                          <span className="block text-xs uppercase tracking-[0.2em] text-slate-200/70">{item.date}</span>
+                        </div>
                       </article>
                     ))}
                   </div>
@@ -566,13 +563,20 @@ export default function Page() {
                     {filteredResearch.map((item) => (
                       <article
                         key={item.title}
-                        className={`flex min-h-[200px] flex-col justify-between rounded-[28px] p-6 ${
+                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 ${
                           toneStyles[item.tone ?? "violet"].background
                         } ${toneStyles[item.tone ?? "violet"].text} ${toneStyles[item.tone ?? "violet"].shadow}`}
                       >
-                        <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
-                        <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-                        <span className="mt-6 text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
+                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <div className="relative">
+                          <span className="block text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
+                        </div>
+                        <div className="relative mt-4">
+                          <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                        </div>
+                        <div className="relative mt-6">
+                          <span className="block text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
+                        </div>
                       </article>
                     ))}
                   </div>
@@ -598,13 +602,20 @@ export default function Page() {
                     {filteredPrograms.map((item) => (
                       <article
                         key={item.title}
-                        className={`flex min-h-[200px] flex-col justify-between rounded-[28px] p-6 ${
+                        className={`relative isolate flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[28px] p-6 ${
                           toneStyles[item.tone ?? "blue"].background
                         } ${toneStyles[item.tone ?? "blue"].text} ${toneStyles[item.tone ?? "blue"].shadow}`}
                       >
-                        <span className="text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
-                        <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
-                        <span className="mt-6 text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
+                        <span className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[1px]" aria-hidden="true" />
+                        <div className="relative">
+                          <span className="block text-[11px] uppercase tracking-[0.2em] opacity-80">{item.category}</span>
+                        </div>
+                        <div className="relative mt-4">
+                          <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                        </div>
+                        <div className="relative mt-6">
+                          <span className="block text-xs uppercase tracking-[0.2em] opacity-80">{item.date}</span>
+                        </div>
                       </article>
                     ))}
                   </div>
@@ -657,23 +668,15 @@ function FooterPanel() {
         ))}
       </div>
 
-      <div className="mt-12 grid gap-10 lg:grid-cols-[3fr_2fr]">
-        <div className="grid gap-6 text-sm text-white/70 sm:grid-cols-2 lg:grid-cols-3">
-          {operationsDirectory.map((entry) => (
-            <div key={entry.label} className="space-y-1">
-              <span className="text-[10px] uppercase tracking-[0.24em] text-white/50">{entry.label}</span>
-              <span className="break-all">{entry.value}</span>
-            </div>
-          ))}
-        </div>
-        <div className="space-y-6 text-sm text-white/70">
-          <div className="flex flex-wrap gap-6">
-            <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
-              <span className="flex items-center gap-2 text-white/60">
-                <Globe2 className="h-4 w-4" /> Language
-              </span>
+      <div className="mt-12 space-y-6 text-sm text-white/70">
+        <div className="flex flex-wrap gap-6">
+          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
+            <span className="flex items-center gap-2 text-white/60">
+              <Globe2 className="h-4 w-4" /> Language
+            </span>
+            <div className="relative">
               <select
-                className="w-full min-w-[220px] rounded-full bg-white/10 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                className="w-full min-w-[240px] appearance-none rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur focus:border-white/40 focus:outline-none"
                 defaultValue={languageOptions[0]}
                 aria-label="Select language"
               >
@@ -683,13 +686,18 @@ function FooterPanel() {
                   </option>
                 ))}
               </select>
-            </label>
-            <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
-              <span className="flex items-center gap-2 text-white/60">
-                <MapPin className="h-4 w-4" /> Region
+              <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/60">
+                <ChevronDown className="h-4 w-4" />
               </span>
+            </div>
+          </label>
+          <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.22em] text-white/50">
+            <span className="flex items-center gap-2 text-white/60">
+              <MapPin className="h-4 w-4" /> Region
+            </span>
+            <div className="relative">
               <select
-                className="w-full min-w-[220px] rounded-full bg-white/10 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                className="w-full min-w-[240px] appearance-none rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur focus:border-white/40 focus:outline-none"
                 defaultValue={regionOptions[0]}
                 aria-label="Select region"
               >
@@ -699,12 +707,15 @@ function FooterPanel() {
                   </option>
                 ))}
               </select>
-            </label>
-          </div>
-          <p className="text-xs text-white/50">
-            Aeterna localizes compliance, currency, and mission governance across every active territory and orbital platform.
-          </p>
+              <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/60">
+                <ChevronDown className="h-4 w-4" />
+              </span>
+            </div>
+          </label>
         </div>
+        <p className="text-xs text-white/50">
+          Aeterna localizes compliance, currency, and mission governance across every active territory and orbital platform.
+        </p>
       </div>
 
       <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-8 text-xs uppercase tracking-[0.2em] text-white/50 sm:flex-row sm:items-center sm:justify-between">

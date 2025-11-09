@@ -9,7 +9,6 @@ import { getFooterCollection } from "@/lib/cms/site-config";
 
 const footerCollection = getFooterCollection();
 const footerColumns = footerCollection.columns;
-const operationsContacts = footerCollection.contacts;
 const statusBadges = footerCollection.statusBadges;
 const globalPresence = footerCollection.globalPresence ?? [];
 const footnotes = footerCollection.footnotes ?? [];
@@ -120,16 +119,8 @@ export function Footer() {
             ))}
           </div>
         ) : null}
-        <div className="flex flex-col gap-8 border-t border-[var(--border-light)] pt-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="grid grid-cols-1 gap-6 text-sm text-[var(--text-secondary)] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {operationsContacts.map((contact) => (
-              <div key={contact.label} className="space-y-1">
-                <span className="text-[10px] uppercase tracking-[0.24em] text-[var(--text-tertiary)]">{contact.label}</span>
-                <span className="break-all">{contact.value}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col items-start gap-3 text-xs text-[var(--text-tertiary)] sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+        <div className="flex flex-col gap-6 border-t border-[var(--border-light)] pt-8 text-xs text-[var(--text-tertiary)] lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-3 text-[var(--text-tertiary)]">
             <span className="text-[var(--text-status-warning)]">© {new Date().getFullYear()} Aeterna Technology</span>
             <Link href="/privacy" className="transition hover:text-[var(--text-primary)]">
               Privacy
@@ -140,36 +131,36 @@ export function Footer() {
             <Link href="/status" className="transition hover:text-[var(--text-primary)]">
               Status
             </Link>
-            <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveView("language");
-                  setLocaleOpen(true);
-                }}
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-[var(--text-secondary)] transition hover:border-[var(--text-status-warning)] hover:text-[var(--text-primary)]"
-              >
-                <Globe2 className="h-4 w-4" />
-                <span className="text-left">
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Language</span>
-                  <span className="text-xs font-medium text-[var(--text-primary)]">{languageSelection.name}</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveView("region");
-                  setLocaleOpen(true);
-                }}
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] px-4 py-2 text-[var(--text-secondary)] transition hover:border-[var(--text-status-warning)] hover:text-[var(--text-primary)]"
-              >
-                <MapPin className="h-4 w-4" />
-                <span className="text-left">
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Region</span>
-                  <span className="text-xs font-medium text-[var(--text-primary)]">{regionSelection.name}</span>
-                </span>
-              </button>
-            </div>
+          </div>
+          <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("language");
+                setLocaleOpen(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[var(--text-secondary)] backdrop-blur transition hover:border-[var(--text-status-warning)] hover:text-[var(--text-primary)]"
+            >
+              <Globe2 className="h-4 w-4" />
+              <span className="text-left">
+                <span className="block text-[10px] uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Language</span>
+                <span className="text-xs font-medium text-[var(--text-primary)]">{languageSelection.name}</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("region");
+                setLocaleOpen(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[var(--text-secondary)] backdrop-blur transition hover:border-[var(--text-status-warning)] hover:text-[var(--text-primary)]"
+            >
+              <MapPin className="h-4 w-4" />
+              <span className="text-left">
+                <span className="block text-[10px] uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Region</span>
+                <span className="text-xs font-medium text-[var(--text-primary)]">{regionSelection.name}</span>
+              </span>
+            </button>
           </div>
         </div>
         {footnotes.length ? (
