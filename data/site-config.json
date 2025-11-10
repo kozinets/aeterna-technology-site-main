@@ -1351,156 +1351,95 @@
     "footer": {
       "columns": [
         {
-          "title": "Corporate",
+          "title": "Ecosystem",
           "links": [
-            {
-              "label": "Overview",
-              "href": "/company/overview"
-            },
-            {
-              "label": "Leadership",
-              "href": "/company/leadership"
-            },
-            {
-              "label": "Careers",
-              "href": "/company/careers"
-            },
-            {
-              "label": "Newsroom",
-              "href": "/company/newsroom"
-            },
-            {
-              "label": "Global facilities",
-              "href": "/company/facilities"
-            }
+            { "label": "Aeterna overview", "href": "/ecosystem/overview" },
+            { "label": "Continuum map", "href": "/ecosystem/map" },
+            { "label": "Orbital network", "href": "/ecosystem/orbital" },
+            { "label": "Planetary mesh", "href": "/ecosystem/mesh" },
+            { "label": "DePIN infrastructure", "href": "/ecosystem/depin" },
+            { "label": "Sentinel guilds", "href": "/ecosystem/sentinels" },
+            { "label": "Partner alliances", "href": "/ecosystem/alliances" }
           ]
         },
         {
-          "title": "Operations",
+          "title": "Intelligence network",
           "links": [
-            {
-              "label": "Mission control",
-              "href": "/operations/control-center"
-            },
-            {
-              "label": "Atlas operations",
-              "href": "/operations/atlas"
-            },
-            {
-              "label": "Edge deployments",
-              "href": "/operations/edge-hubs"
-            },
-            {
-              "label": "Biomed network",
-              "href": "/operations/biomed"
-            },
-            {
-              "label": "Orbital logistics",
-              "href": "/operations/orbital"
-            }
+            { "label": "Helios continuum", "href": "/intelligence/helios" },
+            { "label": "Atlas relay", "href": "/intelligence/atlas" },
+            { "label": "Pulse vault", "href": "/intelligence/pulse" },
+            { "label": "Chronicle loom", "href": "/intelligence/chronicle" },
+            { "label": "Nova proxy", "href": "/intelligence/nova" },
+            { "label": "Beacon archives", "href": "/intelligence/archives" }
           ]
         },
         {
           "title": "Programs",
           "links": [
-            {
-              "label": "Neural integrity",
-              "href": "/programs/neural-integrity"
-            },
-            {
-              "label": "Orbital autonomy",
-              "href": "/programs/orbital-autonomy"
-            },
-            {
-              "label": "Quantum finance",
-              "href": "/programs/quantum-finance"
-            },
-            {
-              "label": "Longevity guilds",
-              "href": "/programs/longevity-guilds"
-            },
-            {
-              "label": "Robotics continuum",
-              "href": "/programs/robotics-continuum"
-            }
+            { "label": "Neural integrity", "href": "/programs/neural-integrity" },
+            { "label": "Orbital autonomy", "href": "/programs/orbital-autonomy" },
+            { "label": "Continuum finance", "href": "/programs/quantum-finance" },
+            { "label": "Public sector missions", "href": "/programs/public-sector" },
+            { "label": "Sovereign resilience", "href": "/programs/resilience" },
+            { "label": "Aeterna academy", "href": "/programs/academy" }
           ]
         },
         {
-          "title": "Trust & compliance",
+          "title": "Research & labs",
           "links": [
-            {
-              "label": "Security posture",
-              "href": "/trust/security-posture"
-            },
-            {
-              "label": "Compliance hub",
-              "href": "/trust/compliance"
-            },
-            {
-              "label": "Transparency",
-              "href": "/trust/transparency"
-            },
-            {
-              "label": "Incident response",
-              "href": "/trust/incident-response"
-            },
-            {
-              "label": "Responsible AI",
-              "href": "/trust/responsible-ai"
-            }
+            { "label": "Mission labs", "href": "/research/labs" },
+            { "label": "Ethics council", "href": "/research/ethics" },
+            { "label": "Bio interface", "href": "/research/biointerface" },
+            { "label": "Quantum observatory", "href": "/research/quantum" },
+            { "label": "Orbital habitats", "href": "/research/habitats" },
+            { "label": "Publications", "href": "/research/publications" }
           ]
         },
         {
           "title": "Developers",
           "links": [
-            {
-              "label": "Start building",
-              "href": "/developers/start"
-            },
-            {
-              "label": "API catalog",
-              "href": "/developers/api"
-            },
-            {
-              "label": "SDK downloads",
-              "href": "/developers/sdks"
-            },
-            {
-              "label": "Changelog",
-              "href": "/developers/changelog"
-            },
-            {
-              "label": "Support center",
-              "href": "/developers/support"
-            }
+            { "label": "Start building", "href": "/developers/start" },
+            { "label": "API catalog", "href": "/developers/api" },
+            { "label": "SDK downloads", "href": "/developers/sdks" },
+            { "label": "Changelog", "href": "/developers/changelog" },
+            { "label": "Status dashboard", "href": "/developers/status" },
+            { "label": "Support center", "href": "/developers/support" }
+          ]
+        },
+        {
+          "title": "Trust & compliance",
+          "links": [
+            { "label": "Security posture", "href": "/trust/security-posture" },
+            { "label": "Compliance library", "href": "/trust/compliance" },
+            { "label": "Transparency reports", "href": "/trust/transparency" },
+            { "label": "Incident response", "href": "/trust/incident-response" },
+            { "label": "Responsible AI", "href": "/trust/responsible-ai" },
+            { "label": "Privacy center", "href": "/trust/privacy-center" }
+          ]
+        },
+        {
+          "title": "Community",
+          "links": [
+            { "label": "Press room", "href": "/company/newsroom" },
+            { "label": "Investor relations", "href": "/company/investors" },
+            { "label": "Careers", "href": "/company/careers" },
+            { "label": "Sustainability", "href": "/company/sustainability" },
+            { "label": "Diversity & belonging", "href": "/company/belonging" },
+            { "label": "Brand resources", "href": "/company/brand" }
           ]
         }
       ],
       "contacts": [
-        {
-          "label": "Mission command",
-          "value": "command@aeterna.global"
-        },
-        {
-          "label": "Security desk",
-          "value": "security@aeterna.global"
-        },
-        {
-          "label": "Payments desk",
-          "value": "pay@aeterna.global"
-        },
-        {
-          "label": "Life sciences",
-          "value": "vitality@aeterna.global"
-        },
-        {
-          "label": "Orbital ops",
-          "value": "orbit@aeterna.global"
-        },
-        {
-          "label": "Media",
-          "value": "press@aeterna.global"
-        }
+        { "label": "Mission command", "value": "command@aeterna.global" },
+        { "label": "Security desk", "value": "security@aeterna.global" },
+        { "label": "Continuum NOC", "value": "noc@aeterna.global" },
+        { "label": "Payments desk", "value": "pay@aeterna.global" },
+        { "label": "Life sciences", "value": "vitality@aeterna.global" },
+        { "label": "Orbital ops", "value": "orbit@aeterna.global" },
+        { "label": "Global partnerships", "value": "alliances@aeterna.global" },
+        { "label": "Investor relations", "value": "invest@aeterna.global" },
+        { "label": "Press", "value": "press@aeterna.global" },
+        { "label": "Emergency hotline", "value": "+1-415-555-0128" }
       ],
       "statusBadges": [
         "#AtlasLive",
@@ -1508,7 +1447,43 @@
         "#NeuroOps",
         "#DePINFlux",
         "#SentientCloud",
-        "#ContinuityLab"
+        "#ContinuityLab",
+        "#HeliosContinuum",
+        "#MissionReadiness"
+      ],
+      "globalPresence": [
+        {
+          "title": "Mission command centers",
+          "details": [
+            "Helios Arcology · Tycho City (Lunar)",
+            "Atlas Relay Hub · Reykjavík (Earth)",
+            "Continuum Nexus · Singapore",
+            "Sovereign Ops · Dakar"
+          ]
+        },
+        {
+          "title": "Regulatory headquarters",
+          "details": [
+            "Geneva Compliance Forum · Switzerland",
+            "Washington Strategic Office · United States",
+            "Canberra Accord Desk · Australia",
+            "São Paulo Financial Bridge · Brazil"
+          ]
+        },
+        {
+          "title": "Support & escalation",
+          "details": [
+            "Tier-0 response: 24/7 within 15 minutes",
+            "Regional language desks in 40+ locales",
+            "Critical missions assigned dedicated liaisons",
+            "All communications recorded for audit continuity"
+          ]
+        }
+      ],
+      "footnotes": [
+        "Aeterna Technology operates under multi-sovereign licensing agreements and adheres to the Continuum Accord for interplanetary governance.",
+        "Service availability complies with region-specific cryptography and bio-safety regulations. Extended validation documentation is available upon request.",
+        "Investor materials, sustainability disclosures, and orbital safety reports are updated quarterly for transparency."
       ]
     },
     "pages": {
